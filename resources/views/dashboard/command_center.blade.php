@@ -17,7 +17,7 @@
 
     <style>
         :root {
-            /* Palet mengikuti halaman login SIMON-K */
+            /* Palet resmi SIMON-K Navy */
             --navy: #0b4a82;
             --navy-deep: #083a68;
             --navy-soft: #0e5a9c;
@@ -28,15 +28,15 @@
             --cyan: #22b8e8;
             --cyan-soft: #e0f6fd;
 
-            --bg-base: #eef3f9;
+            --bg-base: #f0f4f9;
             --bg-card: #ffffff;
-            --bg-sub: #f6f9fd;
-            --border: #e1e8f2;
-            --border-strong: #cdd9ea;
+            --bg-sub: #f8fafc;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
 
             --text-main: #0f2a44;
             --text-body: #33495f;
-            --text-muted: #586d83;
+            --text-muted: #64748b;
 
             --success: #0c8a5d;
             --success-soft: #e3f6ee;
@@ -47,10 +47,11 @@
             --purple: #6f45bd;
             --purple-soft: #efe8fa;
 
-            --shadow-sm: 0 1px 2px rgba(11, 74, 130, 0.06);
-            --shadow-md: 0 4px 18px rgba(11, 74, 130, 0.08);
+            --shadow-sm: 0 1px 3px rgba(11, 74, 130, 0.05);
+            --shadow-md: 0 4px 16px rgba(11, 74, 130, 0.08);
+            --shadow-lg: 0 10px 30px rgba(11, 74, 130, 0.12);
 
-            --body-height: calc(100vh - 330px);
+            --body-height: calc(100vh - 295px);
         }
 
         * {
@@ -70,20 +71,20 @@
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #c5d3e6;
+            background: #cbd5e1;
             border-radius: 999px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #a9bcd6;
+            background: #94a3b8;
         }
 
-        /* ===== Header ===== */
+        /* ===== Header Navigasi TV / Command Center ===== */
         .top-command-bar {
             background-color: var(--navy);
             background-image:
@@ -109,16 +110,17 @@
         }
 
         .brand-badge {
-            width: 46px;
-            height: 46px;
+            width: 44px;
+            height: 44px;
             background: #ffffff;
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 25px;
+            font-size: 24px;
             color: var(--primary);
             flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         .brand-title {
@@ -134,7 +136,7 @@
         .live-tag {
             font-size: 10px;
             font-weight: 800;
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.18);
             color: #ffffff;
             padding: 2px 9px;
             border-radius: 999px;
@@ -148,125 +150,113 @@
             content: '';
             width: 6px;
             height: 6px;
-            border-radius: 999px;
-            background: #4ade80;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+            animation: pulse-dot 1.6s infinite ease-in-out;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.4; }
         }
 
         .brand-sub {
-            font-size: 12px;
-            font-weight: 600;
-            color: #b9dcf3;
-            margin-top: 2px;
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            margin-top: 1px;
         }
 
         .live-clock-section {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 7px 18px;
+            border-radius: 999px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            background: rgba(255, 255, 255, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 999px;
+            gap: 12px;
+            backdrop-filter: blur(8px);
         }
 
         .clock-pulse {
-            width: 9px;
-            height: 9px;
-            border-radius: 999px;
-            background: #4ade80;
-            animation: soft-blink 3s ease-in-out infinite;
-        }
-
-        @keyframes soft-blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.45;
-            }
-        }
-
-        @keyframes spin-anim {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .spin-active {
-            animation: spin-anim 0.75s linear infinite !important;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
         }
 
         .clock-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
             font-weight: 700;
+            font-size: 13.5px;
             color: #ffffff;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
         }
 
         .clock-date {
-            font-size: 12.5px;
-            color: #d3e8f8;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
             font-weight: 600;
             border-left: 1px solid rgba(255, 255, 255, 0.25);
-            padding-left: 14px;
+            padding-left: 12px;
         }
 
         .command-controls {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex-wrap: wrap;
         }
 
         .btn-control {
             background: rgba(255, 255, 255, 0.12);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            padding: 8px 15px;
-            border-radius: 999px;
-            font-size: 12.5px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 700;
             font-family: inherit;
-            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            transition: background 0.2s, color 0.2s;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
             text-decoration: none;
-            white-space: nowrap;
         }
 
         .btn-control:hover {
             background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
         }
 
         .btn-control.active {
             background: #ffffff;
-            color: var(--primary);
+            color: var(--navy);
             border-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* ===== Container ===== */
+        .spin-active {
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== Main Container ===== */
         .command-container {
-            padding: 20px 28px 28px;
-            flex: 1;
+            padding: 18px 24px 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            max-width: 2000px;
-            width: 100%;
-            margin: 0 auto;
+            gap: 16px;
+            flex: 1;
         }
 
-        /* ===== Ringkasan (KPI) ===== */
+        /* ===== Ringkasan KPI Baris Atas ===== */
         .giant-kpi-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -285,115 +275,82 @@
             }
         }
 
-        @media (max-width: 500px) {
-            .giant-kpi-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .kpi-box {
-            --accent: var(--primary);
-            --accent-soft: var(--primary-soft);
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-left: 5px solid var(--accent);
-            border-radius: 16px;
-            padding: 14px 18px;
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 12px 16px;
             display: grid;
             grid-template-columns: 1fr auto;
             grid-template-areas:
                 "title icon"
                 "number icon"
                 "sub sub";
-            row-gap: 4px;
+            row-gap: 3px;
             align-items: center;
             box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .kpi-blue {
-            --accent: #0a6fb5;
-            --accent-soft: #e8f2fb;
+        .kpi-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
-        .kpi-cyan {
-            --accent: #0e9bc9;
-            --accent-soft: #e0f6fd;
-        }
-
-        .kpi-purple {
-            --accent: #6f45bd;
-            --accent-soft: #efe8fa;
-        }
-
-        .kpi-green {
-            --accent: #0c8a5d;
-            --accent-soft: #e3f6ee;
-        }
-
-        .kpi-amber {
-            --accent: #c47c00;
-            --accent-soft: #fff3d9;
-        }
-
-        .kpi-red {
-            --accent: #d03232;
-            --accent-soft: #fdeaea;
-        }
-
-        .kpi-red.is-alert {
-            background: #fff7f7;
-            border-color: #f4c4c4;
-            border-left-color: #d03232;
-        }
+        .kpi-blue { --accent: #0a6fb5; --accent-soft: #e8f2fb; }
+        .kpi-cyan { --accent: #0e9bc9; --accent-soft: #e0f6fd; }
+        .kpi-purple { --accent: #6f45bd; --accent-soft: #efe8fa; }
+        .kpi-green { --accent: #0c8a5d; --accent-soft: #e3f6ee; }
+        .kpi-amber { --accent: #c47c00; --accent-soft: #fff3d9; }
+        .kpi-red { --accent: #d03232; --accent-soft: #fdeaea; }
 
         .kpi-title {
             grid-area: title;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .kpi-icon-wrap {
             grid-area: icon;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             background: var(--accent-soft);
             color: var(--accent);
         }
 
         .kpi-number {
             grid-area: number;
-            font-size: 34px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--text-main);
-            line-height: 1.1;
+            line-height: 1.15;
             font-variant-numeric: tabular-nums;
             letter-spacing: -0.02em;
         }
 
         .kpi-subtext {
             grid-area: sub;
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             margin-top: 2px;
-        }
-
-        .kpi-subtext i {
-            color: var(--accent);
         }
 
         .kpi-mini-track {
             flex: 1;
-            height: 6px;
+            height: 5px;
             background: var(--accent-soft);
             border-radius: 999px;
             overflow: hidden;
@@ -405,23 +362,23 @@
             border-radius: 999px;
         }
 
-        /* ===== Layout utama: dua kolom, tinggi pas satu layar ===== */
+        /* ===== Layout Utama Dua Kolom ===== */
         .command-body-grid {
             display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 20px;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
             height: var(--body-height);
-            min-height: 620px;
+            min-height: 580px;
         }
 
         .left-col {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             min-height: 0;
         }
 
-        .left-col>.panel-card {
+        .left-col > .panel-card {
             flex: 1 1 0;
         }
 
@@ -431,63 +388,61 @@
                 height: auto;
                 min-height: 0;
             }
-
-            .left-col>.panel-card {
+            .left-col > .panel-card {
                 flex: none;
             }
-
             .scroll-area {
-                max-height: 420px;
+                max-height: 380px;
             }
-
             .table-responsive {
-                max-height: 640px;
+                max-height: 560px;
             }
         }
 
-        /* ===== Panel ===== */
+        /* ===== Panel Box ===== */
         .panel-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-top: 4px solid var(--primary);
-            border-radius: 20px;
+            border-top: 3.5px solid var(--primary);
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
             min-height: 0;
         }
 
         .panel-header {
-            padding: 14px 20px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-shrink: 0;
+            background: #ffffff;
         }
 
         .panel-title {
-            font-size: 14.5px;
+            font-size: 13.5px;
             font-weight: 800;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 9px;
+            gap: 8px;
         }
 
         .panel-title i {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--primary);
         }
 
         .panel-count {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--primary-dark);
             background: var(--primary-soft);
-            padding: 3px 11px;
+            padding: 2px 9px;
             border-radius: 999px;
             white-space: nowrap;
         }
@@ -498,21 +453,21 @@
             overflow-y: auto;
         }
 
-        /* ===== Tim Kerja ===== */
+        /* ===== Tim Kerja List (Clean & Compact) ===== */
         .pokja-list {
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: var(--bg-sub);
         }
 
         .pokja-item {
             background: #ffffff;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px 14px;
-            transition: border-color 0.2s, background 0.2s;
+            border-radius: 10px;
+            padding: 9px 12px;
+            transition: all 0.2s ease;
             text-decoration: none;
             color: inherit;
             display: block;
@@ -520,6 +475,8 @@
 
         .pokja-item:hover {
             border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(2px);
         }
 
         .pokja-item.active {
@@ -535,13 +492,13 @@
         }
 
         .pokja-item-all .lbl {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             color: var(--text-main);
         }
 
         .pokja-item-all .cnt {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--primary-dark);
             font-weight: 700;
         }
@@ -550,65 +507,56 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
             gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .pokja-title-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow: hidden;
+            flex: 1;
         }
 
         .pokja-code-tag {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             background: var(--navy);
             color: #ffffff;
-            padding: 2px 9px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 5px;
+            flex-shrink: 0;
         }
 
-        .pokja-done {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .pokja-name {
-            font-size: 13px;
+        .pokja-name-clean {
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 3px;
-            line-height: 1.35;
-        }
-
-        .pokja-katim {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 9px;
-            gap: 8px;
-        }
-
-        .pokja-katim strong {
-            color: var(--text-body);
-            font-weight: 700;
-        }
-
-        .personil-chip {
-            font-size: 11px;
-            color: var(--text-muted);
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pokja-percent {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            flex-shrink: 0;
         }
 
         .pokja-meter-wrap {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .pokja-track {
             flex: 1;
-            height: 8px;
-            background: #e5edf7;
+            height: 6px;
+            background: #e2e8f0;
             border-radius: 999px;
             overflow: hidden;
         }
@@ -619,20 +567,18 @@
             background: linear-gradient(90deg, var(--primary), var(--cyan));
         }
 
-        .pokja-percent {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary-dark);
-            min-width: 44px;
-            text-align: right;
+        .pokja-done-badge {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
         }
 
-        /* ===== Beban Kerja ===== */
+        /* ===== Beban Kerja Personil ===== */
         .assignee-tabs {
             display: flex;
-            gap: 6px;
-            padding: 10px 14px;
+            gap: 4px;
+            padding: 8px 12px;
             background: var(--bg-sub);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
@@ -643,9 +589,9 @@
             background: #ffffff;
             color: var(--text-muted);
             border: 1px solid var(--border);
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 999px;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             font-family: inherit;
             cursor: pointer;
@@ -665,7 +611,7 @@
         }
 
         .assignee-search-wrap {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
@@ -673,71 +619,62 @@
         .assignee-search-input {
             width: 100%;
             background: var(--primary-soft);
-            border: 1.5px solid var(--border);
+            border: 1px solid var(--border);
             border-radius: 999px;
-            padding: 8px 16px;
-            font-size: 12.5px;
+            padding: 6px 14px;
+            font-size: 12px;
             font-family: inherit;
             color: var(--text-main);
             outline: none;
             transition: all 0.2s;
         }
 
-        .assignee-search-input::placeholder {
-            color: var(--text-muted);
-        }
-
         .assignee-search-input:focus {
             border-color: var(--primary);
             background: #ffffff;
-            box-shadow: 0 0 0 3px var(--primary-glow);
+            box-shadow: 0 0 0 2px var(--primary-glow);
         }
 
         .assignee-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 9px 16px;
-            border-bottom: 1px solid var(--border);
+            gap: 10px;
+            padding: 8px 14px;
+            border-bottom: 1px solid #f1f5f9;
             cursor: pointer;
             transition: background 0.15s ease;
-            border-left: 3px solid transparent;
         }
 
         .assignee-item:hover {
-            background: var(--bg-sub);
+            background: var(--primary-soft);
         }
 
         .assignee-item.selected-assignee {
             background: var(--primary-soft);
-            border-left-color: var(--primary);
-        }
-
-        .assignee-item:last-child {
-            border-bottom: none;
+            border-left: 3px solid var(--primary);
         }
 
         .assignee-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            background: #dbe7f5;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e2e8f0;
             color: var(--navy);
-            font-weight: 800;
-            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
             flex-shrink: 0;
         }
 
         .assignee-avatar.is-katim {
-            background: var(--navy);
-            color: #ffffff;
+            background: #dbeafe;
+            color: var(--primary-dark);
         }
 
         .assignee-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-main);
             white-space: nowrap;
@@ -746,85 +683,62 @@
         }
 
         .assignee-sub {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             display: flex;
-            align-items: center;
             gap: 6px;
-            margin-top: 2px;
+            align-items: center;
+            margin-top: 1px;
         }
 
         .role-pill {
-            font-size: 10px;
+            font-size: 9.5px;
+            padding: 1px 6px;
+            border-radius: 4px;
             font-weight: 700;
-            padding: 1px 8px;
-            border-radius: 999px;
         }
 
-        .role-pill-pegawai {
-            background: var(--primary-soft);
-            color: var(--primary-dark);
-        }
-
-        .role-pill-katim {
-            background: var(--warning-soft);
-            color: var(--warning);
-        }
-
-        .role-pill-kor {
-            background: var(--purple-soft);
-            color: var(--purple);
-        }
-
-        .assignee-count-wrap {
-            margin-left: auto;
-            flex-shrink: 0;
-        }
+        .role-pill-pegawai { background: #f1f5f9; color: #475569; }
+        .role-pill-katim { background: #e0f2fe; color: #0369a1; }
+        .role-pill-kor { background: #f3e8ff; color: #7e22ce; }
 
         .assignee-count-badge {
-            font-size: 11.5px;
+            font-size: 10.5px;
             font-weight: 700;
-            padding: 3px 11px;
+            padding: 2px 7px;
             border-radius: 999px;
             white-space: nowrap;
-            font-variant-numeric: tabular-nums;
         }
 
-        .assignee-count-badge.has-workload {
-            background: var(--success-soft);
-            color: var(--success);
-        }
-
-        .assignee-count-badge.zero-workload {
-            background: #eef2f7;
-            color: #7a8da3;
-        }
+        .has-workload { background: #e0f2fe; color: #0369a1; }
+        .zero-workload { background: #f1f5f9; color: #94a3b8; }
 
         .assignee-footer {
-            padding: 9px 14px;
+            padding: 8px 12px;
             background: var(--bg-sub);
             border-top: 1px solid var(--border);
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             text-align: center;
             flex-shrink: 0;
         }
 
-        /* ===== Daftar Tugas ===== */
+        /* ===== Aliran Tugas & Tabel Rapi (Clean & Anti-Bala) ===== */
         .stream-controls {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             flex-shrink: 0;
+            background: #ffffff;
         }
 
         .stream-tabs {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
@@ -832,21 +746,21 @@
             background: var(--bg-sub);
             color: var(--text-body);
             border: 1px solid var(--border);
-            padding: 7px 14px;
+            padding: 6px 12px;
             border-radius: 999px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
+            gap: 5px;
+            transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         .tab-btn .num {
             font-variant-numeric: tabular-nums;
-            opacity: 0.75;
+            opacity: 0.8;
             font-weight: 600;
         }
 
@@ -862,13 +776,9 @@
             border-color: var(--primary);
         }
 
-        .tab-btn.active .num {
-            opacity: 0.9;
-        }
-
         .tab-btn.tab-danger {
             color: var(--danger);
-            border-color: #f2c3c3;
+            border-color: #fca5a5;
             background: var(--danger-soft);
         }
 
@@ -883,49 +793,46 @@
             align-items: center;
             gap: 8px;
             background: var(--primary-soft);
-            border: 1.5px solid var(--border);
+            border: 1px solid var(--border);
             border-radius: 999px;
-            padding: 6px 16px;
-            transition: all 0.2s;
+            padding: 5px 14px;
+            transition: all 0.2s ease;
         }
 
         .stream-search:focus-within {
             border-color: var(--primary);
             background: #ffffff;
-            box-shadow: 0 0 0 3px var(--primary-glow);
+            box-shadow: 0 0 0 2px var(--primary-glow);
         }
 
         .stream-search i {
             color: var(--text-muted);
+            font-size: 14px;
         }
 
         .stream-search input {
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-size: 12.5px;
+            font-size: 12px;
             outline: none;
-            width: 250px;
+            width: 220px;
             font-family: inherit;
-        }
-
-        .stream-search input::placeholder {
-            color: var(--text-muted);
         }
 
         .btn-reset {
             background: var(--danger-soft);
             color: var(--danger);
-            border: 1px solid #f2c3c3;
-            padding: 7px 14px;
+            border: 1px solid #fca5a5;
+            padding: 5px 12px;
             border-radius: 999px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             white-space: nowrap;
         }
 
@@ -934,6 +841,7 @@
             color: #ffffff;
         }
 
+        /* ===== Tabel Tugas Bersih ===== */
         .table-responsive {
             flex: 1 1 auto;
             min-height: 0;
@@ -943,17 +851,17 @@
         .command-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13.5px;
+            font-size: 13px;
         }
 
         .command-table th {
-            background: #f1f6fc;
+            background: #f8fafc;
             text-align: left;
-            padding: 12px 16px;
+            padding: 10px 14px;
             font-weight: 800;
             color: var(--navy);
             border-bottom: 2px solid var(--border-strong);
-            font-size: 12px;
+            font-size: 11.5px;
             letter-spacing: 0.02em;
             position: sticky;
             top: 0;
@@ -962,235 +870,634 @@
         }
 
         .command-table td {
-            padding: 13px 16px;
+            padding: 11px 14px;
             border-bottom: 1px solid var(--border);
             color: var(--text-body);
             vertical-align: middle;
         }
 
+        .command-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
         .command-table tbody tr:hover td {
-            background: var(--primary-soft);
+            background: #f1f8fe;
         }
 
         .command-table tbody tr.row-late td:first-child {
-            box-shadow: inset 4px 0 0 var(--danger);
+            box-shadow: inset 3.5px 0 0 var(--danger);
         }
 
         .task-code {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--primary-dark);
             background: var(--primary-soft);
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 2.5px 7px;
+            border-radius: 5px;
             white-space: nowrap;
+            display: inline-block;
         }
 
-        .task-title-link {
+        .task-title-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 320px;
+        }
+
+        .task-title-text {
             font-weight: 700;
             color: var(--text-main);
-            text-decoration: none;
-            font-size: 14px;
-            line-height: 1.4;
-            display: block;
+            font-size: 13px;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .task-title-link:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        .task-meta {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
-
-        .task-parent {
-            font-size: 11.5px;
-            color: var(--text-muted);
-        }
-
-        .task-st-badge {
-            font-size: 11px;
-            font-weight: 600;
+        .st-badge-mini {
+            font-size: 9.5px;
+            font-weight: 700;
             background: var(--cyan-soft);
-            color: #0a6f92;
-            padding: 2px 9px;
-            border-radius: 999px;
+            color: #0284c7;
+            padding: 1px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
+            flex-shrink: 0;
         }
 
         .task-pokja-badge {
-            font-size: 11.5px;
+            font-size: 10.5px;
             font-weight: 700;
             background: var(--navy);
             color: #ffffff;
-            padding: 3px 11px;
+            padding: 2.5px 9px;
             border-radius: 999px;
             white-space: nowrap;
+            display: inline-block;
         }
 
-        .pic-name {
+        .pic-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 200px;
+        }
+
+        .pic-avatar-mini {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: var(--navy);
+            font-weight: 800;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pic-name-clean {
             font-weight: 700;
             color: var(--text-main);
-            font-size: 13.5px;
+            font-size: 12.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .pic-nip {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-
-        .team-count-chip {
-            font-size: 11px;
+        .pic-team-badge {
+            font-size: 9.5px;
             font-weight: 700;
             background: var(--success-soft);
             color: var(--success);
-            padding: 2px 9px;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 4px;
-        }
-
-        .target-main {
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .target-bobot {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-
-        .due-date {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: var(--text-body);
-        }
-
-        .due-date.late {
-            color: var(--danger);
-        }
-
-        .due-chip {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 9px;
-            border-radius: 999px;
-            display: inline-block;
-            margin-top: 4px;
+            padding: 1px 5px;
+            border-radius: 4px;
             white-space: nowrap;
         }
 
-        .due-chip.late {
-            background: var(--danger-soft);
+        .due-date-clean {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-body);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .due-date-clean.is-late {
             color: var(--danger);
+            font-weight: 700;
         }
 
-        .due-chip.soon {
-            background: var(--warning-soft);
-            color: var(--warning);
+        .late-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+            display: inline-block;
         }
 
-        .progress-meter {
+        .progress-meter-clean {
             display: flex;
             align-items: center;
-            gap: 10px;
-            min-width: 140px;
+            gap: 8px;
+            min-width: 100px;
         }
 
-        .progress-track-cmd {
+        .progress-track-clean {
             flex: 1;
-            height: 9px;
-            background: #e5edf7;
+            height: 7px;
+            background: #e2e8f0;
             border-radius: 999px;
             overflow: hidden;
         }
 
-        .progress-fill-cmd {
+        .progress-fill-clean {
             height: 100%;
             border-radius: 999px;
         }
 
-        .progress-num {
+        .progress-num-clean {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12.5px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--text-main);
-            min-width: 40px;
+            min-width: 35px;
             text-align: right;
         }
 
-        .progress-upd {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
         .status-badge-cmd {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
 
-        .st-berjalan {
-            background: var(--primary-soft);
+        .st-berjalan { background: var(--primary-soft); color: var(--primary-dark); }
+        .st-verifikasi { background: var(--purple-soft); color: var(--purple); }
+        .st-selesai { background: var(--success-soft); color: var(--success); }
+        .st-terlambat { background: var(--danger-soft); color: var(--danger); }
+        .st-belum { background: #f1f5f9; color: #64748b; }
+
+        .btn-detail-cmd {
+            background: #ffffff;
             color: var(--primary-dark);
+            border: 1px solid var(--border-strong);
+            padding: 5px 11px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
-        .st-verifikasi {
-            background: var(--purple-soft);
-            color: var(--purple);
+        .btn-detail-cmd:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
-        .st-selesai {
-            background: var(--success-soft);
-            color: var(--success);
+        /* ===== Modal Detail Tugas (Interactive & Rich) ===== */
+        .cmd-modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 42, 68, 0.65);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
         }
 
-        .st-terlambat {
-            background: var(--danger-soft);
-            color: var(--danger);
+        .cmd-modal-backdrop.show {
+            display: flex;
         }
 
-        .st-belum {
-            background: #eef2f7;
-            color: #5f7389;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 56px 20px;
-            color: var(--text-muted);
-            font-size: 14px;
+        .cmd-modal-dialog {
+            background: #ffffff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 760px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .empty-state i {
-            font-size: 44px;
-            color: #b7c6da;
-            display: block;
+        @keyframes slideUp {
+            from { transform: translateY(20px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .cmd-modal-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #0b4a82 0%, #083a68 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .cmd-modal-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
             margin-bottom: 8px;
         }
 
-        /* ===== Mode Layar Penuh (TV) ===== */
+        .cmd-modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.4;
+            color: #ffffff;
+        }
+
+        .cmd-modal-parent {
+            font-size: 12px;
+            color: #bae6fd;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cmd-modal-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .cmd-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .cmd-modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: #f8fafc;
+        }
+
+        /* 4 KPI Baris Ringkasan di Modal */
+        .cmd-modal-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .cmd-modal-kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .cmd-kpi-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cmd-kpi-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 4px;
+        }
+
+        .cmd-kpi-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cmd-kpi-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .cmd-kpi-track {
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .cmd-kpi-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 999px;
+        }
+
+        /* Box Informasi di Modal */
+        .cmd-modal-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cmd-box-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .cmd-box-desc {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-body);
+        }
+
+        .cmd-box-expected {
+            margin-top: 10px;
+            padding: 9px 12px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            font-size: 12.5px;
+            color: #166534;
+        }
+
+        /* Penanggung Jawab Card */
+        .cmd-pic-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .cmd-pic-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--navy);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(11, 74, 130, 0.2);
+        }
+
+        .cmd-pic-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .cmd-pic-nip {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 2px;
+        }
+
+        .cmd-pic-jabatan {
+            font-size: 12px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .cmd-pic-badge {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            font-size: 10px;
+            font-weight: 700;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+
+        /* Tim Pelaksana */
+        .cmd-team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .cmd-team-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .cmd-team-chip {
+            font-size: 11px;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 1px 7px;
+            border-radius: 999px;
+        }
+
+        .cmd-team-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .cmd-team-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cmd-member-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .cmd-member-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cmd-member-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cmd-member-jab {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Riwayat Update Terakhir */
+        .cmd-update-card {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .cmd-update-date {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #b45309;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cmd-update-note {
+            font-size: 12.5px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        /* Footer Modal */
+        .cmd-modal-footer {
+            padding: 14px 24px;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cmd-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-cmd-secondary:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-cmd-primary {
+            background: var(--navy);
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(11, 74, 130, 0.25);
+        }
+
+        .btn-cmd-primary:hover {
+            background: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* ===== Fullscreen Mode (TV) ===== */
         body.fullscreen-mode {
-            --body-height: calc(100vh - 318px);
+            --body-height: calc(100vh - 290px);
         }
 
         body.fullscreen-mode .top-command-bar {
@@ -1198,28 +1505,15 @@
         }
 
         body.fullscreen-mode .command-container {
-            padding: 22px 36px 30px;
+            padding: 20px 36px 30px;
             max-width: none;
-        }
-
-        body.fullscreen-mode .kpi-number {
-            font-size: 40px;
-        }
-
-        body.fullscreen-mode .command-table td {
-            padding: 15px 18px;
-            font-size: 14.5px;
-        }
-
-        body.fullscreen-mode .task-title-link {
-            font-size: 15px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- 1. Bilah Atas -->
+    <!-- 1. Header Pemantauan Balai -->
     <header class="top-command-bar">
         <div class="brand-section">
             <div class="brand-badge">
@@ -1266,10 +1560,10 @@
         </div>
     </header>
 
-    <!-- 2. Isi Halaman -->
+    <!-- 2. Isi Halaman Command Center -->
     <main class="command-container">
 
-        <!-- Ringkasan -->
+        <!-- 6 KPI Utama Balai -->
         <div class="giant-kpi-grid">
             <div class="kpi-box kpi-blue">
                 <span class="kpi-title">Total Tugas</span>
@@ -1285,7 +1579,7 @@
                 <div class="kpi-icon-wrap"><i class="ph-duotone ph-rocket-launch"></i></div>
                 <div class="kpi-number">{{ number_format($pekerjaanBerjalan) }}</div>
                 <div class="kpi-subtext">
-                    <i class="ph-bold ph-spinner"></i> Sudah ada laporan progres
+                    <i class="ph-bold ph-spinner"></i> Berjalan aktif
                 </div>
             </div>
 
@@ -1294,7 +1588,7 @@
                 <div class="kpi-icon-wrap"><i class="ph-duotone ph-seal-check"></i></div>
                 <div class="kpi-number">{{ number_format($menungguVerifikasi) }}</div>
                 <div class="kpi-subtext">
-                    <i class="ph-bold ph-clock"></i> Capaian 100%, menunggu Katim
+                    <i class="ph-bold ph-clock"></i> Menunggu tinjauan Katim
                 </div>
             </div>
 
@@ -1303,7 +1597,7 @@
                 <div class="kpi-icon-wrap"><i class="ph-duotone ph-check-fat"></i></div>
                 <div class="kpi-number">{{ number_format($selesaiTerverifikasi) }}</div>
                 <div class="kpi-subtext">
-                    <i class="ph-bold ph-check"></i> Hasil sudah diverifikasi
+                    <i class="ph-bold ph-check"></i> Hasil terverifikasi
                 </div>
             </div>
 
@@ -1320,64 +1614,60 @@
 
             <div class="kpi-box {{ $lewatTenggat > 0 ? 'kpi-red is-alert' : 'kpi-green' }}">
                 <span class="kpi-title">Terlambat</span>
-                <div class="kpi-icon-wrap"><i
-                        class="ph-duotone {{ $lewatTenggat > 0 ? 'ph-warning-octagon' : 'ph-check-circle' }}"></i></div>
+                <div class="kpi-icon-wrap">
+                    <i class="ph-duotone {{ $lewatTenggat > 0 ? 'ph-warning-octagon' : 'ph-check-circle' }}"></i>
+                </div>
                 <div class="kpi-number">{{ number_format($lewatTenggat) }}</div>
                 <div class="kpi-subtext">
                     @if($lewatTenggat > 0)
-                        <i class="ph-bold ph-warning"></i> Melewati tenggat, perlu tindak lanjut
+                        <i class="ph-bold ph-warning"></i> Perlu perhatian tindak lanjut
                     @else
-                        <i class="ph-bold ph-check"></i> Tidak ada tugas terlambat
+                        <i class="ph-bold ph-check"></i> Tidak ada keterlambatan
                     @endif
                 </div>
             </div>
         </div>
 
-        <!-- Kolom kiri: tim kerja & beban kerja | Kolom kanan: daftar tugas -->
+        <!-- Body Grid: Kolom Kiri (Pokja & Staf) | Kolom Kanan (Tabel Rapi) -->
         <div class="command-body-grid">
 
+            <!-- Kolom Kiri -->
             <div class="left-col">
 
-                <!-- Capaian Tim Kerja -->
+                <!-- Capaian Tim Kerja (Compact & Clean) -->
                 <div class="panel-card">
                     <div class="panel-header">
                         <div class="panel-title">
                             <i class="ph-duotone ph-buildings"></i>
                             Capaian Tim Kerja
                         </div>
-                        <span class="panel-count">{{ $pokjas->count() }} tim</span>
+                        <span class="panel-count">{{ $pokjas->count() }} unit</span>
                     </div>
 
                     <div class="scroll-area" id="pokjaScrollContainer">
                         <div class="pokja-list">
                             <a href="{{ route('monitoring.balai') }}"
                                 class="pokja-item pokja-item-all {{ !request('pokja_id') ? 'active' : '' }}">
-                                <span class="lbl">Semua Tim Kerja</span>
+                                <span class="lbl">Semua Unit & Tim</span>
                                 <span class="cnt">{{ $totalPekerjaan }} tugas</span>
                             </a>
 
                             @foreach($pokjas as $p)
                                 <a href="{{ route('monitoring.balai', array_merge(request()->except(['pokja_id']), ['pokja_id' => $p->id])) }}"
                                     class="pokja-item {{ request('pokja_id') == $p->id ? 'active' : '' }}"
-                                    @if(!empty($p->anggota) && $p->anggota->isNotEmpty())
-                                    title="Anggota: {{ $p->anggota->pluck('name')->implode(', ') }}" @endif>
+                                    title="{{ $p->nama_pokja }} (Katim: {{ $p->katim_name }})">
                                     <div class="pokja-item-header">
-                                        <span class="pokja-code-tag">{{ $p->kode_pokja }}</span>
-                                        <span class="pokja-done">{{ $p->tugas_selesai }} dari {{ $p->total_tugas }}
-                                            selesai</span>
-                                    </div>
-                                    <div class="pokja-name">{{ $p->nama_pokja }}</div>
-                                    <div class="pokja-katim">
-                                        <span>Katim: <strong>{{ $p->katim_name }}</strong></span>
-                                        <span class="personil-chip">
-                                            <i class="ph-bold ph-users"></i> {{ $p->anggota_count }} orang
-                                        </span>
+                                        <div class="pokja-title-box">
+                                            <span class="pokja-code-tag">{{ $p->kode_pokja }}</span>
+                                            <span class="pokja-name-clean">{{ $p->nama_pokja }}</span>
+                                        </div>
+                                        <span class="pokja-percent">{{ $p->avg_progres }}%</span>
                                     </div>
                                     <div class="pokja-meter-wrap">
                                         <div class="pokja-track">
                                             <div class="pokja-fill" style="width: {{ $p->avg_progres }}%;"></div>
                                         </div>
-                                        <div class="pokja-percent">{{ $p->avg_progres }}%</div>
+                                        <span class="pokja-done-badge">{{ $p->tugas_selesai }}/{{ $p->total_tugas }} selesai</span>
                                     </div>
                                 </a>
                             @endforeach
@@ -1392,7 +1682,7 @@
                             <i class="ph-duotone ph-users-three"></i>
                             Beban Kerja Personil
                         </div>
-                        <span class="panel-count">{{ $topAssignees->count() }} orang</span>
+                        <span class="panel-count">{{ $topAssignees->count() }} staf</span>
                     </div>
 
                     <div class="assignee-tabs">
@@ -1400,17 +1690,15 @@
                             Semua ({{ $topAssignees->count() }})
                         </button>
                         <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('pegawai', this)">
-                            Pelaksana
-                            ({{ $topAssignees->filter(fn($u) => in_array($u->role, ['pegawai', 'tim_pokja']))->count() }})
+                            Pelaksana ({{ $topAssignees->filter(fn($u) => in_array($u->role, ['pegawai', 'tim_pokja']))->count() }})
                         </button>
                         <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('katim', this)">
-                            Katim & Koordinator
-                            ({{ $topAssignees->filter(fn($u) => in_array($u->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']))->count() }})
+                            Katim & Koor ({{ $topAssignees->filter(fn($u) => in_array($u->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']))->count() }})
                         </button>
                     </div>
 
                     <div class="assignee-search-wrap">
-                        <input type="text" id="assigneeSearchInput" placeholder="Cari nama personil..."
+                        <input type="text" id="assigneeSearchInput" placeholder="Cari personil..."
                             class="assignee-search-input" oninput="filterAssigneeRows(this.value)">
                     </div>
 
@@ -1438,8 +1726,7 @@
                                     </div>
                                 </div>
                                 <div class="assignee-count-wrap">
-                                    <div class="assignee-count-badge {{ ($staf->pic_count + $staf->member_count) > 0 ? 'has-workload' : 'zero-workload' }}"
-                                        title="{{ $staf->pic_count }} tugas sebagai PIC, {{ $staf->member_count }} tugas sebagai anggota tim">
+                                    <div class="assignee-count-badge {{ ($staf->pic_count + $staf->member_count) > 0 ? 'has-workload' : 'zero-workload' }}">
                                         {{ $staf->pic_count + $staf->member_count }} tugas
                                     </div>
                                 </div>
@@ -1447,13 +1734,13 @@
                         @endforeach
                     </div>
                     <div class="assignee-footer">
-                        <i class="ph-bold ph-cursor-click"></i> Klik nama untuk melihat tugasnya di tabel
+                        <i class="ph-bold ph-cursor-click"></i> Klik nama untuk menyaring daftar tugas
                     </div>
                 </div>
 
             </div>
 
-            <!-- Daftar Tugas -->
+            <!-- Kolom Kanan: Tabel Aliran Tugas (Anti-Bala & Poin Utama Saja) -->
             <div class="panel-card">
 
                 <div class="stream-controls">
@@ -1482,15 +1769,13 @@
 
                     <form method="GET" action="{{ route('monitoring.balai') }}"
                         style="display: flex; gap: 8px; align-items: center;">
-                        @if(request('pokja_id')) <input type="hidden" name="pokja_id" value="{{ request('pokja_id') }}">
-                        @endif
-                        @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}">
-                        @endif
+                        @if(request('pokja_id')) <input type="hidden" name="pokja_id" value="{{ request('pokja_id') }}"> @endif
+                        @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
 
                         <div class="stream-search">
                             <i class="ph-bold ph-magnifying-glass"></i>
                             <input type="text" name="q" id="searchFilterInput" value="{{ request('q') }}"
-                                placeholder="Cari tugas, kode, nama, atau nomor ST..."
+                                placeholder="Cari tugas, kode, atau PIC..."
                                 onkeyup="clientFilterTable(this.value)">
                         </div>
 
@@ -1506,135 +1791,165 @@
                     <table class="command-table" id="commandTable">
                         <thead>
                             <tr>
-                                <th style="width: 80px;">Kode</th>
-                                <th>Tugas</th>
-                                <th style="width: 90px;">Tim</th>
-                                <th>Penanggung Jawab</th>
-                                <th style="width: 120px;">Target</th>
-                                <th style="width: 130px;">Tenggat</th>
-                                <th style="width: 170px;">Progres</th>
-                                <th style="width: 180px;">Status</th>
+                                <th style="width: 75px;">Kode</th>
+                                <th>Nama Tugas</th>
+                                <th style="width: 85px;">Unit</th>
+                                <th style="width: 170px;">Penanggung Jawab</th>
+                                <th style="width: 110px;">Tenggat</th>
+                                <th style="width: 125px;">Progres</th>
+                                <th style="width: 120px;">Status</th>
+                                <th style="width: 80px; text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($pekerjaanList as $job)
                                 @php
                                     $isTerlambat = $job->isTerlambat();
-                                    $sisaHari = Carbon\Carbon::today()->diffInDays($job->tenggat, false);
-                                    $progressClass = $job->progres >= 100 ? '#0c8a5d' : ($job->progres >= 50 ? '#0a6fb5' : '#e39a13');
+                                    $sisaHari = \Carbon\Carbon::today()->diffInDays($job->tenggat, false);
+                                    $progressColor = $job->progres >= 100 ? '#0c8a5d' : ($job->progres >= 50 ? '#0a6fb5' : '#e39a13');
                                     $rowLate = $isTerlambat && $job->status_pelaksanaan !== 'selesai_terverifikasi';
+                                    
+                                    // Status info
+                                    $statusLabel = match($job->status_pelaksanaan) {
+                                        'selesai_terverifikasi' => 'Selesai',
+                                        'hasil_diajukan' => 'Menunggu Verifikasi',
+                                        'dikerjakan' => 'Dikerjakan',
+                                        'perlu_perbaikan_hasil' => 'Perlu Revisi',
+                                        default => 'Belum Dimulai'
+                                    };
+                                    $statusClass = match($job->status_pelaksanaan) {
+                                        'selesai_terverifikasi' => 'st-selesai',
+                                        'hasil_diajukan' => 'st-verifikasi',
+                                        'dikerjakan' => 'st-berjalan',
+                                        'perlu_perbaikan_hasil' => 'st-terlambat',
+                                        default => 'st-belum'
+                                    };
+
+                                    // Payload JSON untuk Detail Modal
+                                    $payload = [
+                                        'id' => $job->id,
+                                        'kode' => $job->kode_tampilan,
+                                        'judul' => $job->judul,
+                                        'deskripsi' => $job->deskripsi ?? 'Belum ada deskripsi rinci untuk pekerjaan ini.',
+                                        'hasil_diharapkan' => $job->hasil_diharapkan ?? 'Tercapainya output kegiatan sesuai sasaran.',
+                                        'target' => number_format($job->target, 0) . ' ' . $job->satuan,
+                                        'bobot' => number_format($job->bobot, 1) . '%',
+                                        'progres' => (float)$job->progres,
+                                        'tenggat' => $job->tenggat ? $job->tenggat->format('d/m/Y') : '-',
+                                        'is_terlambat' => $isTerlambat,
+                                        'sisa_hari' => $sisaHari,
+                                        'nomor_st' => $job->nomor_st,
+                                        'status_label' => $statusLabel,
+                                        'status_class' => $statusClass,
+                                        'pokja' => $job->pokja ? $job->pokja->kode_pokja . ' - ' . $job->pokja->nama_pokja : 'BGTK DKI Jakarta',
+                                        'pokja_code' => $job->pokja?->kode_pokja ?? 'BGTK',
+                                        'parent' => $job->parent ? $job->parent->kode_tampilan . ' - ' . $job->parent->judul : null,
+                                        'pj_nama' => $job->penanggungJawab?->name ?? 'Belum Ditugaskan',
+                                        'pj_nip' => $job->penanggungJawab?->nip ? 'NIP: ' . $job->penanggungJawab->nip : 'Tenaga Alih Daya / Non-PNS',
+                                        'pj_jabatan' => $job->penanggungJawab?->jabatan ?? 'Pegawai',
+                                        'pj_initial' => strtoupper(substr($job->penanggungJawab?->name ?? 'PJ', 0, 2)),
+                                        'pelaksana' => $job->pelaksana->map(fn($p) => [
+                                            'name' => $p->name,
+                                            'jabatan' => $p->jabatan ?? 'Pegawai',
+                                            'initial' => strtoupper(substr($p->name, 0, 2))
+                                        ])->toArray(),
+                                        'url_show' => route('pekerjaan.show', $job),
+                                        'last_update' => $job->realisasi->first() ? $job->realisasi->first()->created_at->format('d/m/Y H:i') : null,
+                                        'last_note' => $job->realisasi->first()?->catatan ?? null,
+                                    ];
                                 @endphp
-                                <tr class="table-row-item {{ $rowLate ? 'row-late' : '' }}">
+                                <tr class="table-row-item {{ $rowLate ? 'row-late' : '' }}"
+                                    onclick="openJobModal({{ json_encode($payload) }})"
+                                    title="Klik untuk melihat rincian tugas {{ $job->kode_tampilan }}">
+                                    <!-- 1. Kode -->
                                     <td>
                                         <span class="task-code">{{ $job->kode_tampilan }}</span>
                                     </td>
 
-                                    <td style="max-width: 360px;">
-                                        <a href="{{ route('pekerjaan.show', $job) }}" target="_blank"
-                                            class="task-title-link">
-                                            {{ $job->judul }}
-                                        </a>
-                                        @if($job->parent || $job->nomor_st)
-                                            <div class="task-meta">
-                                                @if($job->nomor_st)
-                                                    <span class="task-st-badge">
-                                                        <i class="ph-bold ph-file-text"></i> ST {{ $job->nomor_st }}
-                                                    </span>
-                                                @endif
-                                                @if($job->parent)
-                                                    <span class="task-parent">
-                                                        Bagian dari {{ $job->parent->kode_tampilan }} -
-                                                        {{ Str::limit($job->parent->judul, 28) }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        @endif
+                                    <!-- 2. Tugas (Ringkas & Poin Utama) -->
+                                    <td>
+                                        <div class="task-title-cell">
+                                            <span class="task-title-text" title="{{ $job->judul }}">
+                                                {{ $job->judul }}
+                                            </span>
+                                            @if($job->nomor_st)
+                                                <span class="st-badge-mini" title="Surat Tugas Nomor: {{ $job->nomor_st }}">
+                                                    <i class="ph-bold ph-file-text"></i> ST
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
 
+                                    <!-- 3. Unit / Tim -->
                                     <td>
                                         <span class="task-pokja-badge">
                                             {{ $job->pokja?->kode_pokja ?? 'BGTK' }}
                                         </span>
                                     </td>
 
+                                    <!-- 4. Penanggung Jawab -->
                                     <td>
-                                        <div class="pic-name">
-                                            {{ $job->penanggungJawab->name ?? 'Belum ditugaskan' }}
-                                        </div>
-                                        <div class="pic-nip">
-                                            {{ $job->penanggungJawab->nip ?? 'Penanggung jawab utama' }}
-                                        </div>
-
-                                        @if($job->pelaksana && $job->pelaksana->count() > 1)
-                                            @php
-                                                $namesList = $job->pelaksana->pluck('name')->implode(', ');
-                                            @endphp
-                                            <span class="team-count-chip" title="Anggota pelaksana: {{ $namesList }}">
-                                                <i class="ph-bold ph-users-three"></i> Tim {{ $job->pelaksana->count() }} orang
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        <div class="target-main">
-                                            {{ number_format($job->target, 0) }} {{ $job->satuan }}
-                                        </div>
-                                        <div class="target-bobot">
-                                            Bobot {{ number_format($job->bobot, 1) }}%
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <div class="due-date {{ $isTerlambat ? 'late' : '' }}">
-                                            {{ $job->tenggat ? $job->tenggat->format('d/m/Y') : '-' }}
-                                        </div>
-                                        @if($job->status_pelaksanaan !== 'selesai_terverifikasi')
-                                            @if($isTerlambat)
-                                                <span class="due-chip late">Terlambat {{ abs($sisaHari) }} hari</span>
-                                            @elseif($sisaHari <= 7 && $sisaHari >= 0)
-                                                <span class="due-chip soon">Sisa {{ $sisaHari }} hari</span>
-                                            @endif
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        <div class="progress-meter">
-                                            <div class="progress-track-cmd">
-                                                <div class="progress-fill-cmd"
-                                                    style="width: {{ $job->progres }}%; background: {{ $progressClass }};">
+                                        <div class="pic-cell">
+                                            <div class="pic-avatar-mini">
+                                                {{ strtoupper(substr($job->penanggungJawab?->name ?? 'PJ', 0, 2)) }}
+                                            </div>
+                                            <div style="overflow: hidden; flex: 1;">
+                                                <div class="pic-name-clean" title="{{ $job->penanggungJawab->name ?? '-' }}">
+                                                    {{ $job->penanggungJawab->name ?? 'Belum ditugaskan' }}
                                                 </div>
                                             </div>
-                                            <span class="progress-num">{{ number_format($job->progres, 0) }}%</span>
+                                            @if($job->pelaksana && $job->pelaksana->count() > 1)
+                                                <span class="pic-team-badge" title="Tim {{ $job->pelaksana->count() }} orang">
+                                                    +{{ $job->pelaksana->count() - 1 }}
+                                                </span>
+                                            @endif
                                         </div>
-                                        @if($job->realisasi && $job->realisasi->first())
-                                            <div class="progress-upd">
-                                                Diperbarui {{ $job->realisasi->first()->created_at->format('d/m') }}
-                                            </div>
-                                        @endif
                                     </td>
 
+                                    <!-- 5. Tenggat Waktu -->
                                     <td>
-                                        @if($job->status_pelaksanaan === 'selesai_terverifikasi')
-                                            <span class="status-badge-cmd st-selesai">
-                                                <i class="ph-bold ph-seal-check"></i> Selesai
-                                            </span>
-                                        @elseif($job->status_pelaksanaan === 'hasil_diajukan')
-                                            <span class="status-badge-cmd st-verifikasi">
-                                                <i class="ph-bold ph-clock"></i> Menunggu Verifikasi
-                                            </span>
-                                        @elseif($job->status_pelaksanaan === 'dikerjakan')
-                                            <span class="status-badge-cmd st-berjalan">
-                                                <i class="ph-bold ph-spinner"></i> Dikerjakan
-                                            </span>
-                                        @elseif($job->status_pelaksanaan === 'perlu_perbaikan_hasil')
-                                            <span class="status-badge-cmd st-terlambat">
-                                                <i class="ph-bold ph-arrow-counter-clockwise"></i> Perlu Revisi
-                                            </span>
-                                        @else
-                                            <span class="status-badge-cmd st-belum">
-                                                Belum Dimulai
-                                            </span>
-                                        @endif
+                                        <div class="due-date-clean {{ $isTerlambat && $job->status_pelaksanaan !== 'selesai_terverifikasi' ? 'is-late' : '' }}">
+                                            @if($isTerlambat && $job->status_pelaksanaan !== 'selesai_terverifikasi')
+                                                <span class="late-dot" title="Terlambat"></span>
+                                            @endif
+                                            {{ $job->tenggat ? $job->tenggat->format('d/m/Y') : '-' }}
+                                        </div>
+                                    </td>
+
+                                    <!-- 6. Progres Capaian -->
+                                    <td>
+                                        <div class="progress-meter-clean">
+                                            <div class="progress-track-clean">
+                                                <div class="progress-fill-clean"
+                                                    style="width: {{ $job->progres }}%; background: {{ $progressColor }};">
+                                                </div>
+                                            </div>
+                                            <span class="progress-num-clean">{{ number_format($job->progres, 0) }}%</span>
+                                        </div>
+                                    </td>
+
+                                    <!-- 7. Status -->
+                                    <td>
+                                        <span class="status-badge-cmd {{ $statusClass }}">
+                                            @if($job->status_pelaksanaan === 'selesai_terverifikasi')
+                                                <i class="ph-bold ph-check"></i>
+                                            @elseif($job->status_pelaksanaan === 'hasil_diajukan')
+                                                <i class="ph-bold ph-clock"></i>
+                                            @elseif($job->status_pelaksanaan === 'dikerjakan')
+                                                <i class="ph-bold ph-spinner"></i>
+                                            @elseif($job->status_pelaksanaan === 'perlu_perbaikan_hasil')
+                                                <i class="ph-bold ph-warning"></i>
+                                            @endif
+                                            {{ $statusLabel }}
+                                        </span>
+                                    </td>
+
+                                    <!-- 8. Aksi Detail -->
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn-detail-cmd"
+                                            onclick="event.stopPropagation(); openJobModal({{ json_encode($payload) }})">
+                                            <i class="ph-bold ph-eye"></i> Detail
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -1655,11 +1970,253 @@
 
     </main>
 
+    <!-- 3. Modal Detail Tugas Balai (Interactive & Lengkap) -->
+    <div id="jobDetailModal" class="cmd-modal-backdrop" onclick="closeJobModal(event)">
+        <div class="cmd-modal-dialog" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="cmd-modal-header">
+                <div style="flex: 1; overflow: hidden;">
+                    <div class="cmd-modal-badges">
+                        <span id="mJobCode" class="task-code" style="font-size: 12px; padding: 3px 9px;">-</span>
+                        <span id="mJobStatus" class="status-badge-cmd">-</span>
+                        <span id="mJobPokja" class="task-pokja-badge">-</span>
+                        <span id="mJobST" class="st-badge-mini" style="display: none;">
+                            <i class="ph-bold ph-file-text"></i> <span id="mJobSTText">-</span>
+                        </span>
+                    </div>
+                    <h3 id="mJobTitle" class="cmd-modal-title">Judul Tugas</h3>
+                    <div id="mJobParentWrap" class="cmd-modal-parent" style="display: none;">
+                        <i class="ph-bold ph-git-branch"></i> Bagian dari: <span id="mJobParent">-</span>
+                    </div>
+                </div>
+                <button type="button" class="cmd-modal-close" onclick="closeJobModalDirect()" title="Tutup">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="cmd-modal-body">
+                <!-- 4 KPI Baris Ringkas -->
+                <div class="cmd-modal-kpi-grid">
+                    <div class="cmd-kpi-card">
+                        <div class="cmd-kpi-lbl">Capaian Progres</div>
+                        <div class="cmd-kpi-val" id="mJobProgres">0%</div>
+                        <div class="cmd-kpi-track">
+                            <div class="cmd-kpi-fill" id="mJobProgresBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="cmd-kpi-card">
+                        <div class="cmd-kpi-lbl">Target Hasil</div>
+                        <div class="cmd-kpi-val" id="mJobTarget">-</div>
+                        <div class="cmd-kpi-sub">Volume sasaran</div>
+                    </div>
+                    <div class="cmd-kpi-card">
+                        <div class="cmd-kpi-lbl">Bobot Penugasan</div>
+                        <div class="cmd-kpi-val" id="mJobBobot">0.0%</div>
+                        <div class="cmd-kpi-sub">Kontribusi balai</div>
+                    </div>
+                    <div class="cmd-kpi-card">
+                        <div class="cmd-kpi-lbl">Tenggat Waktu</div>
+                        <div class="cmd-kpi-val" id="mJobTenggat">-</div>
+                        <div class="cmd-kpi-sub" id="mJobSisaHari">-</div>
+                    </div>
+                </div>
+
+                <!-- Deskripsi & Hasil -->
+                <div class="cmd-modal-box">
+                    <h4 class="cmd-box-title"><i class="ph-bold ph-info"></i> Deskripsi & Sasaran Tugas</h4>
+                    <p id="mJobDesc" class="cmd-box-desc"></p>
+                    <div class="cmd-box-expected">
+                        <strong><i class="ph-bold ph-target"></i> Hasil yang Diharapkan:</strong>
+                        <span id="mJobExpected">-</span>
+                    </div>
+                </div>
+
+                <!-- Penanggung Jawab & Tim -->
+                <div class="cmd-modal-box">
+                    <h4 class="cmd-box-title"><i class="ph-bold ph-users"></i> Penanggung Jawab & Tim Pelaksana</h4>
+                    
+                    <!-- PIC -->
+                    <div class="cmd-pic-card">
+                        <div class="cmd-pic-avatar" id="mJobPicAvatar">PJ</div>
+                        <div class="cmd-pic-info">
+                            <div class="cmd-pic-name" id="mJobPicName">-</div>
+                            <div class="cmd-pic-nip" id="mJobPicNip">-</div>
+                            <div class="cmd-pic-jabatan" id="mJobPicJabatan">-</div>
+                        </div>
+                        <span class="cmd-pic-badge">Penanggung Jawab (PIC)</span>
+                    </div>
+
+                    <!-- Tim Pelaksana -->
+                    <div id="mJobTeamWrap" style="margin-top: 14px;">
+                        <div class="cmd-team-header">
+                            <span class="cmd-team-title">Personil Pelaksana Lainnya:</span>
+                            <span id="mJobTeamCount" class="cmd-team-chip">0 Anggota</span>
+                        </div>
+                        <div id="mJobTeamList" class="cmd-team-list">
+                            <!-- Injected by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riwayat Update Terakhir -->
+                <div class="cmd-modal-box" id="mJobUpdateWrap" style="display: none;">
+                    <h4 class="cmd-box-title"><i class="ph-bold ph-clock-counter-clockwise"></i> Pembaruan Progres Terakhir</h4>
+                    <div class="cmd-update-card">
+                        <div class="cmd-update-date"><i class="ph-bold ph-calendar-check"></i> <span id="mJobUpdateDate">-</span></div>
+                        <div class="cmd-update-note" id="mJobUpdateNote">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="cmd-modal-footer">
+                <button type="button" class="btn-cmd-secondary" onclick="closeJobModalDirect()">
+                    <i class="ph-bold ph-x"></i> Tutup
+                </button>
+                <a id="mJobLink" href="#" target="_blank" class="btn-cmd-primary">
+                    <i class="ph-bold ph-arrow-square-out"></i> Buka Halaman Tugas Lengkap
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Skrip Logika Halaman & Modal -->
     <script>
         const STATE_KEY = 'bgtkMonitoringState';
         const scrollContainer = document.getElementById('tableScrollContainer');
         const assigneeContainer = document.getElementById('assigneeListContainer');
         const pokjaContainer = document.getElementById('pokjaScrollContainer');
+        const modalBackdrop = document.getElementById('jobDetailModal');
+
+        // Modal Logic
+        let isModalOpen = false;
+
+        function openJobModal(job) {
+            if (!job) return;
+            isModalOpen = true;
+
+            // Badges
+            document.getElementById('mJobCode').textContent = job.kode || '-';
+            
+            const statusEl = document.getElementById('mJobStatus');
+            statusEl.textContent = job.status_label || '-';
+            statusEl.className = 'status-badge-cmd ' + (job.status_class || '');
+
+            document.getElementById('mJobPokja').textContent = job.pokja_code || 'BGTK';
+
+            const stEl = document.getElementById('mJobST');
+            if (job.nomor_st) {
+                document.getElementById('mJobSTText').textContent = 'ST: ' + job.nomor_st;
+                stEl.style.display = 'inline-flex';
+            } else {
+                stEl.style.display = 'none';
+            }
+
+            // Title & Parent
+            document.getElementById('mJobTitle').textContent = job.judul || '-';
+            const parentWrap = document.getElementById('mJobParentWrap');
+            if (job.parent) {
+                document.getElementById('mJobParent').textContent = job.parent;
+                parentWrap.style.display = 'flex';
+            } else {
+                parentWrap.style.display = 'none';
+            }
+
+            // KPI Grid
+            const prog = Math.min(100, Math.max(0, job.progres || 0));
+            document.getElementById('mJobProgres').textContent = prog + '%';
+            const barEl = document.getElementById('mJobProgresBar');
+            barEl.style.width = prog + '%';
+            barEl.style.background = prog >= 100 ? '#0c8a5d' : (prog >= 50 ? '#0a6fb5' : '#e39a13');
+
+            document.getElementById('mJobTarget').textContent = job.target || '-';
+            document.getElementById('mJobBobot').textContent = job.bobot || '-';
+            document.getElementById('mJobTenggat').textContent = job.tenggat || '-';
+
+            const sisaEl = document.getElementById('mJobSisaHari');
+            if (job.status_raw === 'selesai_terverifikasi') {
+                sisaEl.textContent = 'Selesai diverifikasi';
+                sisaEl.style.color = '#0c8a5d';
+            } else if (job.is_terlambat) {
+                sisaEl.textContent = 'Terlambat ' + Math.abs(job.sisa_hari) + ' hari';
+                sisaEl.style.color = '#d03232';
+            } else if (job.sisa_hari !== null && job.sisa_hari >= 0) {
+                sisaEl.textContent = 'Sisa ' + job.sisa_hari + ' hari lagi';
+                sisaEl.style.color = '#64748b';
+            } else {
+                sisaEl.textContent = '-';
+            }
+
+            // Desc & Expected
+            document.getElementById('mJobDesc').textContent = job.deskripsi || '-';
+            document.getElementById('mJobExpected').textContent = job.hasil_diharapkan || '-';
+
+            // PIC
+            document.getElementById('mJobPicAvatar').textContent = job.pj_initial || 'PJ';
+            document.getElementById('mJobPicName').textContent = job.pj_nama || '-';
+            document.getElementById('mJobPicNip').textContent = job.pj_nip || '-';
+            document.getElementById('mJobPicJabatan').textContent = job.pj_jabatan || '-';
+
+            // Team list
+            const teamWrap = document.getElementById('mJobTeamWrap');
+            const teamList = document.getElementById('mJobTeamList');
+            teamList.innerHTML = '';
+
+            if (job.pelaksana && job.pelaksana.length > 0) {
+                teamWrap.style.display = 'block';
+                document.getElementById('mJobTeamCount').textContent = job.pelaksana.length + ' Orang';
+                job.pelaksana.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'cmd-member-item';
+                    item.innerHTML = `
+                        <div class="cmd-member-avatar">${m.initial || 'PL'}</div>
+                        <div style="overflow: hidden; flex: 1;">
+                            <div class="cmd-member-name" title="${m.name}">${m.name}</div>
+                            <div class="cmd-member-jab" title="${m.jabatan}">${m.jabatan}</div>
+                        </div>
+                    `;
+                    teamList.appendChild(item);
+                });
+            } else {
+                teamWrap.style.display = 'none';
+            }
+
+            // Update terakhir
+            const updateWrap = document.getElementById('mJobUpdateWrap');
+            if (job.last_update) {
+                updateWrap.style.display = 'block';
+                document.getElementById('mJobUpdateDate').textContent = 'Diperbarui pada: ' + job.last_update;
+                document.getElementById('mJobUpdateNote').textContent = job.last_note ? `"${job.last_note}"` : 'Progres berhasil diperbarui ke sistem.';
+            } else {
+                updateWrap.style.display = 'none';
+            }
+
+            // Direct Link
+            document.getElementById('mJobLink').href = job.url_show || '#';
+
+            modalBackdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeJobModalDirect() {
+            isModalOpen = false;
+            modalBackdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function closeJobModal(event) {
+            if (event.target === modalBackdrop) {
+                closeJobModalDirect();
+            }
+        }
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isModalOpen) {
+                closeJobModalDirect();
+            }
+        });
 
         // 1. Jam digital
         function updateLiveClock() {
@@ -1675,9 +2232,7 @@
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        // 2. Segarkan data otomatis secara berkala di latar belakang (In-Place Fetch)
-        //    PENTING: Menggunakan fetch background, BUKAN location.reload(),
-        //    agar browser TIDAK keluar dari mode Layar Penuh (Fullscreen) saat data diperbarui.
+        // 2. Segarkan data otomatis (In-Place Fetch)
         const REFRESH_INTERVAL = 30;
         let refreshSecondsLeft = REFRESH_INTERVAL;
         let isAutoRefreshActive = true;
@@ -1696,7 +2251,7 @@
         }
 
         async function refreshDashboardData() {
-            if (isRefreshing) return;
+            if (isRefreshing || isModalOpen) return; // Jangan refresh jika modal terbuka
             isRefreshing = true;
             renderRefreshLabel();
 
@@ -1713,14 +2268,12 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    // 1. Perbarui KPI Ringkasan Angka
+                    // 1. KPI
                     const newKpi = doc.querySelector('.giant-kpi-grid');
                     const curKpi = document.querySelector('.giant-kpi-grid');
-                    if (newKpi && curKpi) {
-                        curKpi.innerHTML = newKpi.innerHTML;
-                    }
+                    if (newKpi && curKpi) curKpi.innerHTML = newKpi.innerHTML;
 
-                    // 2. Perbarui Capaian Tim Kerja (Pokja) tanpa mereset posisi scroll
+                    // 2. Pokja
                     const newPokja = doc.getElementById('pokjaScrollContainer');
                     const curPokja = document.getElementById('pokjaScrollContainer');
                     if (newPokja && curPokja) {
@@ -1729,7 +2282,7 @@
                         curPokja.scrollTop = prevScroll;
                     }
 
-                    // 3. Perbarui Daftar Beban Kerja Personil tanpa mereset posisi scroll
+                    // 3. Assignees
                     const newAssignee = doc.getElementById('assigneeListContainer');
                     const curAssignee = document.getElementById('assigneeListContainer');
                     if (newAssignee && curAssignee) {
@@ -1737,32 +2290,15 @@
                         curAssignee.innerHTML = newAssignee.innerHTML;
                         curAssignee.scrollTop = prevScroll;
                         filterAssigneeRows();
-                        if (selectedAssigneeName) {
-                            markSelectedAssignee(selectedAssigneeName);
-                        }
+                        if (selectedAssigneeName) markSelectedAssignee(selectedAssigneeName);
                     }
 
-                    // 4. Perbarui Tab Kategori Personil
-                    const newAssigneeTabs = doc.querySelector('.assignee-tabs');
-                    const curAssigneeTabs = document.querySelector('.assignee-tabs');
-                    if (newAssigneeTabs && curAssigneeTabs) {
-                        const activeTab = currentAssigneeTab;
-                        curAssigneeTabs.innerHTML = newAssigneeTabs.innerHTML;
-                        const tabs = curAssigneeTabs.querySelectorAll('.btn-assignee-tab');
-                        tabs.forEach(b => b.classList.remove('active'));
-                        if (activeTab === 'pegawai' && tabs[1]) tabs[1].classList.add('active');
-                        else if (activeTab === 'katim' && tabs[2]) tabs[2].classList.add('active');
-                        else if (tabs[0]) tabs[0].classList.add('active');
-                    }
-
-                    // 5. Perbarui Tab Status Aliran Tugas
+                    // 4. Tabs
                     const newTabs = doc.querySelector('.stream-tabs');
                     const curTabs = document.querySelector('.stream-tabs');
-                    if (newTabs && curTabs) {
-                        curTabs.innerHTML = newTabs.innerHTML;
-                    }
+                    if (newTabs && curTabs) curTabs.innerHTML = newTabs.innerHTML;
 
-                    // 6. Perbarui Isi Tabel Tugas & terapkan filter pencarian yang sedang aktif
+                    // 5. Table Body
                     const newTbody = doc.querySelector('#commandTable tbody');
                     const curTbody = document.querySelector('#commandTable tbody');
                     if (newTbody && curTbody) {
@@ -1772,13 +2308,6 @@
                             clientFilterTable(searchInput.value);
                         }
                     }
-
-                    // 7. Perbarui angka count panel
-                    const newCounts = doc.querySelectorAll('.panel-count');
-                    const curCounts = document.querySelectorAll('.panel-count');
-                    curCounts.forEach((c, idx) => {
-                        if (newCounts[idx]) c.textContent = newCounts[idx].textContent;
-                    });
                 }
             } catch (err) {
                 console.warn('Gagal sinkronisasi data monitoring balai:', err);
@@ -1791,9 +2320,8 @@
         }
 
         function runRefreshCountdown() {
-            if (!isAutoRefreshActive || isRefreshing) return;
+            if (!isAutoRefreshActive || isRefreshing || isModalOpen) return;
 
-            // Jangan muat ulang saat seseorang sedang mengetik di kolom pencarian
             const active = document.activeElement;
             if (active && active.tagName === 'INPUT' && active.value) {
                 refreshSecondsLeft = REFRESH_INTERVAL;
@@ -1838,7 +2366,7 @@
             }
         });
 
-        // 4. Gulir otomatis untuk layar TV (berhenti sejenak di ujung atas dan bawah)
+        // 4. Gulir otomatis untuk layar TV
         let isAutoScrollActive = false;
         let scrollTimer = null;
         let scrollPausedUntil = 0;
@@ -1865,7 +2393,7 @@
             reachedBottom = false;
             scrollPausedUntil = Date.now() + 2500;
             scrollTimer = setInterval(() => {
-                if (!isAutoScrollActive || !scrollContainer) return;
+                if (!isAutoScrollActive || !scrollContainer || isModalOpen) return;
                 const now = Date.now();
                 if (now < scrollPausedUntil) return;
 
@@ -1896,7 +2424,7 @@
             });
         }
 
-        // 5b. Daftar beban kerja personil
+        // 6. Beban kerja filter
         let currentAssigneeTab = 'all';
         let selectedAssigneeName = null;
 
@@ -1942,69 +2470,7 @@
             }
         }
 
-        // 6. Simpan & pulihkan kondisi layar saat halaman disegarkan,
-        //    supaya posisi gulir dan pilihan tidak kembali ke awal.
-        function saveState() {
-            try {
-                sessionStorage.setItem(STATE_KEY, JSON.stringify({
-                    tableScroll: scrollContainer ? scrollContainer.scrollTop : 0,
-                    assigneeScroll: assigneeContainer ? assigneeContainer.scrollTop : 0,
-                    pokjaScroll: pokjaContainer ? pokjaContainer.scrollTop : 0,
-                    pageScroll: window.scrollY,
-                    autoScroll: isAutoScrollActive,
-                    autoRefresh: isAutoRefreshActive,
-                    assignee: selectedAssigneeName,
-                    assigneeTab: currentAssigneeTab,
-                    assigneeQuery: (document.getElementById('assigneeSearchInput') || {}).value || ''
-                }));
-            } catch (e) { /* abaikan */ }
-        }
-
-        function restoreState() {
-            let state = null;
-            try { state = JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); } catch (e) { }
-            if (!state) return;
-            try { sessionStorage.removeItem(STATE_KEY); } catch (e) { }
-
-            if (state.autoRefresh === false) {
-                isAutoRefreshActive = false;
-                document.getElementById('btnAutoRefresh').classList.remove('active');
-                renderRefreshLabel();
-            }
-
-            const searchInput = document.getElementById('searchFilterInput');
-            if (state.assignee && searchInput && !searchInput.value) {
-                selectedAssigneeName = state.assignee;
-                searchInput.value = state.assignee;
-                clientFilterTable(state.assignee);
-                markSelectedAssignee(state.assignee);
-            }
-
-            if (state.assigneeTab && state.assigneeTab !== 'all') {
-                const tabs = document.querySelectorAll('.btn-assignee-tab');
-                const map = { all: 0, pegawai: 1, katim: 2 };
-                switchAssigneeTab(state.assigneeTab, tabs[map[state.assigneeTab]]);
-            }
-            if (state.assigneeQuery) {
-                const input = document.getElementById('assigneeSearchInput');
-                if (input) { input.value = state.assigneeQuery; filterAssigneeRows(state.assigneeQuery); }
-            }
-
-            if (scrollContainer) scrollContainer.scrollTop = state.tableScroll || 0;
-            if (assigneeContainer) assigneeContainer.scrollTop = state.assigneeScroll || 0;
-            if (pokjaContainer) pokjaContainer.scrollTop = state.pokjaScroll || 0;
-            window.scrollTo(0, state.pageScroll || 0);
-
-            if (state.autoScroll) {
-                isAutoScrollActive = true;
-                renderScrollLabel();
-                startAutoScroll();
-                scrollPausedUntil = 0;
-            }
-        }
-        window.addEventListener('DOMContentLoaded', restoreState);
-
-        // 7. Pintasan keyboard: F = layar penuh, S = gulir otomatis, R = segarkan otomatis
+        // 7. Shortcut keyboard: F, S, R
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
