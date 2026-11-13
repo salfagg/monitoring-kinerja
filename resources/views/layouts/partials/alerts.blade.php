@@ -26,7 +26,7 @@
     </div>
 @endif
 
-@if($errors->any())
+@if(isset($errors) && $errors->any())
     <div class="alert-box alert-danger">
         <div>
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-weight: 700;">

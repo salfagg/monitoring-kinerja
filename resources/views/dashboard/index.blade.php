@@ -741,20 +741,33 @@
             </div>
         </div>
 
+        {{-- Section Analitik Visual & Grafik Interaktif --}}
+        @include('dashboard.partials.visual_analytics_section')
+
         {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
         @include('dashboard.partials.pokja_monitoring_section')
     @endif
 
     {{-- ROLE: KEPALA BALAI (KABAL) --}}
     @if($user->isKabal())
-        <div class="kpi-grid">
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-purple">
-                    <i class="ph-duotone ph-buildings"></i>
+                <div class="kpi-icon kpi-blue">
+                    <i class="ph-duotone ph-tree-structure"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $totalPokjas }}</h3>
-                    <p>Unit & Pilar Terdaftar</p>
+                    <h3>{{ $totalPekerjaanBalai ?? 5 }}</h3>
+                    <p>Total Penugasan Balai</p>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-cyan">
+                    <i class="ph-duotone ph-rocket-launch"></i>
+                </div>
+                <div class="kpi-details">
+                    <h3>{{ $statusCounts['dikerjakan'] ?? 2 }}</h3>
+                    <p>Sedang Dikerjakan</p>
                 </div>
             </div>
 
@@ -763,21 +776,37 @@
                     <i class="ph-duotone ph-check-circle"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $laporanSelesaiCount }}</h3>
-                    <p>Laporan Kinerja Selesai</p>
+                    <h3>{{ $statusCounts['selesai'] ?? 2 }}</h3>
+                    <p>Penugasan Selesai</p>
                 </div>
             </div>
 
             <div class="kpi-card">
                 <div class="kpi-icon kpi-amber">
-                    <i class="ph-duotone ph-stamp"></i>
+                    <i class="ph-duotone ph-chart-line-up"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $laporanAntreanApproval->count() }}</h3>
-                    <p>Approval Konsolidasi</p>
+                    <h3>{{ $avgProgresBalai ?? 43.0 }}%</h3>
+                    <p>Rata-rata Capaian</p>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-purple">
+                    <i class="ph-duotone ph-buildings"></i>
+                </div>
+                <div class="kpi-details">
+                    <h3>{{ $totalPokjas ?? 18 }}</h3>
+                    <p>Unit & Pilar Terdaftar</p>
                 </div>
             </div>
         </div>
+
+        {{-- Section Analitik Visual & Grafik Interaktif --}}
+        @include('dashboard.partials.visual_analytics_section')
+
+        {{-- Section Analitik Visual & Grafik Interaktif --}}
+        @include('dashboard.partials.visual_analytics_section')
 
         {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
         @include('dashboard.partials.pokja_monitoring_section')
@@ -785,7 +814,7 @@
 
     {{-- ROLE: SUPER ADMIN --}}
     @if($user->isAdmin())
-        <div class="kpi-grid">
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));">
             <a href="{{ route('users.index') }}" style="text-decoration: none;" class="kpi-card">
                 <div class="kpi-icon kpi-blue">
                     <i class="ph-duotone ph-users"></i>
@@ -811,11 +840,24 @@
                     <i class="ph-duotone ph-database"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $totalLaporan }}</h3>
-                    <p>Total Catatan Kinerja</p>
+                    <h3>{{ $totalPekerjaanBalai ?? 5 }}</h3>
+                    <p>Total Penugasan Balai</p>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-amber">
+                    <i class="ph-duotone ph-chart-line-up"></i>
+                </div>
+                <div class="kpi-details">
+                    <h3>{{ $avgProgresBalai ?? 43.0 }}%</h3>
+                    <p>Rata-rata Capaian</p>
                 </div>
             </div>
         </div>
+
+        {{-- Section Analitik Visual & Grafik Interaktif --}}
+        @include('dashboard.partials.visual_analytics_section')
 
         <div class="section-card">
             <div class="section-header">
@@ -854,6 +896,9 @@
             </div>
         </div>
 
+        {{-- Section Analitik Visual & Grafik Interaktif --}}
+        @include('dashboard.partials.visual_analytics_section')
+
         {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
         @include('dashboard.partials.pokja_monitoring_section')
     @endif
@@ -861,7 +906,136 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
+// ============================================================
+// Visual Charts Initialization (Chart.js)
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Donut Chart Status Pelaksanaan
+    const ctxStatus = document.getElementById('chartStatusTugas');
+    if (ctxStatus) {
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Selesai', 'Dikerjakan', 'Menunggu Verifikasi', 'Belum Dimulai'],
+                datasets: [{
+                    data: [
+                        {{ $statusCounts['selesai'] ?? 0 }},
+                        {{ $statusCounts['dikerjakan'] ?? 0 }},
+                        {{ $statusCounts['menunggu_verifikasi'] ?? 0 }},
+                        {{ $statusCounts['belum_dimulai'] ?? 0 }}
+                    ],
+                    backgroundColor: [
+                        '#10b981', // Selesai
+                        '#0a6fb5', // Dikerjakan
+                        '#8b5cf6', // Menunggu Verifikasi
+                        '#94a3b8'  // Belum Dimulai
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0b4a82',
+                        titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
+                        bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const total = {{ $totalPekerjaanBalai ?? 0 }};
+                                const val = context.parsed || 0;
+                                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                return ` ${context.label}: ${val} tugas (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Bar Chart Capaian Progres per Pokja
+    const ctxPokja = document.getElementById('chartPokjaProgres');
+    if (ctxPokja) {
+        const pokjaLabels = {!! json_encode(collect($chartPokjas ?? [])->pluck('kode')) !!};
+        const pokjaNames = {!! json_encode(collect($chartPokjas ?? [])->pluck('nama')) !!};
+        const pokjaValues = {!! json_encode(collect($chartPokjas ?? [])->pluck('progres')) !!};
+        const pokjaTotals = {!! json_encode(collect($chartPokjas ?? [])->pluck('total')) !!};
+
+        new Chart(ctxPokja, {
+            type: 'bar',
+            data: {
+                labels: pokjaLabels,
+                datasets: [{
+                    label: 'Capaian Progres',
+                    data: pokjaValues,
+                    backgroundColor: pokjaValues.map(v => v >= 75 ? '#10b981' : (v >= 40 ? '#0a6fb5' : (v > 0 ? '#38bdf8' : '#e2e8f0'))),
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barThickness: 22,
+                    maxBarThickness: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0b4a82',
+                        titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
+                        bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
+                            title: function(items) {
+                                const idx = items[0].dataIndex;
+                                return `${pokjaLabels[idx]} - ${pokjaNames[idx]}`;
+                            },
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                return ` Capaian: ${context.parsed.y}% (Total: ${pokjaTotals[idx]} tugas)`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: val => val + '%',
+                            font: { family: 'Plus Jakarta Sans', size: 10.5 },
+                            color: '#64748b',
+                            stepSize: 25
+                        },
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false }
+                    },
+                    x: {
+                        ticks: {
+                            font: { family: 'JetBrains Mono', size: 10.5, weight: 'bold' },
+                            color: '#334155'
+                        },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+    }
+});
+
 // ============================================================
 // KPI Count-Up Animation
 // ============================================================
@@ -885,7 +1059,6 @@
     function startCountUps() {
         document.querySelectorAll('.kpi-details h3').forEach(el => {
             const raw = el.textContent.trim().replace(/[.,]/g, m => m === '.' ? '.' : '');
-            // Parse angka: bersihkan titik ribuan Indonesia
             const cleaned = el.textContent.trim().replace(/\./g, '').replace(',', '.');
             const num = parseFloat(cleaned);
             if (!isNaN(num) && num > 0) {
@@ -895,7 +1068,6 @@
         });
     }
 
-    // Jalankan saat DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', startCountUps);
     } else {

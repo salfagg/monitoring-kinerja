@@ -34,11 +34,57 @@ class DashboardController extends Controller
           ->take(5)
           ->get();
 
+        $totalPekerjaanBalai = Pekerjaan::count();
+        $avgProgresBalai = $totalPekerjaanBalai > 0 ? round((float) Pekerjaan::avg('progres'), 1) : 0;
+
+        $statusCounts = [
+            'selesai' => Pekerjaan::where('status_pelaksanaan', 'selesai_terverifikasi')->count(),
+            'dikerjakan' => Pekerjaan::where('status_pelaksanaan', 'dikerjakan')->count(),
+            'menunggu_verifikasi' => Pekerjaan::where(function ($q) {
+                $q->where('status_pelaksanaan', 'hasil_diajukan')
+                  ->orWhere(function ($sub) {
+                      $sub->where('progres', '>=', 100)
+                          ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
+                  });
+            })->count(),
+            'belum_dimulai' => Pekerjaan::where('status_pelaksanaan', 'belum_dimulai')->count(),
+            'perlu_revisi' => Pekerjaan::where('status_pelaksanaan', 'perlu_perbaikan_hasil')->count(),
+        ];
+
+        $pekerjaanTerlambatCount = Pekerjaan::where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+            ->whereDate('tenggat', '<', Carbon::today())
+            ->count();
+
+        // Data Unit & Tim Kerja untuk Bar Chart Kinerja
+        $chartPokjas = Pokja::whereIn('tipe', ['tim_kerja', 'subbag_pilar'])
+            ->with('pekerjaan')
+            ->get()
+            ->map(function ($p) {
+                $totalTugas = $p->pekerjaan->count();
+                $avg = $totalTugas > 0 ? round((float)$p->pekerjaan->avg('progres'), 1) : 0;
+                $selesai = $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
+                return [
+                    'id' => $p->id,
+                    'kode' => $p->kode_pokja,
+                    'nama' => $p->nama_pokja,
+                    'total' => $totalTugas,
+                    'selesai' => $selesai,
+                    'progres' => $avg,
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
+
         $data = [
             'user' => $user,
             'currentMonth' => $currentMonth,
             'currentYear' => $currentYear,
             'tugasAktifSaya' => $tugasAktifSaya,
+            'totalPekerjaanBalai' => $totalPekerjaanBalai,
+            'avgProgresBalai' => $avgProgresBalai,
+            'statusCounts' => $statusCounts,
+            'pekerjaanTerlambatCount' => $pekerjaanTerlambatCount,
+            'chartPokjas' => $chartPokjas,
         ];
 
         switch ($user->role) {
