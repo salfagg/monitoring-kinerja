@@ -470,6 +470,21 @@ class DashboardController extends Controller
 
         $allPokjas = Pokja::orderBy('kode_pokja')->get();
 
+        $statusCounts = [
+            'selesai' => $selesaiTerverifikasi,
+            'dikerjakan' => Pekerjaan::where('status_pelaksanaan', 'dikerjakan')->count(),
+            'menunggu_verifikasi' => $menungguVerifikasi,
+            'belum_dimulai' => Pekerjaan::where('status_pelaksanaan', 'belum_dimulai')->count(),
+            'perlu_revisi' => Pekerjaan::where('status_pelaksanaan', 'perlu_perbaikan_hasil')->count(),
+        ];
+
+        // Pokja chart data untuk diagram
+        $pokjaChartData = $pokjas->filter(fn($p) => $p->total_tugas > 0 || in_array($p->kode_pokja, ['TIM-01', 'TIM-02', 'TIM-03', 'TIM-04', 'TIM-05', 'SUBBAG-UMUM']))
+            ->values();
+        if ($pokjaChartData->isEmpty()) {
+            $pokjaChartData = $pokjas->take(8)->values();
+        }
+
         return view('dashboard.command_center', compact(
             'totalPekerjaan',
             'pekerjaanBerjalan',
@@ -480,7 +495,9 @@ class DashboardController extends Controller
             'pokjas',
             'pekerjaanList',
             'topAssignees',
-            'allPokjas'
+            'allPokjas',
+            'statusCounts',
+            'pokjaChartData'
         ));
     }
 }

@@ -13,11 +13,13 @@
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Phosphor Icons & Chart.js -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <style>
         :root {
-            /* Palet resmi SIMON-K Navy */
+            /* Palet resmi SIMON-K Navy Eksekutif */
             --navy: #0b4a82;
             --navy-deep: #083a68;
             --navy-soft: #0e5a9c;
@@ -50,8 +52,6 @@
             --shadow-sm: 0 1px 3px rgba(11, 74, 130, 0.05);
             --shadow-md: 0 4px 16px rgba(11, 74, 130, 0.08);
             --shadow-lg: 0 10px 30px rgba(11, 74, 130, 0.12);
-
-            --body-height: calc(100vh - 295px);
         }
 
         * {
@@ -213,9 +213,9 @@
             background: rgba(255, 255, 255, 0.12);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.22);
-            padding: 8px 14px;
+            padding: 7px 13px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             font-family: inherit;
             display: inline-flex;
@@ -249,7 +249,7 @@
 
         /* ===== Main Container ===== */
         .command-container {
-            padding: 18px 24px 24px;
+            padding: 18px 24px 28px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -260,7 +260,7 @@
         .giant-kpi-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 14px;
+            gap: 12px;
         }
 
         @media (max-width: 1400px) {
@@ -307,7 +307,7 @@
 
         .kpi-title {
             grid-area: title;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -316,20 +316,20 @@
 
         .kpi-icon-wrap {
             grid-area: icon;
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 19px;
             background: var(--accent-soft);
             color: var(--accent);
         }
 
         .kpi-number {
             grid-area: number;
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--text-main);
             line-height: 1.15;
@@ -339,7 +339,7 @@
 
         .kpi-subtext {
             grid-area: sub;
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             font-weight: 600;
             display: flex;
@@ -362,13 +362,229 @@
             border-radius: 999px;
         }
 
+        /* ===== SECTION DIAGRAM INTERAKTIF BALAI (BARU) ===== */
+        .diagram-section-wrapper {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-top: 3.5px solid var(--navy);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-header-bar {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .diagram-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diagram-title i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .diagram-btn-toggle {
+            background: #ffffff;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .diagram-btn-toggle:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .diagram-content-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr 240px;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+        }
+
+        @media (max-width: 1300px) {
+            .diagram-content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .diagram-metric-strip {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .diagram-content-grid {
+                grid-template-columns: 1fr;
+            }
+            .diagram-metric-strip {
+                grid-column: span 1;
+            }
+        }
+
+        /* Donut Card di Monitoring */
+        .diagram-donut-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .donut-canvas-wrap {
+            position: relative;
+            width: 145px;
+            height: 145px;
+            flex-shrink: 0;
+        }
+
+        .donut-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .donut-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            display: block;
+        }
+
+        .donut-lbl {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .donut-legend-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .legend-pill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .legend-pill:hover {
+            background: var(--primary-soft);
+        }
+
+        .legend-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dot-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Bar Chart Box */
+        .diagram-bar-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            height: 145px;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            padding: 0 16px;
+        }
+
+        @media (max-width: 1300px) {
+            .diagram-bar-box {
+                border-right: none;
+            }
+        }
+
+        .bar-title-sub {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Metric Strip Box */
+        .diagram-metric-strip {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cmd-stat-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cmd-stat-left {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .cmd-stat-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
         /* ===== Layout Utama Dua Kolom ===== */
         .command-body-grid {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 310px 1fr;
             gap: 16px;
-            height: var(--body-height);
-            min-height: 580px;
+            min-height: 520px;
         }
 
         .left-col {
@@ -385,8 +601,6 @@
         @media (max-width: 1200px) {
             .command-body-grid {
                 grid-template-columns: 1fr;
-                height: auto;
-                min-height: 0;
             }
             .left-col > .panel-card {
                 flex: none;
@@ -395,7 +609,7 @@
                 max-height: 380px;
             }
             .table-responsive {
-                max-height: 560px;
+                max-height: 540px;
             }
         }
 
@@ -723,7 +937,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== Aliran Tugas & Tabel Rapi (Clean & Anti-Bala) ===== */
+        /* ===== Aliran Tugas & Tabel Rapi ===== */
         .stream-controls {
             padding: 10px 16px;
             border-bottom: 1px solid var(--border);
@@ -1496,16 +1710,12 @@
         }
 
         /* ===== Fullscreen Mode (TV) ===== */
-        body.fullscreen-mode {
-            --body-height: calc(100vh - 290px);
-        }
-
         body.fullscreen-mode .top-command-bar {
             padding: 14px 36px;
         }
 
         body.fullscreen-mode .command-container {
-            padding: 20px 36px 30px;
+            padding: 16px 36px 30px;
             max-width: none;
         }
     </style>
@@ -1535,24 +1745,35 @@
         </div>
 
         <div class="command-controls">
+            <!-- Tombol Toggle Diagram -->
+            <button type="button" class="btn-control active" id="btnToggleDiagram" onclick="toggleDiagramBar()"
+                title="Sembunyikan / Tampilkan Diagram Interaktif">
+                <i class="ph-bold ph-chart-donut"></i>
+                <span id="diagramToggleLabel">Diagram: Aktif</span>
+            </button>
+
+            <!-- Tombol Segarkan Otomatis -->
             <button type="button" class="btn-control active" id="btnAutoRefresh" onclick="toggleAutoRefresh()"
                 title="Perbarui data otomatis (tombol R)">
                 <i class="ph-bold ph-arrows-clockwise"></i>
-                <span id="refreshLabel">Segarkan otomatis: 30d</span>
+                <span id="refreshLabel">Segarkan: 30d</span>
             </button>
 
+            <!-- Tombol Gulir Otomatis TV -->
             <button type="button" class="btn-control" id="btnAutoScroll" onclick="toggleAutoScroll()"
-                title="Gulir daftar tugas otomatis untuk layar TV (tombol S)">
+                title="Gulir otomatis layar TV (tombol S)">
                 <i class="ph-bold ph-arrows-down-up"></i>
-                <span id="scrollLabel">Gulir otomatis: Mati</span>
+                <span id="scrollLabel">Gulir TV: Mati</span>
             </button>
 
+            <!-- Layar Penuh -->
             <button type="button" class="btn-control" onclick="toggleFullscreen()"
                 title="Tampilan layar penuh (tombol F)">
                 <i class="ph-bold ph-corners-out"></i>
                 <span id="fsLabel">Layar Penuh</span>
             </button>
 
+            <!-- Portal Utama -->
             <a href="{{ route('dashboard') }}" class="btn-control" title="Kembali ke dashboard utama">
                 <i class="ph-bold ph-arrow-square-out"></i>
                 <span>Portal</span>
@@ -1620,15 +1841,105 @@
                 <div class="kpi-number">{{ number_format($lewatTenggat) }}</div>
                 <div class="kpi-subtext">
                     @if($lewatTenggat > 0)
-                        <i class="ph-bold ph-warning"></i> Perlu perhatian tindak lanjut
+                        <i class="ph-bold ph-warning"></i> Perlu perhatian khusus
                     @else
-                        <i class="ph-bold ph-check"></i> Tidak ada keterlambatan
+                        <i class="ph-bold ph-check"></i> 100% tepat waktu
                     @endif
                 </div>
             </div>
         </div>
 
-        <!-- Body Grid: Kolom Kiri (Pokja & Staf) | Kolom Kanan (Tabel Rapi) -->
+        <!-- 3. BARIS DIAGRAM INTERAKTIF TERPADU BALAI (BARU) -->
+        <div class="diagram-section-wrapper" id="diagramSectionWrapper">
+            <div class="diagram-header-bar">
+                <div class="diagram-title">
+                    <i class="ph-bold ph-chart-donut"></i>
+                    <span>Diagram Analitik Kinerja Real-Time Balai</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Klik status atau bar untuk menyaring tabel</span>
+                    <button type="button" class="diagram-btn-toggle" onclick="toggleDiagramBar()">
+                        <i class="ph-bold ph-caret-up" id="diagramToggleIcon"></i> Tutup Diagram
+                    </button>
+                </div>
+            </div>
+
+            <div class="diagram-content-grid" id="diagramGridContainer">
+                <!-- Diagram 1: Donut Status Tugas -->
+                <div class="diagram-donut-box">
+                    <div class="donut-canvas-wrap">
+                        <canvas id="cmdDonutStatus"></canvas>
+                        <div class="donut-center-text">
+                            <span class="donut-num">{{ $totalPekerjaan }}</span>
+                            <span class="donut-lbl">Total Tugas</span>
+                        </div>
+                    </div>
+                    <div class="donut-legend-mini">
+                        <div class="legend-pill" onclick="filterTableByStatusClick('selesai')" title="Filter tugas selesai">
+                            <span class="legend-left">
+                                <span class="dot-status" style="background: #10b981;"></span>
+                                <span>Selesai</span>
+                            </span>
+                            <strong style="color: #10b981;">{{ $statusCounts['selesai'] ?? 0 }}</strong>
+                        </div>
+                        <div class="legend-pill" onclick="filterTableByStatusClick('berjalan')" title="Filter tugas dikerjakan">
+                            <span class="legend-left">
+                                <span class="dot-status" style="background: #0a6fb5;"></span>
+                                <span>Dikerjakan</span>
+                            </span>
+                            <strong style="color: #0a6fb5;">{{ $statusCounts['dikerjakan'] ?? 0 }}</strong>
+                        </div>
+                        <div class="legend-pill" onclick="filterTableByStatusClick('menunggu_verifikasi')" title="Filter menunggu verifikasi">
+                            <span class="legend-left">
+                                <span class="dot-status" style="background: #8b5cf6;"></span>
+                                <span>Verifikasi</span>
+                            </span>
+                            <strong style="color: #8b5cf6;">{{ $statusCounts['menunggu_verifikasi'] ?? 0 }}</strong>
+                        </div>
+                        <div class="legend-pill" onclick="filterTableByStatusClick('terlambat')" title="Filter tugas terlambat">
+                            <span class="legend-left">
+                                <span class="dot-status" style="background: #d03232;"></span>
+                                <span>Terlambat</span>
+                            </span>
+                            <strong style="color: #d03232;">{{ $lewatTenggat }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diagram 2: Bar Capaian Progres per Unit -->
+                <div class="diagram-bar-box">
+                    <div class="bar-title-sub">
+                        <span><i class="ph-bold ph-chart-bar"></i> Capaian Progres per Tim Kerja & Unit</span>
+                        <span style="color: var(--primary); font-weight: 800;">Balai: {{ number_format($avgProgres, 1) }}%</span>
+                    </div>
+                    <div style="flex: 1; position: relative;">
+                        <canvas id="cmdBarPokja"></canvas>
+                    </div>
+                </div>
+
+                <!-- Diagram 3: Indikator Metrik Kunci -->
+                <div class="diagram-metric-strip">
+                    <div class="cmd-stat-box">
+                        <span class="cmd-stat-left"><i class="ph-bold ph-seal-check"></i> Rasio Selesai:</span>
+                        <span class="cmd-stat-val" style="color: #10b981;">
+                            {{ $totalPekerjaan > 0 ? round(($selesaiTerverifikasi / $totalPekerjaan) * 100, 0) : 0 }}%
+                        </span>
+                    </div>
+                    <div class="cmd-stat-box">
+                        <span class="cmd-stat-left"><i class="ph-bold ph-clock"></i> Ketepatan:</span>
+                        <span class="cmd-stat-val" style="color: {{ $lewatTenggat > 0 ? '#d03232' : '#0c8a5d' }};">
+                            {{ $lewatTenggat > 0 ? $lewatTenggat . ' Tertunda' : '100% On-Track' }}
+                        </span>
+                    </div>
+                    <div class="cmd-stat-box">
+                        <span class="cmd-stat-left"><i class="ph-bold ph-buildings"></i> Unit Aktif:</span>
+                        <span class="cmd-stat-val">{{ $pokjas->count() }} Tim/Pilar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Body Grid: Kolom Kiri (Pokja & Staf) | Kolom Kanan (Tabel Rapi & Anti-Bala) -->
         <div class="command-body-grid">
 
             <!-- Kolom Kiri -->
@@ -1970,7 +2281,7 @@
 
     </main>
 
-    <!-- 3. Modal Detail Tugas Balai (Interactive & Lengkap) -->
+    <!-- 5. Modal Detail Tugas Balai (Interactive & Lengkap) -->
     <div id="jobDetailModal" class="cmd-modal-backdrop" onclick="closeJobModal(event)">
         <div class="cmd-modal-dialog" onclick="event.stopPropagation()">
             <!-- Header -->
@@ -2081,7 +2392,7 @@
         </div>
     </div>
 
-    <!-- 4. Skrip Logika Halaman & Modal -->
+    <!-- 6. Skrip Logika Halaman, Diagram & Modal -->
     <script>
         const STATE_KEY = 'bgtkMonitoringState';
         const scrollContainer = document.getElementById('tableScrollContainer');
@@ -2089,14 +2400,173 @@
         const pokjaContainer = document.getElementById('pokjaScrollContainer');
         const modalBackdrop = document.getElementById('jobDetailModal');
 
-        // Modal Logic
+        // ============================================================
+        // 1. Inisialisasi Diagram Interaktif Chart.js
+        // ============================================================
+        let chartDonutInstance = null;
+        let chartBarInstance = null;
+
+        function initMonitoringCharts() {
+            // A. Donut Chart Status
+            const ctxDonut = document.getElementById('cmdDonutStatus');
+            if (ctxDonut) {
+                if (chartDonutInstance) chartDonutInstance.destroy();
+
+                chartDonutInstance = new Chart(ctxDonut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Selesai', 'Dikerjakan', 'Verifikasi', 'Belum Dimulai'],
+                        datasets: [{
+                            data: [
+                                {{ $statusCounts['selesai'] ?? 0 }},
+                                {{ $statusCounts['dikerjakan'] ?? 0 }},
+                                {{ $statusCounts['menunggu_verifikasi'] ?? 0 }},
+                                {{ $statusCounts['belum_dimulai'] ?? 0 }}
+                            ],
+                            backgroundColor: ['#10b981', '#0a6fb5', '#8b5cf6', '#94a3b8'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '72%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0b4a82',
+                                titleFont: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                                bodyFont: { family: 'Plus Jakarta Sans', size: 11 },
+                                cornerRadius: 6,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const tot = {{ $totalPekerjaan ?? 0 }};
+                                        const val = ctx.parsed || 0;
+                                        const pct = tot > 0 ? Math.round((val / tot) * 100) : 0;
+                                        return ` ${ctx.label}: ${val} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // B. Bar Chart Pokja
+            const ctxBar = document.getElementById('cmdBarPokja');
+            if (ctxBar) {
+                if (chartBarInstance) chartBarInstance.destroy();
+
+                const pokjaLabels = {!! json_encode(collect($pokjaChartData ?? [])->pluck('kode_pokja')) !!};
+                const pokjaNames = {!! json_encode(collect($pokjaChartData ?? [])->pluck('nama_pokja')) !!};
+                const pokjaValues = {!! json_encode(collect($pokjaChartData ?? [])->pluck('avg_progres')) !!};
+                const pokjaTotals = {!! json_encode(collect($pokjaChartData ?? [])->pluck('total_tugas')) !!};
+
+                chartBarInstance = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: pokjaLabels,
+                        datasets: [{
+                            label: 'Progres (%)',
+                            data: pokjaValues,
+                            backgroundColor: pokjaValues.map(v => v >= 75 ? '#10b981' : (v >= 40 ? '#0a6fb5' : (v > 0 ? '#38bdf8' : '#e2e8f0'))),
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            barThickness: 16,
+                            maxBarThickness: 24
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        onClick: (e, elements) => {
+                            if (elements && elements.length > 0) {
+                                const idx = elements[0].index;
+                                const code = pokjaLabels[idx];
+                                const searchInput = document.getElementById('searchFilterInput');
+                                if (searchInput) {
+                                    searchInput.value = code;
+                                    clientFilterTable(code);
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0b4a82',
+                                titleFont: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                                bodyFont: { family: 'Plus Jakarta Sans', size: 11 },
+                                cornerRadius: 6,
+                                callbacks: {
+                                    title: (items) => `${pokjaLabels[items[0].dataIndex]} - ${pokjaNames[items[0].dataIndex]}`,
+                                    label: (ctx) => ` Capaian: ${ctx.parsed.y}% (${pokjaTotals[ctx.dataIndex]} tugas)`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: v => v + '%',
+                                    font: { family: 'Plus Jakarta Sans', size: 10 },
+                                    color: '#64748b',
+                                    stepSize: 50
+                                },
+                                grid: { color: '#f1f5f9' },
+                                border: { display: false }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { family: 'JetBrains Mono', size: 9.5, weight: 'bold' },
+                                    color: '#334155'
+                                },
+                                grid: { display: false },
+                                border: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Toggle Diagram Accordion Bar
+        let isDiagramVisible = true;
+        function toggleDiagramBar() {
+            isDiagramVisible = !isDiagramVisible;
+            const wrapper = document.getElementById('diagramGridContainer');
+            const icon = document.getElementById('diagramToggleIcon');
+            const btn = document.getElementById('btnToggleDiagram');
+            const label = document.getElementById('diagramToggleLabel');
+
+            if (isDiagramVisible) {
+                wrapper.style.display = 'grid';
+                icon.className = 'ph-bold ph-caret-up';
+                btn.classList.add('active');
+                label.textContent = 'Diagram: Aktif';
+            } else {
+                wrapper.style.display = 'none';
+                icon.className = 'ph-bold ph-caret-down';
+                btn.classList.remove('active');
+                label.textContent = 'Diagram: Tertutup';
+            }
+        }
+
+        function filterTableByStatusClick(status) {
+            window.location.href = "{{ route('monitoring.balai') }}?status=" + status;
+        }
+
+        // ============================================================
+        // 2. Modal Detail Tugas Balai
+        // ============================================================
         let isModalOpen = false;
 
         function openJobModal(job) {
             if (!job) return;
             isModalOpen = true;
 
-            // Badges
             document.getElementById('mJobCode').textContent = job.kode || '-';
             
             const statusEl = document.getElementById('mJobStatus');
@@ -2113,7 +2583,6 @@
                 stEl.style.display = 'none';
             }
 
-            // Title & Parent
             document.getElementById('mJobTitle').textContent = job.judul || '-';
             const parentWrap = document.getElementById('mJobParentWrap');
             if (job.parent) {
@@ -2123,7 +2592,6 @@
                 parentWrap.style.display = 'none';
             }
 
-            // KPI Grid
             const prog = Math.min(100, Math.max(0, job.progres || 0));
             document.getElementById('mJobProgres').textContent = prog + '%';
             const barEl = document.getElementById('mJobProgresBar');
@@ -2148,17 +2616,14 @@
                 sisaEl.textContent = '-';
             }
 
-            // Desc & Expected
             document.getElementById('mJobDesc').textContent = job.deskripsi || '-';
             document.getElementById('mJobExpected').textContent = job.hasil_diharapkan || '-';
 
-            // PIC
             document.getElementById('mJobPicAvatar').textContent = job.pj_initial || 'PJ';
             document.getElementById('mJobPicName').textContent = job.pj_nama || '-';
             document.getElementById('mJobPicNip').textContent = job.pj_nip || '-';
             document.getElementById('mJobPicJabatan').textContent = job.pj_jabatan || '-';
 
-            // Team list
             const teamWrap = document.getElementById('mJobTeamWrap');
             const teamList = document.getElementById('mJobTeamList');
             teamList.innerHTML = '';
@@ -2182,7 +2647,6 @@
                 teamWrap.style.display = 'none';
             }
 
-            // Update terakhir
             const updateWrap = document.getElementById('mJobUpdateWrap');
             if (job.last_update) {
                 updateWrap.style.display = 'block';
@@ -2192,7 +2656,6 @@
                 updateWrap.style.display = 'none';
             }
 
-            // Direct Link
             document.getElementById('mJobLink').href = job.url_show || '#';
 
             modalBackdrop.classList.add('show');
@@ -2211,14 +2674,15 @@
             }
         }
 
-        // Close on ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isModalOpen) {
                 closeJobModalDirect();
             }
         });
 
-        // 1. Jam digital
+        // ============================================================
+        // 3. Jam Digital & Sinkronisasi Real-Time
+        // ============================================================
         function updateLiveClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -2232,7 +2696,6 @@
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        // 2. Segarkan data otomatis (In-Place Fetch)
         const REFRESH_INTERVAL = 30;
         let refreshSecondsLeft = REFRESH_INTERVAL;
         let isAutoRefreshActive = true;
@@ -2242,16 +2705,16 @@
             const label = document.getElementById('refreshLabel');
             if (!label) return;
             if (isRefreshing) {
-                label.textContent = 'Menyinkronkan...';
+                label.textContent = 'Menyinkron...';
             } else if (!isAutoRefreshActive) {
-                label.textContent = 'Segarkan otomatis: Jeda';
+                label.textContent = 'Segarkan: Jeda';
             } else {
-                label.textContent = `Segarkan otomatis: ${refreshSecondsLeft}d`;
+                label.textContent = `Segarkan: ${refreshSecondsLeft}d`;
             }
         }
 
         async function refreshDashboardData() {
-            if (isRefreshing || isModalOpen) return; // Jangan refresh jika modal terbuka
+            if (isRefreshing || isModalOpen) return;
             isRefreshing = true;
             renderRefreshLabel();
 
@@ -2268,12 +2731,12 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    // 1. KPI
+                    // Update KPI
                     const newKpi = doc.querySelector('.giant-kpi-grid');
                     const curKpi = document.querySelector('.giant-kpi-grid');
                     if (newKpi && curKpi) curKpi.innerHTML = newKpi.innerHTML;
 
-                    // 2. Pokja
+                    // Update Pokja
                     const newPokja = doc.getElementById('pokjaScrollContainer');
                     const curPokja = document.getElementById('pokjaScrollContainer');
                     if (newPokja && curPokja) {
@@ -2282,7 +2745,7 @@
                         curPokja.scrollTop = prevScroll;
                     }
 
-                    // 3. Assignees
+                    // Update Assignees
                     const newAssignee = doc.getElementById('assigneeListContainer');
                     const curAssignee = document.getElementById('assigneeListContainer');
                     if (newAssignee && curAssignee) {
@@ -2293,12 +2756,12 @@
                         if (selectedAssigneeName) markSelectedAssignee(selectedAssigneeName);
                     }
 
-                    // 4. Tabs
+                    // Update Tabs
                     const newTabs = doc.querySelector('.stream-tabs');
                     const curTabs = document.querySelector('.stream-tabs');
                     if (newTabs && curTabs) curTabs.innerHTML = newTabs.innerHTML;
 
-                    // 5. Table Body
+                    // Update Table Body
                     const newTbody = doc.querySelector('#commandTable tbody');
                     const curTbody = document.querySelector('#commandTable tbody');
                     if (newTbody && curTbody) {
@@ -2345,12 +2808,14 @@
             renderRefreshLabel();
         }
 
-        // 3. Layar penuh (TV)
+        // ============================================================
+        // 4. Layar Penuh & Gulir Otomatis TV
+        // ============================================================
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().then(() => {
                     document.body.classList.add('fullscreen-mode');
-                    document.getElementById('fsLabel').textContent = 'Keluar Layar Penuh';
+                    document.getElementById('fsLabel').textContent = 'Keluar Layar';
                 }).catch(err => {
                     alert('Tidak dapat membuka layar penuh: ' + err.message);
                 });
@@ -2366,7 +2831,6 @@
             }
         });
 
-        // 4. Gulir otomatis untuk layar TV
         let isAutoScrollActive = false;
         let scrollTimer = null;
         let scrollPausedUntil = 0;
@@ -2374,7 +2838,7 @@
 
         function renderScrollLabel() {
             document.getElementById('scrollLabel').textContent =
-                'Gulir otomatis: ' + (isAutoScrollActive ? 'Hidup' : 'Mati');
+                'Gulir TV: ' + (isAutoScrollActive ? 'Hidup' : 'Mati');
             document.getElementById('btnAutoScroll').classList.toggle('active', isAutoScrollActive);
         }
 
@@ -2415,7 +2879,9 @@
             }, 40);
         }
 
-        // 5. Filter cepat pada tabel
+        // ============================================================
+        // 5. Filter Cepat & Pencarian
+        // ============================================================
         function clientFilterTable(query) {
             query = (query || '').toLowerCase().trim();
             document.querySelectorAll('.table-row-item').forEach(row => {
@@ -2424,7 +2890,6 @@
             });
         }
 
-        // 6. Beban kerja filter
         let currentAssigneeTab = 'all';
         let selectedAssigneeName = null;
 
@@ -2470,7 +2935,7 @@
             }
         }
 
-        // 7. Shortcut keyboard: F, S, R
+        // Shortcut keyboard: F, S, R
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -2478,6 +2943,11 @@
             if (k === 'f') toggleFullscreen();
             else if (k === 's') toggleAutoScroll();
             else if (k === 'r') toggleAutoRefresh();
+        });
+
+        // Inisialisasi saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            initMonitoringCharts();
         });
     </script>
 </body>
