@@ -283,7 +283,7 @@
         <div class="rekap-header-kop">
             <h3>Kementerian Pendidikan Dasar dan Menengah</h3>
             <h2>BALAI GURU PENGGERAK PROVINSI DKI JAKARTA</h2>
-            <p>Sistem Informasi Monitoring Kinerja Pegawai (SIMON-K)</p>
+            <p>Tata Kelola Kinerja Digital dan Monitoring (TANJIDOR)</p>
         </div>
 
         <!-- Judul Laporan -->

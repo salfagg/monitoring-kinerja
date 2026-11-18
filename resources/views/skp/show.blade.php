@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rincian Sasaran Kinerja (SKP) | SIMON-K')
+@section('title', 'Rincian Sasaran Kinerja (SKP) | TANJIDOR')
 @section('page-title', 'Rincian Sasaran Kinerja Pegawai')
 
 @section('styles')

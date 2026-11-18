@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogHarianController;
 use App\Http\Controllers\PekerjaanController;
 use App\Http\Controllers\PokjaController;
+use App\Http\Controllers\RekapPenugasanController;
 use App\Http\Controllers\SkpController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
     // FONDASI UTAMA: Modul Hierarki Pekerjaan (PRD BGTK)
     Route::get('pekerjaan-saya', [PekerjaanController::class, 'pekerjaanSaya'])->name('pekerjaan.saya');
     Route::get('persetujuan', [PekerjaanController::class, 'persetujuanIndex'])->name('persetujuan.index');
+    Route::get('rekap-penugasan', [RekapPenugasanController::class, 'index'])->name('rekap-penugasan.index');
+    Route::get('rekap-penugasan/export-excel', [RekapPenugasanController::class, 'exportExcel'])->name('rekap-penugasan.export-excel');
     Route::resource('pekerjaan', PekerjaanController::class);
     Route::post('pekerjaan/{pekerjaan}/progres', [PekerjaanController::class, 'updateProgres'])->name('pekerjaan.update-progres');
     Route::post('realisasi/{realisasi}/approve', [PekerjaanController::class, 'approveRealisasi'])->name('realisasi.approve');

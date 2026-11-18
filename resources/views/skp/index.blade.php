@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($isManager ? 'Sasaran Kinerja Pegawai (SKP)' : 'SKP Saya') . ' | SIMON-K')
+@section('title', ($isManager ? 'Sasaran Kinerja Pegawai (SKP)' : 'SKP Saya') . ' | TANJIDOR')
 @section('page-title', $isManager ? 'Sasaran Kinerja Pegawai (SKP)' : 'Sasaran Kinerja Saya (SKP)')
 
 @section('styles')

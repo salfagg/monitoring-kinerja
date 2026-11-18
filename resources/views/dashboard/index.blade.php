@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Monitoring Kinerja')
+@section('title', 'Dashboard | TANJIDOR BGTK')
 @section('page-title', 'Beranda Kinerja')
 
 @section('styles')

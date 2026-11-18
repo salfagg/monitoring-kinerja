@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola Pengguna | SIMON-K BGTK')
+@section('title', 'Kelola Pengguna | TANJIDOR BGTK')
 @section('page-title', 'Kelola Pengguna Sistem')
 
 @section('styles')

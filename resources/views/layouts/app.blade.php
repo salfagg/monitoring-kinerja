@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') | SIMON-K BGTK</title>
+    <title>@yield('title', 'Dashboard') | TANJIDOR BGTK</title>
     
     <!-- Instant Dark Theme Early Check to Prevent FOUC -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('simon_theme');
+            const savedTheme = localStorage.getItem('tanjidor_theme') || localStorage.getItem('simon_theme');
             if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
             } else {
@@ -29,7 +29,7 @@
     <!-- Custom Modern Stylesheet -->
     <style>
         :root {
-            /* Palet SIMON-K Resmi Kemendikdasmen BGTK DKI Jakarta */
+            /* Palet TANJIDOR Resmi Kemendikdasmen BGTK DKI Jakarta */
             --navy: #0b4a82;
             --navy-deep: #083a68;
             --navy-soft: #0e5a9c;
@@ -297,7 +297,7 @@
             min-height: 100vh;
         }
 
-        /* ===== Top Navbar (SIMON-K Navy Style) ===== */
+        /* ===== Top Navbar (TANJIDOR Navy Style) ===== */
         .top-navbar {
             height: 72px;
             background-color: var(--navy);
@@ -958,6 +958,7 @@
             const current = document.documentElement.getAttribute('data-theme') || 'light';
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('tanjidor_theme', next);
             localStorage.setItem('simon_theme', next);
             updateThemeToggleUI(next);
         }

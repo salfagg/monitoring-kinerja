@@ -1,4 +1,4 @@
-<!-- Top Navbar Component (SIMON-K Navy Style) -->
+<!-- Top Navbar Component (TANJIDOR Navy Style) -->
 <header class="top-navbar">
     <div class="navbar-left">
         <div class="navbar-brand-badge">
@@ -7,10 +7,10 @@
         <div>
             <div class="navbar-brand-title">
                 <span>BGTK PROVINSI DKI JAKARTA</span>
-                <span class="navbar-live-tag">SIMON-K</span>
+                <span class="navbar-live-tag">TANJIDOR</span>
             </div>
             <div class="navbar-page-sub">
-                @yield('page-title', 'Sistem Informasi Monitoring Kinerja Pegawai')
+                @yield('page-title', 'Tata Kelola Kinerja Digital dan Monitoring')
             </div>
         </div>
     </div>

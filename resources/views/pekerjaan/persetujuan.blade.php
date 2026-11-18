@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Pusat Persetujuan Laporan Progres | SIMON-K BGTK')
+@section('title', 'Pusat Persetujuan Laporan Progres | TANJIDOR BGTK')
 @section('page-title', 'Pusat Persetujuan Progres')
 
 @section('styles')

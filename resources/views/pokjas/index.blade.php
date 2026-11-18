@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola Pokja & Pilar Subbag Umum | SIMON-K')
+@section('title', 'Kelola Pokja & Pilar Subbag Umum | TANJIDOR')
 @section('page-title', 'Kelola Master Pokja & Struktur Unit Kerja')
 
 @section('styles')

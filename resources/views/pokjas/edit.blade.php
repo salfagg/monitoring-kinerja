@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ubah Pokja | SIMON-K')
+@section('title', 'Ubah Pokja | TANJIDOR')
 @section('page-title', 'Ubah Kelompok Kerja (Pokja)')
 
 @section('styles')

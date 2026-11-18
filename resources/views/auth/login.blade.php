@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk | Portal Kemendikdasmen - BGTK DKI Jakarta</title>
+    <title>Masuk | TANJIDOR - BGTK DKI Jakarta</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -139,7 +139,8 @@
             animation: welcomeEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
         }
 
-        .hero-simonk {
+        .hero-simonk,
+        .hero-tanjidor {
             font-size: 54px;
             font-weight: 900;
             line-height: 1.05;
@@ -153,7 +154,7 @@
             user-select: none;
         }
 
-        /* Karakter Ejaan SIMON-K per Huruf */
+        /* Karakter Ejaan TANJIDOR per Huruf */
         .spell-char {
             display: inline-block;
             color: #ffffff;
@@ -187,8 +188,9 @@
             filter: drop-shadow(0 0 18px #38bdf8);
         }
 
-        .hero-simonk.is-complete .spell-char {
-            animation: simonKShimmer 5.5s linear infinite;
+        .hero-simonk.is-complete .spell-char,
+        .hero-tanjidor.is-complete .spell-char {
+            animation: tanjidorShimmer 5.5s linear infinite;
         }
 
         .hero-tagline {
@@ -544,6 +546,15 @@
             }
         }
 
+        @keyframes tanjidorShimmer {
+            0% {
+                background-position: 180% 0;
+            }
+            100% {
+                background-position: -180% 0;
+            }
+        }
+
         @keyframes taglineEntrance {
             from {
                 opacity: 0;
@@ -621,6 +632,7 @@
             .hero-badge .badge-dot,
             .hero-welcome,
             .hero-simonk,
+            .hero-tanjidor,
             .hero-tagline,
             .hero-divider,
             .hero-left::before,
@@ -654,7 +666,8 @@
                 flex: none;
             }
 
-            .hero-simonk {
+            .hero-simonk,
+            .hero-tanjidor {
                 font-size: 38px;
             }
 
@@ -704,16 +717,17 @@
                     BGTK PROVINSI DKI JAKARTA
                 </span>
                 <div class="hero-welcome">Selamat Datang di</div>
-                <h1 class="hero-simonk" aria-label="SIMON-K" title="SIMON-K">
-                    <span class="spell-char" data-char="S">S</span>
-                    <span class="spell-char" data-char="I">I</span>
-                    <span class="spell-char" data-char="M">M</span>
-                    <span class="spell-char" data-char="O">O</span>
+                <h1 class="hero-tanjidor" aria-label="TANJIDOR" title="TANJIDOR">
+                    <span class="spell-char" data-char="T">T</span>
+                    <span class="spell-char" data-char="A">A</span>
                     <span class="spell-char" data-char="N">N</span>
-                    <span class="spell-char" data-char="-">-</span>
-                    <span class="spell-char" data-char="K">K</span>
+                    <span class="spell-char" data-char="J">J</span>
+                    <span class="spell-char" data-char="I">I</span>
+                    <span class="spell-char" data-char="D">D</span>
+                    <span class="spell-char" data-char="O">O</span>
+                    <span class="spell-char" data-char="R">R</span>
                 </h1>
-                <div class="hero-tagline">Sistem Informasi Monitoring Kinerja Pegawai</div>
+                <div class="hero-tagline">Tata Kelola Kinerja Digital dan Monitoring</div>
                 <div class="hero-divider"></div>
             </div>
 
@@ -824,11 +838,11 @@
         }
 
         // ========================================================
-        // ANIMASI MENGEJA TEKS SIMON-K PER HURUF (S s/d K)
+        // ANIMASI MENGEJA TEKS TANJIDOR PER HURUF (T s/d R)
         // ========================================================
-        (function initSimonKSpelling() {
-            const container = document.querySelector('.hero-simonk');
-            const chars = document.querySelectorAll('.hero-simonk .spell-char');
+        (function initTanjidorSpelling() {
+            const container = document.querySelector('.hero-tanjidor, .hero-simonk');
+            const chars = document.querySelectorAll('.hero-tanjidor .spell-char, .hero-simonk .spell-char');
             if (!chars.length || !container) return;
 
             let isSpelling = false;
@@ -842,7 +856,7 @@
                 container.classList.remove('is-complete');
                 chars.forEach(ch => ch.classList.remove('is-visible', 'just-typed'));
 
-                // Eja huruf per huruf secara berurutan: S, I, M, O, N, -, K
+                // Eja huruf per huruf secara berurutan: T, A, N, J, I, D, O, R
                 const letterDelay = 180; // Kecepatan ejaan per huruf (ms)
                 const startDelay = 350;
 
@@ -851,7 +865,7 @@
                         ch.classList.add('is-visible', 'just-typed');
                         setTimeout(() => ch.classList.remove('just-typed'), 220);
 
-                        // Bila sudah sampai huruf terakhir (K)
+                        // Bila sudah sampai huruf terakhir (R)
                         if (index === chars.length - 1) {
                             setTimeout(() => {
                                 container.classList.add('is-complete');

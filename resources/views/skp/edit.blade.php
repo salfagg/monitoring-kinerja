@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Sasaran Kinerja (SKP) | SIMON-K')
+@section('title', 'Edit Sasaran Kinerja (SKP) | TANJIDOR')
 @section('page-title', 'Edit Sasaran Kinerja')
 
 @section('styles')

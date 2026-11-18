@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "Edit Pekerjaan: {$pekerjaan->judul} | SIMON-K")
+@section('title', "Edit Pekerjaan: {$pekerjaan->judul} | TANJIDOR")
 @section('page-title', "Edit Pekerjaan: {$pekerjaan->kode_tampilan}")
 
 @section('styles')

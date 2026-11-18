@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Pekerjaan & Penugasan | BGTK DKI Jakarta')
+@section('title', 'Daftar Pekerjaan & Penugasan | TANJIDOR BGTK')
 @section('page-title', 'Daftar Pekerjaan & Penugasan')
 
 @section('styles')
@@ -294,12 +294,18 @@
                 <p style="font-size: 13px; color: var(--text-muted);">Kelola penugasan dan pantau progres kerja pegawai di setiap Pokja</p>
             </div>
 
-            @if(Auth::user()->canManagePekerjaan())
-                <a href="{{ route('pekerjaan.create') }}" class="btn-create-main">
-                    <i class="ph-bold ph-plus-circle"></i>
-                    <span>+ Buat Penugasan Baru</span>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <a href="{{ route('rekap-penugasan.index') }}" class="btn-create-main" style="background: #10b981; border: 1px solid #059669;" title="Lihat Rekap Penugasan & Surat Tugas per Orang (Tarik Excel)">
+                    <i class="ph-bold ph-file-xls"></i>
+                    <span>Rekap Penugasan & ST</span>
                 </a>
-            @endif
+                @if(Auth::user()->canManagePekerjaan())
+                    <a href="{{ route('pekerjaan.create') }}" class="btn-create-main">
+                        <i class="ph-bold ph-plus-circle"></i>
+                        <span>+ Buat Penugasan Baru</span>
+                    </a>
+                @endif
+            </div>
         </div>
 
         <form method="GET" action="{{ route('pekerjaan.index') }}" class="filter-grid">

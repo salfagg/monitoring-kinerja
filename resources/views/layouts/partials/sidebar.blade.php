@@ -5,7 +5,7 @@
             <i class="ph-bold ph-chart-line-up"></i>
         </div>
         <div class="brand-text">
-            <h2>SIMON-K</h2>
+            <h2>TANJIDOR</h2>
             <p>BGTK DKI Jakarta</p>
         </div>
     </div>
@@ -40,6 +40,13 @@
             class="nav-item {{ request()->routeIs('pekerjaan.saya') ? 'active' : '' }}">
             <i class="ph-duotone ph-list-checks"></i>
             <span>Tugas & Pekerjaan Saya</span>
+        </a>
+
+        <a href="{{ route('rekap-penugasan.index') }}"
+            class="nav-item {{ request()->routeIs('rekap-penugasan.*') ? 'active' : '' }}"
+            title="Rekap Beban Penugasan & Surat Tugas Seluruh Pegawai (Tarik Excel)">
+            <i class="ph-duotone ph-table"></i>
+            <span>Rekap Penugasan & ST</span>
         </a>
 
         <a href="{{ route('log-harian.index') }}"
