@@ -87,4 +87,3 @@ return new class extends Migration
         // Nilai reversibel tidak kritis karena penataan jabatan baru adalah standarisasi data resmi
     }
 };
-

@@ -4,116 +4,7 @@
 @section('page-title', 'Rincian Sasaran Kinerja Pegawai')
 
 @section('styles')
-<style>
-    .detail-container {
-        max-width: 960px;
-        margin: 0 auto 50px auto;
-    }
-
-    .card-detail {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        padding: 28px 32px;
-        margin-bottom: 24px;
-    }
-
-    .badge-status-skp {
-        font-size: 11px;
-        font-weight: 800;
-        padding: 4px 10px;
-        border-radius: 99px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .status-disetujui { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .status-diajukan { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
-    .status-draft { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-    .status-revisi { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #f1f5f9;
-    }
-
-    .info-item .info-label {
-        font-size: 11.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        letter-spacing: 0.05em;
-        margin-bottom: 4px;
-    }
-
-    .info-item .info-val {
-        font-size: 14.5px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .btn-action-main {
-        padding: 9px 18px;
-        border-radius: var(--radius-md);
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        transition: var(--transition);
-        border: none;
-        cursor: pointer;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        padding: 12px 16px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: #64748b;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .data-table td {
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-    }
-
-    .progress-bar-wrap {
-        width: 80px;
-        height: 6px;
-        background: #e2e8f0;
-        border-radius: 99px;
-        overflow: hidden;
-        margin-right: 8px;
-        display: inline-block;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        background: #10b981;
-        border-radius: 99px;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/master-data.css') }}">
 @endsection
 
 @section('content')
@@ -164,7 +55,7 @@
                         {{ $skp->user?->name ?? '-' }}
                     </h3>
                     <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;">
-                        NIP: {{ $skp->user?->nip ?? '-' }} • Unit: <strong>{{ $skp->user?->pokja?->nama_pokja ?? 'BGTK DKI Jakarta' }}</strong>
+                        NIP: {{ $skp->user?->nip ?? '-' }} â€¢ Unit: <strong>{{ $skp->user?->pokja?->nama_pokja ?? 'BGTK DKI Jakarta' }}</strong>
                     </div>
                 </div>
             </div>
@@ -253,7 +144,7 @@
                             <th>Judul Pekerjaan</th>
                             <th>PIC Utama</th>
                             <th>Tenggat</th>
-                            <th>Progres</th>
+                            <th>Laporan Masuk</th>
                             <th>Status Pelaksanaan</th>
                             <th style="text-align: right;">Aksi</th>
                         </tr>
@@ -278,11 +169,9 @@
                                     <span style="font-size: 12px; color: var(--text-muted);">{{ $p->tenggat->format('d M Y') }}</span>
                                 </td>
                                 <td>
-                                    <div style="display: flex; align-items: center;">
-                                        <div class="progress-bar-wrap">
-                                            <div class="progress-bar-fill" style="width: {{ $p->progres }}%;"></div>
-                                        </div>
-                                        <span style="font-size: 11.5px; font-family: monospace; font-weight: 700;">{{ (float)$p->progres }}%</span>
+                                    <div style="font-weight: 700; font-size: 11.5px; color: #1e293b; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="ph-bold ph-newspaper-clipping" style="color: #64748b;"></i>
+                                        <span>{{ $p->realisasi->where('status_approval', 'disetujui')->count() }} Laporan</span>
                                     </div>
                                 </td>
                                 <td>

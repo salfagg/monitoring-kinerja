@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Carbon\Carbon;
 
 class LogHarian extends Model
 {
@@ -114,7 +114,7 @@ class LogHarian extends Model
 
     public function getDurasiFormatAttribute(): string
     {
-        if (!$this->jam_mulai || !$this->jam_selesai) {
+        if (! $this->jam_mulai || ! $this->jam_selesai) {
             return '-';
         }
         $start = Carbon::parse($this->jam_mulai);
@@ -127,6 +127,7 @@ class LogHarian extends Model
         } elseif ($hours > 0) {
             return "{$hours} jam";
         }
+
         return "{$mins} mnt";
     }
 
@@ -146,4 +147,3 @@ class LogHarian extends Model
         };
     }
 }
-

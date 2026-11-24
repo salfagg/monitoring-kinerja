@@ -104,9 +104,9 @@
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         @foreach($logHarian->buktiDukung as $b)
                             @if($b->tipe === 'file')
-                                <a href="/storage/{{ $b->file_path }}" target="_blank" style="font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i class="ph-bold ph-file-text"></i> {{ $b->nama_dokumen }}
-                                </a>
+                                <button type="button" onclick="previewBuktiDukung('/storage/{{ $b->file_path }}', '{{ $b->nama_dokumen }}')" style="font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bae6fd; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="ph-bold ph-eye"></i> {{ $b->nama_dokumen }}
+                                </button>
                             @else
                                 <a href="{{ $b->link_url }}" target="_blank" style="font-size: 12px; font-weight: 700; color: #059669; background: #ecfdf5; padding: 4px 10px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
                                     <i class="ph-bold ph-arrow-square-out"></i> {{ $b->nama_dokumen }}

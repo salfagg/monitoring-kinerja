@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pokja extends Model
@@ -26,7 +27,7 @@ class Pokja extends Model
         return $this->belongsTo(User::class, 'katim_id');
     }
 
-    public function anggota(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function anggota(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'pokja_user')->withPivot('peran')->withTimestamps();
     }

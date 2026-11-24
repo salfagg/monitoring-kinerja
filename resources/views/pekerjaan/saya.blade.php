@@ -4,482 +4,7 @@
 @section('page-title', 'Tugas & Pekerjaan Saya')
 
 @section('styles')
-<style>
-    /* Hero Banner */
-    .hero-box {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border-radius: var(--radius-lg);
-        padding: 24px 28px;
-        color: #ffffff;
-        margin-bottom: 24px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12);
-    }
-
-    .hero-box h2 {
-        font-size: 20px;
-        font-weight: 800;
-        margin-bottom: 6px;
-    }
-
-    .hero-box p {
-        font-size: 13.5px;
-        color: #94a3b8;
-        max-width: 750px;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    /* KPI Summary Cards */
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .kpi-card {
-        background: #ffffff;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--border);
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-        border-color: #cbd5e1;
-    }
-
-    .kpi-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .kpi-blue { background: #eff6ff; color: #2563eb; }
-    .kpi-orange { background: #fff7ed; color: #ea580c; }
-    .kpi-purple { background: #faf5ff; color: #9333ea; }
-    .kpi-green { background: #f0fdf4; color: #16a34a; }
-
-    .kpi-info h4 {
-        font-size: 24px;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.1;
-    }
-
-    .kpi-info p {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 3px;
-    }
-
-    /* Tabs Component */
-    .tabs-wrapper {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    .tabs-header {
-        display: flex;
-        border-bottom: 1px solid var(--border);
-        background: #f8fafc;
-        overflow-x: auto;
-    }
-
-    .tab-btn {
-        padding: 16px 22px;
-        font-size: 13.5px;
-        font-weight: 700;
-        color: #64748b;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 3px solid transparent;
-        transition: var(--transition);
-        white-space: nowrap;
-    }
-
-    .tab-btn:hover {
-        color: var(--primary);
-        background: rgba(37, 99, 235, 0.03);
-    }
-
-    .tab-btn.active {
-        color: var(--primary);
-        border-bottom-color: var(--primary);
-        background: #ffffff;
-    }
-
-    .tab-badge {
-        font-size: 11px;
-        font-weight: 800;
-        padding: 2px 7px;
-        border-radius: 999px;
-        line-height: 1;
-    }
-
-    .tab-badge-blue { background: #eff6ff; color: #1d4ed8; }
-    .tab-badge-orange { background: #fff7ed; color: #c2410c; }
-    .tab-badge-purple { background: #faf5ff; color: #7e22ce; }
-    .tab-badge-green { background: #ecfdf5; color: #047857; }
-
-    /* Filter Bar */
-    .filter-bar {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        background: #ffffff;
-        flex-wrap: wrap;
-    }
-
-    .search-box {
-        position: relative;
-        flex: 1;
-        min-width: 250px;
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 9px 12px 9px 36px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        background: #f8fafc;
-        outline: none;
-    }
-
-    .search-input:focus {
-        border-color: var(--primary);
-        background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* Data Table */
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        color: #475569;
-        font-weight: 700;
-        text-align: left;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border);
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        white-space: nowrap;
-    }
-
-    .data-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        color: #334155;
-        vertical-align: middle;
-    }
-
-    .data-table tr:hover td {
-        background: #fafbfc;
-    }
-
-    .code-badge {
-        font-family: 'SF Mono', Consolas, Menlo, monospace;
-        font-weight: 700;
-        font-size: 11.5px;
-        background: #f1f5f9;
-        color: #0f172a;
-        padding: 4px 8px;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        display: inline-block;
-    }
-
-    .badge-pill {
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 8px;
-        border-radius: 20px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
-        white-space: nowrap;
-    }
-
-    .status-disetujui { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-    .status-diajukan { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .status-perlu_perbaikan { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-
-    .exec-dikerjakan { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700; }
-    .exec-belum_dimulai { background: #f8fafc; color: #64748b; border: 1px solid #cbd5e1; }
-    .exec-hasil_diajukan { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-weight: 800; }
-    .exec-selesai_terverifikasi { background: #f0fdf4; color: #166534; border: 1px solid #86efac; font-weight: 800; }
-    .exec-perlu_perbaikan_hasil { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
-
-    /* Action Buttons */
-    .btn-action-primary {
-        background: var(--primary);
-        color: white;
-        padding: 7px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: var(--transition);
-        text-decoration: none;
-    }
-
-    .btn-action-primary:hover {
-        background: var(--primary-hover);
-        transform: translateY(-1px);
-    }
-
-    .btn-action-green {
-        background: #10b981;
-        color: white;
-        padding: 7px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: var(--transition);
-        text-decoration: none;
-    }
-
-    .btn-action-green:hover {
-        background: #059669;
-        transform: translateY(-1px);
-    }
-
-    .btn-action-purple {
-        background: #8b5cf6;
-        color: white;
-        padding: 7px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: var(--transition);
-        text-decoration: none;
-    }
-
-    .btn-action-purple:hover {
-        background: #7c3aed;
-        transform: translateY(-1px);
-    }
-
-    .btn-action-outline {
-        background: white;
-        color: #475569;
-        border: 1px solid var(--border);
-        padding: 6px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: var(--transition);
-    }
-
-    .btn-action-outline:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-        color: #0f172a;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 48px 20px;
-        color: #64748b;
-    }
-
-    .empty-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        color: #94a3b8;
-        margin: 0 auto 16px;
-    }
-
-    .empty-state h4 {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 6px;
-    }
-
-    .empty-state p {
-        font-size: 13px;
-        margin: 0;
-        max-width: 400px;
-        margin-inline: auto;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.65);
-        backdrop-filter: blur(4px);
-        z-index: 1050;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-    }
-
-    .modal-card {
-        background: #ffffff;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 580px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        animation: modalFadeIn 0.2s ease-out;
-    }
-
-    @keyframes modalFadeIn {
-        from { opacity: 0; transform: scale(0.96); }
-        to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal-header {
-        padding: 18px 24px;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f8fafc;
-    }
-
-    .modal-title {
-        font-size: 16px;
-        font-weight: 800;
-        color: #0f172a;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .modal-body {
-        padding: 20px 24px;
-        max-height: 75vh;
-        overflow-y: auto;
-    }
-
-    .modal-footer {
-        padding: 16px 24px;
-        background: #f8fafc;
-        border-top: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .form-group {
-        margin-bottom: 16px;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 12.5px;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 6px;
-    }
-
-    .form-input, .form-textarea {
-        width: 100%;
-        padding: 9px 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 13px;
-        color: #0f172a;
-        background: #ffffff;
-        outline: none;
-        transition: var(--transition);
-        font-family: inherit;
-    }
-
-    .form-input:focus, .form-textarea:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    @media (max-width: 640px) {
-        .modal-card {
-            border-radius: 14px;
-            max-height: 92vh;
-        }
-        .modal-header, .modal-footer {
-            padding: 14px 18px;
-        }
-        .modal-body {
-            padding: 16px 18px;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/pekerjaan.css') }}">
 @endsection
 
 @section('content')
@@ -503,7 +28,7 @@
     <div class="hero-box">
         <h2>Tugas & Pekerjaan Saya</h2>
         <p>
-            Kelola dan laporkan kemajuan pekerjaan yang Anda ajukan atau ditugaskan kepada Anda. Catat realisasi berkala, lampirkan bukti dukung, atau selesaikan penugasan 100% untuk diajukan ke Katim.
+            Kelola dan laporkan kemajuan pekerjaan yang Anda ajukan atau ditugaskan kepada Anda. Catat realisasi berkala, lampirkan bukti dukung, atau laporkan penyelesaian akhir penugasan untuk diverifikasi Katim.
         </p>
     </div>
 
@@ -525,7 +50,7 @@
             </div>
             <div class="kpi-info">
                 <h4>{{ $countSelesai }}</h4>
-                <p>Pekerjaan Selesai Tuntas (100%)</p>
+                <p>Pekerjaan Selesai Tuntas</p>
             </div>
         </a>
     </div>
@@ -543,7 +68,7 @@
             <a href="{{ route('pekerjaan.saya', ['tab' => 'selesai']) }}" 
                class="tab-btn {{ $activeTab === 'selesai' ? 'active' : '' }}">
                 <i class="ph-bold ph-check-fat"></i>
-                <span>Pekerjaan Selesai (100%)</span>
+                <span>Pekerjaan Selesai Tuntas</span>
                 <span class="tab-badge tab-badge-green">{{ $countSelesai }}</span>
             </a>
         </div>
@@ -591,10 +116,9 @@
                             <th>Kode</th>
                             <th>Pekerjaan & Induk</th>
                             <th>Target & Satuan</th>
-                            <th>Bobot</th>
                             <th>Tenggat Waktu</th>
-                            <th>Capaian Progres</th>
-                            <th>Status</th>
+                            <th>Aktivitas & Log Laporan</th>
+                            <th>Status Pelaksanaan</th>
                             <th style="text-align: right;">Aksi Pelaporan</th>
                         </tr>
                     </thead>
@@ -647,9 +171,6 @@
                                     <strong>{{ number_format($item->target, 0) }}</strong> {{ $item->satuan }}
                                 </td>
                                 <td>
-                                    <strong>{{ number_format($item->bobot, 1) }}%</strong>
-                                </td>
-                                <td>
                                     <span style="color: {{ $item->isTerlambat() ? '#dc2626' : 'inherit' }}; font-weight: {{ $item->isTerlambat() ? '700' : 'normal' }};">
                                         {{ $item->tenggat ? $item->tenggat->format('d M Y') : '-' }}
                                     </span>
@@ -658,43 +179,51 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <div style="width: 70px; height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
-                                            <div style="height: 100%; width: {{ $item->progres }}%; background: {{ $item->progres >= 100 ? '#10b981' : '#2563eb' }}; border-radius: 10px;"></div>
-                                        </div>
-                                        <span style="font-weight: 800; font-size: 12px; color: {{ $item->progres >= 100 ? '#047857' : '#1d4ed8' }};">
-                                            {{ number_format($item->progres, 0) }}%
-                                        </span>
+                                    @php
+                                        $accCount = $item->realisasi->where('status_approval', 'disetujui')->count();
+                                        $pendingCount = $item->realisasi->where('status_approval', 'menunggu_persetujuan')->count();
+                                    @endphp
+                                    <div style="font-size: 12.5px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 5px;">
+                                        <i class="ph-bold ph-chats-circle" style="color: #2563eb;"></i>
+                                        <span>{{ $accCount }} Laporan Disetujui</span>
                                     </div>
+                                    @if($pendingCount > 0)
+                                        <div style="font-size: 10.5px; background: #fef3c7; color: #b45309; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;">
+                                            <i class="ph-bold ph-clock"></i> {{ $pendingCount }} butuh ACC Katim
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
-                                    @if($item->status_persetujuan !== 'disetujui')
-                                        <span class="badge-pill status-{{ $item->status_persetujuan }}">
-                                            {{ str_replace('_', ' ', $item->status_persetujuan) }}
-                                        </span>
-                                    @else
-                                        <span class="badge-pill exec-{{ $item->status_pelaksanaan }}">
-                                            {{ str_replace('_', ' ', $item->status_pelaksanaan) }}
-                                        </span>
-                                    @endif
+                                    <span class="badge-pill exec-{{ $item->status_pelaksanaan }}">
+                                        {{ str_replace('_', ' ', $item->status_pelaksanaan) }}
+                                    </span>
                                 </td>
                                 <td style="text-align: right; white-space: nowrap;">
                                     @if($item->isDisetujui() && $item->status_pelaksanaan !== 'selesai_terverifikasi')
-                                        <!-- Tombol Lapor Progres Berkala -->
+                                        @if($item->status_pelaksanaan === 'belum_dimulai')
+                                            <form action="{{ route('pekerjaan.update-progres', $item) }}" method="POST" style="display: inline-block; margin: 0;">
+                                                @csrf
+                                                <input type="hidden" name="aksi_status" value="mulai_kerja">
+                                                <input type="hidden" name="tanggal" value="{{ date('Y-m-d') }}">
+                                                <button type="submit" class="btn-action-outline" style="border-color: #3b82f6; color: #1d4ed8; font-weight: 700;" title="Mulai Penugasan">
+                                                    <i class="ph-bold ph-play"></i> Mulai Kerja
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <!-- Tombol Lapor Kemajuan -->
                                         <button type="button" 
                                                 class="btn-action-green" 
-                                                onclick="openProgressModal({{ $item->id }}, '{{ addslashes($item->kode_tampilan) }}', '{{ addslashes($item->judul) }}', {{ $item->progres }}, false)">
-                                            <i class="ph-bold ph-pencil-simple-line"></i> Lapor Progres
+                                                onclick="openProgressModal({{ $item->id }}, '{{ addslashes($item->kode_tampilan) }}', '{{ addslashes($item->judul) }}', 'kemajuan')">
+                                            <i class="ph-bold ph-pencil-simple-line"></i> Lapor Kemajuan
                                         </button>
 
-                                        <!-- Tombol Selesaikan Pekerjaan (100%) -->
-                                        @if($item->status_pelaksanaan !== 'hasil_diajukan')
-                                            <button type="button" 
-                                                    class="btn-action-purple" 
-                                                    onclick="openProgressModal({{ $item->id }}, '{{ addslashes($item->kode_tampilan) }}', '{{ addslashes($item->judul) }}', 100, true)">
-                                                <i class="ph-bold ph-seal-check"></i> Selesaikan (100%)
-                                            </button>
-                                        @endif
+                                        <!-- Tombol Ajukan Selesai -->
+                                        <button type="button" 
+                                                class="btn-action-purple" 
+                                                onclick="openProgressModal({{ $item->id }}, '{{ addslashes($item->kode_tampilan) }}', '{{ addslashes($item->judul) }}', 'penyelesaian')">
+                                            <i class="ph-bold ph-seal-check"></i> Ajukan Selesai
+                                        </button>
                                     @endif
 
                                     @if($item->pembuat_id === Auth::id() || $item->penanggung_jawab_id === Auth::id() || Auth::user()->canManagePekerjaan())
@@ -737,71 +266,39 @@
                         <div style="font-weight: 800; color: #0f172a; margin-top: 2px;" id="progressTaskTitle">-</div>
                     </div>
 
-                    <!-- Banner Status Progres Tim Saat Ini -->
-                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 12px; font-weight: 700; color: #1e40af; text-transform: uppercase;">
-                                <i class="ph-bold ph-chart-line-up"></i> Progres Tim Saat Ini:
-                            </span>
-                            <span style="font-size: 15px; font-weight: 800; color: #1d4ed8; font-family: monospace;" id="displayCurrentProg">0.0%</span>
-                        </div>
-                        <div style="width: 100%; height: 8px; background: rgba(59, 130, 246, 0.2); border-radius: 999px; overflow: hidden; margin-bottom: 6px;">
-                            <div id="barCurrentProg" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 999px; transition: width 0.3s ease;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #475569;">
-                            <span>Sisa menuju tuntas: <strong id="displayRemainingProg" style="color: #0f172a;">100.0%</strong></span>
-                            <span>Target: 100% (Kolaboratif)</span>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">Tanggal Pelaporan <span style="color: #ef4444;">*</span></label>
-                            <input type="date" name="tanggal" class="form-input" value="{{ date('Y-m-d') }}" required>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <label class="form-label" style="margin-bottom: 0;">Tambahan Progres (+%) <span style="color: #ef4444;">*</span></label>
-                                <button type="button" onclick="setProgresToRemaining()" style="background: none; border: none; color: #2563eb; font-size: 11.5px; font-weight: 700; cursor: pointer; text-decoration: underline;">
-                                    ⚡ Selesaikan Sisa
-                                </button>
-                            </div>
-                            <input type="number" id="inputProgresCapaian" name="progres_capaian" class="form-input" min="0.1" max="100" step="0.1" placeholder="Misal: 20 (+20%)" required>
+                    <!-- Pilihan Jenis Laporan -->
+                    <div style="margin-bottom: 16px;">
+                        <label class="form-label" style="margin-bottom: 8px;">Pilih Jenis Laporan <span style="color: #ef4444;">*</span></label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <label id="optJenisKemajuan" style="border: 2px solid #3b82f6; background: #eff6ff; border-radius: 8px; padding: 10px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px;">
+                                <input type="radio" name="jenis_laporan" id="radioJenisKemajuan" value="kemajuan" checked style="margin-top: 3px;" onchange="updateModalType('kemajuan')">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 13px; color: #1d4ed8;"><i class="ph-bold ph-pencil-simple-line"></i> Kemajuan Berkala</div>
+                                    <div style="font-size: 11px; color: #475569; margin-top: 2px;">Tugas tetap aktif berjalan, lapor log aktivitas & progres.</div>
+                                </div>
+                            </label>
+                            <label id="optJenisPenyelesaian" style="border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 10px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px;">
+                                <input type="radio" name="jenis_laporan" id="radioJenisPenyelesaian" value="penyelesaian" style="margin-top: 3px;" onchange="updateModalType('penyelesaian')">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 13px; color: #7e22ce;"><i class="ph-bold ph-seal-check"></i> Penyelesaian Tugas</div>
+                                    <div style="font-size: 11px; color: #475569; margin-top: 2px;">Tugas telah tuntas, ajukan pengesahan selesai ke Katim.</div>
+                                </div>
+                            </label>
                         </div>
                     </div>
 
-                    <!-- Preset Quick Add Buttons -->
-                    <div id="presetButtonsWrap" style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; align-items: center;">
-                        <span style="font-size: 11px; color: #64748b; font-weight: 600;">Pilih Cepat:</span>
-                        <button type="button" onclick="setPresetToSaya(5)" class="preset-pill">+5%</button>
-                        <button type="button" onclick="setPresetToSaya(10)" class="preset-pill">+10%</button>
-                        <button type="button" onclick="setPresetToSaya(15)" class="preset-pill">+15%</button>
-                        <button type="button" onclick="setPresetToSaya(20)" class="preset-pill">+20%</button>
-                        <button type="button" onclick="setPresetToSaya(25)" class="preset-pill">+25%</button>
+                    <div id="bannerInfoModal" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #1e40af;">
+                        <i class="ph-bold ph-info"></i> Laporan kemajuan berkala akan diperiksa dan di-ACC oleh pembuat tugas/Katim.
                     </div>
 
-                    <!-- Live Calculation Preview -->
-                    <div id="liveCalcBoxSaya" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12.5px; color: #334155;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-                            <div>
-                                <span>Saat Ini: <strong id="previewCalcCurrent">0.0%</strong></span>
-                                <span style="margin: 0 4px;">+</span>
-                                <span>Tambahan: <strong id="previewCalcAddition" style="color: #059669;">+0.0%</strong></span>
-                            </div>
-                            <div style="font-size: 13px;">
-                                <span>Total Akumulasi: <strong id="previewCalcTotal" style="font-size: 15px; color: #2563eb;">0.0%</strong></span>
-                            </div>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Tanggal Pelaporan <span style="color: #ef4444;">*</span></label>
+                        <input type="date" name="tanggal" class="form-input" value="{{ date('Y-m-d') }}" required>
                     </div>
 
-                    <div id="noticeSelesai" style="display: none; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #7e22ce;">
-                        <i class="ph-bold ph-seal-check"></i> <strong>Akumulasi Mencapai 100%!</strong> Status akan otomatis beralih ke <strong>Hasil Diajukan</strong> untuk diverifikasi & disahkan oleh Katim.
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Uraian Realisasi / Hasil Kemajuan <span style="color: #ef4444;">*</span></label>
-                        <textarea id="inputDeskripsiProgres" name="deskripsi_progres" class="form-textarea" rows="3" placeholder="Jelaskan kontribusi atau kemajuan tugas yang telah diselesaikan pada laporan ini..." required></textarea>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Uraian Kemajuan / Realisasi Pekerjaan <span style="color: #ef4444;">*</span></label>
+                        <textarea id="inputDeskripsiProgres" name="deskripsi_progres" class="form-textarea" rows="3" placeholder="Tuliskan kemajuan pekerjaan atau aktivitas yang telah diselesaikan..." required></textarea>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
@@ -811,7 +308,7 @@
                         </div>
 
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">Rencana Tindak Lanjut</label>
+                            <label class="form-label">Rencana Tindak Lanjut / Solusi</label>
                             <textarea name="tindak_lanjut" class="form-textarea" rows="2" placeholder="Langkah berikutnya..."></textarea>
                         </div>
                     </div>
@@ -829,7 +326,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn-action-outline" onclick="closeModal('modalUpdateProgresUniversal')">Batal</button>
-                    <button type="submit" id="btnSubmitProgress" class="btn-action-green">Simpan Realisasi</button>
+                    <button type="submit" id="btnSubmitProgress" class="btn-action-green">Kirim Laporan Kemajuan ke Pembuat Tugas</button>
                 </div>
             </form>
         </div>
@@ -838,23 +335,6 @@
 @endsection
 
 @section('scripts')
-<style>
-    .preset-pill {
-        background: #f1f5f9;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        padding: 2px 8px;
-        font-size: 11.5px;
-        font-weight: 700;
-        color: #334155;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .preset-pill:hover {
-        background: #e2e8f0;
-        border-color: #94a3b8;
-    }
-</style>
 <script>
     function openModal(id) {
         const modal = document.getElementById(id);
@@ -870,84 +350,77 @@
         if (e.target.id === id) closeModal(id);
     }
 
-    let currentTaskBaseProg = 0;
-    let currentTaskMaxRemaining = 100;
-
-    function updateLiveCalcSaya(additionVal) {
-        const val = parseFloat(additionVal) || 0;
-        const total = Math.min(100, Math.round((currentTaskBaseProg + val) * 10) / 10);
-
-        document.getElementById('previewCalcCurrent').textContent = `${currentTaskBaseProg.toFixed(1)}%`;
-        document.getElementById('previewCalcAddition').textContent = `+${val.toFixed(1)}%`;
-        document.getElementById('previewCalcTotal').textContent = `${total.toFixed(1)}%`;
-
-        const notice = document.getElementById('noticeSelesai');
+    function updateModalType(type) {
+        const radioKemajuan = document.getElementById('radioJenisKemajuan');
+        const radioPenyelesaian = document.getElementById('radioJenisPenyelesaian');
+        const optKemajuan = document.getElementById('optJenisKemajuan');
+        const optPenyelesaian = document.getElementById('optJenisPenyelesaian');
+        const banner = document.getElementById('bannerInfoModal');
         const submitBtn = document.getElementById('btnSubmitProgress');
+        const heading = document.getElementById('modalProgressHeading');
+        const descInput = document.getElementById('inputDeskripsiProgres');
 
-        if (total >= 100) {
-            notice.style.display = 'block';
-            submitBtn.textContent = 'Selesaikan & Ajukan ke Katim';
-            submitBtn.className = 'btn-action-purple';
+        if (type === 'penyelesaian') {
+            if (radioPenyelesaian) radioPenyelesaian.checked = true;
+            if (optKemajuan) {
+                optKemajuan.style.borderColor = '#cbd5e1';
+                optKemajuan.style.background = '#f8fafc';
+            }
+            if (optPenyelesaian) {
+                optPenyelesaian.style.borderColor = '#8b5cf6';
+                optPenyelesaian.style.background = '#faf5ff';
+            }
+            if (banner) {
+                banner.style.background = '#faf5ff';
+                banner.style.borderColor = '#e9d5ff';
+                banner.style.color = '#7e22ce';
+                banner.innerHTML = '<i class="ph-bold ph-seal-check"></i> <strong>Mengajukan Penyelesaian Tugas.</strong> Setelah diajukan, tugas akan berstatus Menunggu Verifikasi untuk diperiksa dan disahkan oleh Katim.';
+            }
+            if (heading) heading.innerHTML = '<i class="ph-bold ph-seal-check"></i> Ajukan Penyelesaian Tugas ke Katim';
+            if (submitBtn) {
+                submitBtn.textContent = 'Ajukan Penyelesaian Tugas ke Katim';
+                submitBtn.className = 'btn-action-purple';
+            }
+            if (descInput && !descInput.value) {
+                descInput.placeholder = 'Jelaskan hasil akhir pekerjaan dan lampirkan berkas/tautan dokumen tuntas...';
+            }
         } else {
-            notice.style.display = 'none';
-            submitBtn.textContent = val > 0 ? `Simpan Realisasi (+${val.toFixed(1)}%)` : 'Simpan Realisasi';
-            submitBtn.className = 'btn-action-green';
+            if (radioKemajuan) radioKemajuan.checked = true;
+            if (optKemajuan) {
+                optKemajuan.style.borderColor = '#3b82f6';
+                optKemajuan.style.background = '#eff6ff';
+            }
+            if (optPenyelesaian) {
+                optPenyelesaian.style.borderColor = '#cbd5e1';
+                optPenyelesaian.style.background = '#f8fafc';
+            }
+            if (banner) {
+                banner.style.background = '#eff6ff';
+                banner.style.borderColor = '#bfdbfe';
+                banner.style.color = '#1e40af';
+                banner.innerHTML = '<i class="ph-bold ph-info"></i> Laporan kemajuan berkala akan diperiksa dan di-ACC oleh pembuat tugas/Katim (tugas tetap aktif berjalan).';
+            }
+            if (heading) heading.innerHTML = '<i class="ph-bold ph-pencil-simple-line"></i> Laporkan Kemajuan Tugas';
+            if (submitBtn) {
+                submitBtn.textContent = 'Kirim Laporan Kemajuan ke Pembuat Tugas';
+                submitBtn.className = 'btn-action-green';
+            }
+            if (descInput) {
+                descInput.placeholder = 'Tuliskan kemajuan pekerjaan atau aktivitas yang telah diselesaikan...';
+            }
         }
     }
 
-    function setPresetToSaya(preset) {
-        const input = document.getElementById('inputProgresCapaian');
-        const safeVal = Math.min(preset, currentTaskMaxRemaining);
-        input.value = safeVal;
-        updateLiveCalcSaya(safeVal);
-    }
-
-    function setProgresToRemaining() {
-        const input = document.getElementById('inputProgresCapaian');
-        input.value = currentTaskMaxRemaining;
-        updateLiveCalcSaya(currentTaskMaxRemaining);
-    }
-
-    function openProgressModal(id, kode, judul, currentProgres, isCompleting) {
+    function openProgressModal(id, kode, judul, defaultType) {
         const form = document.getElementById('formUpdateProgres');
         form.action = `/pekerjaan/${id}/progres`;
         document.getElementById('progressTaskTitle').textContent = `[${kode}] ${judul}`;
 
-        currentTaskBaseProg = parseFloat(currentProgres) || 0;
-        currentTaskMaxRemaining = Math.max(0, Math.round((100 - currentTaskBaseProg) * 10) / 10);
-
-        document.getElementById('displayCurrentProg').textContent = `${currentTaskBaseProg.toFixed(1)}%`;
-        document.getElementById('barCurrentProg').style.width = `${currentTaskBaseProg}%`;
-        document.getElementById('displayRemainingProg').textContent = `${currentTaskMaxRemaining.toFixed(1)}%`;
-
-        const inputProgres = document.getElementById('inputProgresCapaian');
-        inputProgres.max = currentTaskMaxRemaining;
-
-        const heading = document.getElementById('modalProgressHeading');
         const descInput = document.getElementById('inputDeskripsiProgres');
+        if (descInput) descInput.value = '';
 
-        if (isCompleting) {
-            heading.innerHTML = '<i class="ph-bold ph-seal-check"></i> Selesaikan Pekerjaan & Ajukan Hasil';
-            inputProgres.value = currentTaskMaxRemaining;
-            if (!descInput.value) {
-                descInput.value = 'Telah menyelesaikan seluruh sisa target penugasan bersama tim sesuai spesifikasi.';
-            }
-            updateLiveCalcSaya(currentTaskMaxRemaining);
-        } else {
-            heading.innerHTML = '<i class="ph-bold ph-pencil-simple-line"></i> Laporkan Realisasi & Progres';
-            inputProgres.value = '';
-            updateLiveCalcSaya(0);
-        }
-
-        inputProgres.oninput = function() {
-            updateLiveCalcSaya(this.value);
-        };
-
+        updateModalType(defaultType === 'penyelesaian' ? 'penyelesaian' : 'kemajuan');
         openModal('modalUpdateProgresUniversal');
-    }
-
-    function setProgresTo100() {
-        setProgresToRemaining();
     }
 </script>
 @endsection

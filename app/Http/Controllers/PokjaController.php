@@ -14,10 +14,10 @@ class PokjaController extends Controller
     public function index(): View
     {
         $pokjas = Pokja::with([
-                'katim',
-                'anggota',
-                'pekerjaan' => fn($q) => $q->select('id', 'pokja_id', 'progres', 'status_pelaksanaan')
-            ])
+            'katim',
+            'anggota',
+            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
+        ])
             ->withCount(['anggota', 'pekerjaan'])
             ->orderBy('id')
             ->get();
@@ -32,6 +32,7 @@ class PokjaController extends Controller
         $potentialKatims = User::whereIn('role', ['katim_korjafung', 'tim_pokja', 'pegawai', 'kasubag', 'korlayanan'])
             ->orderBy('name')
             ->get();
+
         return view('pokjas.create', compact('potentialKatims'));
     }
 
@@ -47,18 +48,18 @@ class PokjaController extends Controller
 
         $pokja = Pokja::create($validated);
 
-        if (!empty($validated['katim_id'])) {
+        if (! empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);
 
                 // Masukkan ketua ke pivot
                 $pokja->anggota()->syncWithoutDetaching([
-                    $selectedUser->id => ['peran' => 'ketua']
+                    $selectedUser->id => ['peran' => 'ketua'],
                 ]);
             }
         }
@@ -72,6 +73,7 @@ class PokjaController extends Controller
         $potentialKatims = User::whereIn('role', ['katim_korjafung', 'tim_pokja', 'pegawai', 'kasubag', 'korlayanan'])
             ->orderBy('name')
             ->get();
+
         return view('pokjas.edit', compact('pokja', 'potentialKatims'));
     }
 
@@ -87,18 +89,18 @@ class PokjaController extends Controller
 
         $pokja->update($validated);
 
-        if (!empty($validated['katim_id'])) {
+        if (! empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);
 
                 // Masukkan ketua ke pivot
                 $pokja->anggota()->syncWithoutDetaching([
-                    $selectedUser->id => ['peran' => 'ketua']
+                    $selectedUser->id => ['peran' => 'ketua'],
                 ]);
             }
         }

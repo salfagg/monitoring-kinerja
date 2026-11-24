@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('pekerjaan', function (Blueprint $table) {
             // Sumber pekerjaan: 'manual' (input bebas) atau 'skp' (terhubung ke SKP)
             $table->string('sumber_pekerjaan', 20)->default('manual')->after('kode_tampilan');
-            
+
             // Referensi ke RHK / SKP Tahunan
             $table->foreignId('skp_tahunan_id')
                 ->nullable()

@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Tambah kolom tipe ke tabel pokjas jika belum ada
-        if (!Schema::hasColumn('pokjas', 'tipe')) {
+        if (! Schema::hasColumn('pokjas', 'tipe')) {
             Schema::table('pokjas', function (Blueprint $table) {
                 $table->string('tipe')->default('tim_kerja')->after('kode_pokja'); // 'tim_kerja' atau 'kelompok_kerja'
             });
         }
 
         // 2. Buat tabel pivot pokja_user untuk mendukung multiple keanggotaan
-        if (!Schema::hasTable('pokja_user')) {
+        if (! Schema::hasTable('pokja_user')) {
             Schema::create('pokja_user', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('pokja_id')->constrained('pokjas')->cascadeOnDelete();

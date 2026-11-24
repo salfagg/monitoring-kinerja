@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pekerjaan_id')->constrained('pekerjaan')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // Aktor pemeriksa / pengusul
-            
+
             // Jenis Aksi: pengajuan_rincian, persetujuan_rincian, perbaikan_rincian, pengajuan_hasil, penerimaan_hasil, perbaikan_hasil
             $table->string('jenis_aksi');
             $table->string('status_sebelumnya')->nullable();
             $table->string('status_baru');
             $table->text('catatan')->nullable();
-            
+
             $table->timestamps();
         });
     }

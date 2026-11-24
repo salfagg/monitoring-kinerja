@@ -109,13 +109,24 @@ class User extends Authenticatable
         return $this->hasMany(Pekerjaan::class, 'pembuat_id');
     }
 
+    public function realisasiPekerjaan(): HasMany
+    {
+        return $this->hasMany(RealisasiPekerjaan::class, 'user_id');
+    }
+
     // 7 Official Roles BGTK 2026
     public const ROLE_KABAL = 'kabal';
+
     public const ROLE_KASUBAG = 'kasubag';
+
     public const ROLE_KORJAFUNG = 'korjafung';
+
     public const ROLE_KATIM = 'katim';
+
     public const ROLE_KORLAYANAN = 'korlayanan';
+
     public const ROLE_PEGAWAI = 'pegawai';
+
     public const ROLE_ADMIN = 'admin';
 
     public const ROLES = [

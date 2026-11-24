@@ -4,397 +4,7 @@
 @section('page-title', 'Pusat Persetujuan Progres')
 
 @section('styles')
-<style>
-    /* Hero Header */
-    .approval-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border-radius: var(--radius-lg);
-        padding: 24px 28px;
-        color: #ffffff;
-        margin-bottom: 24px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
-    }
-
-    .approval-header::after {
-        content: '';
-        position: absolute;
-        top: -40px;
-        right: -40px;
-        width: 180px;
-        height: 180px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(255,255,255,0) 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .header-content {
-        position: relative;
-        z-index: 1;
-        max-width: 800px;
-    }
-
-    .header-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, 0.12);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11.5px;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #93c5fd;
-        margin-bottom: 10px;
-    }
-
-    .approval-header h2 {
-        font-size: 20px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        letter-spacing: -0.01em;
-    }
-
-    .approval-header p {
-        font-size: 13.5px;
-        color: #cbd5e1;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    /* KPI Summary Cards */
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .kpi-card {
-        background: #ffffff;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--border);
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-        text-decoration: none;
-        color: inherit;
-        cursor: pointer;
-    }
-
-    .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-        border-color: #cbd5e1;
-    }
-
-    .kpi-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .kpi-amber { background: #fffbeb; color: #d97706; }
-    .kpi-blue { background: #eff6ff; color: #2563eb; }
-    .kpi-green { background: #f0fdf4; color: #16a34a; }
-
-    .kpi-info h4 {
-        font-size: 24px;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.1;
-    }
-
-    .kpi-info p {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 3px;
-    }
-
-    /* Tab Navigation */
-    .tabs-wrapper {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    .tabs-header {
-        display: flex;
-        border-bottom: 1px solid var(--border);
-        background: #f8fafc;
-        overflow-x: auto;
-    }
-
-    .tab-btn {
-        padding: 16px 22px;
-        font-size: 13.5px;
-        font-weight: 700;
-        color: #64748b;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 3px solid transparent;
-        transition: var(--transition);
-        white-space: nowrap;
-    }
-
-    .tab-btn:hover {
-        color: var(--primary);
-        background: rgba(37, 99, 235, 0.03);
-    }
-
-    .tab-btn.active {
-        color: var(--primary);
-        border-bottom-color: var(--primary);
-        background: #ffffff;
-    }
-
-    .tab-badge {
-        font-size: 11px;
-        font-weight: 800;
-        padding: 2px 7px;
-        border-radius: 999px;
-        line-height: 1;
-    }
-
-    .tab-badge-amber { background: #fffbeb; color: #b45309; }
-    .tab-badge-gray { background: #f1f5f9; color: #475569; }
-
-    /* Filter Bar inside Tab */
-    .filter-bar {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        background: #ffffff;
-    }
-
-    .search-box {
-        position: relative;
-        flex: 1;
-        min-width: 240px;
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 16px;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 9px 12px 9px 36px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        background: #f8fafc;
-        outline: none;
-        transition: var(--transition);
-    }
-
-    .search-input:focus {
-        border-color: var(--primary);
-        background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .filter-select {
-        padding: 9px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        background: #f8fafc;
-        outline: none;
-        min-width: 180px;
-        cursor: pointer;
-    }
-
-    /* Tables */
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        color: #475569;
-        font-weight: 700;
-        padding: 12px 16px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        white-space: nowrap;
-    }
-
-    .data-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-        color: #1e293b;
-    }
-
-    .data-table tr:hover td {
-        background: #fbfdff;
-    }
-
-    .btn-action-primary {
-        background: #10b981;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: var(--transition);
-        text-decoration: none;
-    }
-
-    .btn-action-primary:hover {
-        background: #059669;
-        transform: translateY(-1px);
-    }
-
-    .btn-action-outline {
-        background: white;
-        color: #475569;
-        border: 1px solid var(--border);
-        padding: 6px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: var(--transition);
-        cursor: pointer;
-    }
-
-    .btn-action-outline:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-        color: #0f172a;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 48px 20px;
-        color: #64748b;
-    }
-
-    .empty-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        color: #94a3b8;
-        margin: 0 auto 16px;
-    }
-
-    .empty-state h4 {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 6px;
-    }
-
-    .empty-state p {
-        font-size: 13px;
-        margin: 0;
-        max-width: 400px;
-        margin-inline: auto;
-    }
-
-    /* Modal Styling */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.65);
-        backdrop-filter: blur(4px);
-        z-index: 1050;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-    }
-
-    .modal-card {
-        background: #ffffff;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 520px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-    }
-
-    .modal-header {
-        padding: 18px 24px;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .modal-title {
-        font-size: 16px;
-        font-weight: 800;
-        color: #0f172a;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .modal-body {
-        padding: 20px 24px;
-    }
-
-    .modal-footer {
-        padding: 16px 24px;
-        background: #f8fafc;
-        border-top: 1px solid #f1f5f9;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/pekerjaan.css') }}">
 @endsection
 
 @section('content')
@@ -422,7 +32,7 @@
             </div>
             <h2>Pusat Persetujuan Laporan Progres Pegawai</h2>
             <p>
-                Setiap laporan progres dari pegawai pelaksana harus disetujui terlebih dahulu oleh <strong>Katim atau Koordinator pembuat tugas</strong>. Setelah disetujui, capaian persentase progres akan otomatis diakumulasikan ke pekerjaan hingga 100%.
+                Setiap laporan progres dari pegawai pelaksana divalidasi oleh <strong>Katim atau Koordinator pembuat tugas</strong>. Laporan berkala mendokumentasikan catatan kemajuan, dan laporan penyelesaian tugas akan mengesahkan status pekerjaan menjadi selesai terverifikasi.
             </p>
         </div>
     </div>
@@ -445,7 +55,7 @@
             </div>
             <div class="kpi-info">
                 <h4>{{ $countSelesaiTerverifikasi }}</h4>
-                <p>Pekerjaan Tuntas (100%)</p>
+                <p>Pekerjaan Tuntas Selesai</p>
             </div>
         </a>
 
@@ -519,7 +129,7 @@
                                 <th>Pegawai Pelapor</th>
                                 <th>Pekerjaan & Tim</th>
                                 <th>Pemberi Tugas</th>
-                                <th>Tambahan Progres</th>
+                                <th>Jenis Laporan</th>
                                 <th>Uraian Progres</th>
                                 <th>Bukti Dukung</th>
                                 <th style="text-align: right;">Aksi Approval</th>
@@ -559,7 +169,7 @@
                                             </a>
                                             <div style="font-size: 11px; color: #64748b; margin-top: 3px;">
                                                 <i class="ph-bold ph-buildings"></i> {{ $pekerjaan->pokja?->nama_pokja ?? 'BGTK DKI' }}
-                                                &bull; Progres Saat Ini: <strong>{{ number_format($pekerjaan->progres, 1) }}%</strong>
+                                                &bull; Status: <strong>{{ $pekerjaan->status_pelaksanaan_label }}</strong>
                                             </div>
                                         @else
                                             <span style="color: #94a3b8;">-</span>
@@ -574,16 +184,17 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
-                                            <span style="font-size: 13px; font-weight: 800; color: #d97706; background: #fffbeb; padding: 2px 8px; border-radius: 6px; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 2px;">
-                                                <i class="ph-bold ph-plus" style="font-size: 10px;"></i>{{ number_format($item->progres_capaian, 1) }}%
+                                        @if($item->isPenyelesaian())
+                                            <span class="badge-pill" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;">
+                                                <i class="ph-bold ph-seal-check"></i> Penyelesaian Akhir
                                             </span>
-                                            @if($pekerjaan)
-                                                <span style="font-size: 11px; color: #64748b;">
-                                                    Menjadi: <strong style="color: #10b981;">{{ min(100, number_format($pekerjaan->progres + $item->progres_capaian, 1)) }}%</strong>
-                                                </span>
-                                            @endif
-                                        </div>
+                                            <div style="font-size: 11px; color: #7e22ce; margin-top: 3px; font-weight: 600;">Mengajukan Tuntas</div>
+                                        @else
+                                            <span class="badge-pill" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px;">
+                                                <i class="ph-bold ph-pencil-simple-line"></i> Kemajuan Berkala
+                                            </span>
+                                            <div style="font-size: 11px; color: #64748b; margin-top: 3px;">Catatan Progres</div>
+                                        @endif
                                     </td>
                                     <td style="max-width: 250px;">
                                         <div style="font-size: 12.5px; color: #1e293b; line-height: 1.4;">
@@ -597,12 +208,16 @@
                                     </td>
                                     <td>
                                         @if($item->file_bukti)
-                                            <a href="{{ asset('storage/' . $item->file_bukti) }}" target="_blank" class="btn-action-outline" style="padding: 4px 8px; font-size: 11.5px;">
-                                                <i class="ph-bold ph-download-simple"></i> File Bukti
-                                            </a>
+                                            <button type="button" 
+                                                    onclick="previewBuktiDukung('{{ asset('storage/' . $item->file_bukti) }}', '{{ basename($item->file_bukti) }}')" 
+                                                    class="btn-action-outline" 
+                                                    style="padding: 4px 8px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; color: #0284c7; border-color: #bae6fd; background: #f0f9ff;"
+                                                    title="Pratinjau File Bukti Dukung">
+                                                <i class="ph-bold ph-eye"></i> File Bukti
+                                            </button>
                                         @endif
                                         @if($item->link_bukti)
-                                            <a href="{{ $item->link_bukti }}" target="_blank" class="btn-action-outline" style="padding: 4px 8px; font-size: 11.5px; margin-top: 4px;">
+                                            <a href="{{ $item->link_bukti }}" target="_blank" class="btn-action-outline" style="padding: 4px 8px; font-size: 11.5px; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">
                                                 <i class="ph-bold ph-arrow-square-out"></i> Tautan
                                             </a>
                                         @endif
@@ -613,7 +228,11 @@
                                     <td style="text-align: right; white-space: nowrap;">
                                         @if($isPembuat)
                                             <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                                                <form action="{{ route('realisasi.approve', $item) }}" method="POST" onsubmit="return confirm('Setujui laporan progres ini? Capaian +{{ $item->progres_capaian }}% akan langsung diakumulasikan ke pekerjaan.')">
+                                                <form action="{{ route('realisasi.approve', $item) }}" method="POST" 
+                                                      data-confirm="Setujui laporan ini? {{ $item->isPenyelesaian() ? 'Pekerjaan akan disahkan sebagai Selesai Terverifikasi.' : 'Laporan kemajuan berkala akan disahkan dan dicatat.' }}"
+                                                      data-confirm-title="Persetujuan Laporan {{ $item->isPenyelesaian() ? 'Penyelesaian' : 'Kemajuan' }}"
+                                                      data-confirm-btn="Ya, Setujui"
+                                                      data-confirm-type="success">
                                                     @csrf
                                                     <button type="submit" class="btn-action-primary" title="Setujui laporan progres">
                                                         <i class="ph-bold ph-check"></i> Setujui

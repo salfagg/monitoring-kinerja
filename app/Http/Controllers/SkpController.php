@@ -31,7 +31,7 @@ class SkpController extends Controller
             if (! ($user->isKabal() || $user->isKasubag() || $user->isAdmin())) {
                 $query->where(function ($q) use ($user) {
                     if ($user->pokja_id) {
-                        $q->whereHas('user', fn($u) => $u->where('pokja_id', $user->pokja_id));
+                        $q->whereHas('user', fn ($u) => $u->where('pokja_id', $user->pokja_id));
                     }
                     $q->orWhere('user_id', $user->id);
                 });
@@ -56,7 +56,7 @@ class SkpController extends Controller
 
         // Filter Pokja (khusus pimpinan/admin)
         if ($isManager && $request->filled('pokja_id')) {
-            $query->whereHas('user', fn($u) => $u->where('pokja_id', $request->pokja_id));
+            $query->whereHas('user', fn ($u) => $u->where('pokja_id', $request->pokja_id));
         }
 
         // Pencarian teks
@@ -64,8 +64,8 @@ class SkpController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('rencana_kinerja', 'like', "%{$search}%")
-                  ->orWhere('indikator_kinerja', 'like', "%{$search}%")
-                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+                    ->orWhere('indikator_kinerja', 'like', "%{$search}%")
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -78,7 +78,7 @@ class SkpController extends Controller
         } elseif (! ($user->isKabal() || $user->isKasubag() || $user->isAdmin())) {
             $baseMetrik->where(function ($q) use ($user) {
                 if ($user->pokja_id) {
-                    $q->whereHas('user', fn($u) => $u->where('pokja_id', $user->pokja_id));
+                    $q->whereHas('user', fn ($u) => $u->where('pokja_id', $user->pokja_id));
                 }
                 $q->orWhere('user_id', $user->id);
             });
@@ -263,7 +263,7 @@ class SkpController extends Controller
         $skp->delete();
 
         return redirect()->route('skp.index')
-            ->with('success', "SKP berhasil dihapus.");
+            ->with('success', 'SKP berhasil dihapus.');
     }
 
     /**
@@ -282,4 +282,3 @@ class SkpController extends Controller
             ->with('success', "SKP Pegawai '{$skp->user?->name}' berhasil disetujui.");
     }
 }
-

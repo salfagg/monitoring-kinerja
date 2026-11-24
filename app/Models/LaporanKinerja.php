@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -107,11 +108,11 @@ class LaporanKinerja extends Model
 
     public function getDurasiFormatAttribute(): string
     {
-        if (!$this->jam_mulai || !$this->jam_selesai) {
+        if (! $this->jam_mulai || ! $this->jam_selesai) {
             return '-';
         }
-        $start = \Carbon\Carbon::parse($this->jam_mulai);
-        $end = \Carbon\Carbon::parse($this->jam_selesai);
+        $start = Carbon::parse($this->jam_mulai);
+        $end = Carbon::parse($this->jam_selesai);
         $diffMin = $start->diffInMinutes($end);
         $hours = floor($diffMin / 60);
         $mins = $diffMin % 60;
@@ -120,6 +121,7 @@ class LaporanKinerja extends Model
         } elseif ($hours > 0) {
             return "{$hours} jam";
         }
+
         return "{$mins} mnt";
     }
 

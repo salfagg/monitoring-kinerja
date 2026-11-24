@@ -22,9 +22,9 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('jabatan', 'like', "%{$search}%");
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%");
             });
         }
 
@@ -55,6 +55,7 @@ class UserController extends Controller
     public function create(): View
     {
         $pokjas = Pokja::orderBy('nama_pokja')->get();
+
         return view('users.create', compact('pokjas'));
     }
 
@@ -82,6 +83,7 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         $pokjas = Pokja::orderBy('nama_pokja')->get();
+
         return view('users.edit', compact('user', 'pokjas'));
     }
 
@@ -98,7 +100,7 @@ class UserController extends Controller
             'nomor_hp' => ['nullable', 'string', 'max:30'],
         ]);
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);

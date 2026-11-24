@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Pekerjaan;
 use App\Models\Pokja;
 use App\Models\RealisasiPekerjaan;
-use App\Models\RiwayatPersetujuanPekerjaan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -43,8 +42,6 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $katim4->id,
             'penanggung_jawab_id' => $rina ? $rina->id : $katim4->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 100.00,
-            'progres' => 50.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'dikerjakan',
         ]);
@@ -62,8 +59,6 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $rina ? $rina->id : $katim4->id,
             'penanggung_jawab_id' => $rina ? $rina->id : $katim4->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 100.00,
-            'progres' => 50.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'dikerjakan',
         ]);
@@ -81,13 +76,11 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $dedi->id,
             'penanggung_jawab_id' => $dedi->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 100.00,
-            'progres' => 50.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'dikerjakan',
         ]);
 
-        // 1.1.1.1: Analisis Kebutuhan (Bobot 20%, Progres 100% -> Kontribusi 20%)
+        // 1.1.1.1: Analisis Kebutuhan
         $p1_1_1_1 = Pekerjaan::create([
             'parent_id' => $p1_1_1->id,
             'kode_tampilan' => '1.1.1.1',
@@ -100,8 +93,6 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $dedi->id,
             'penanggung_jawab_id' => $dedi->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 20.00,
-            'progres' => 100.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'selesai_terverifikasi',
             'tanggal_selesai_terverifikasi' => Carbon::now()->subDays(3),
@@ -110,14 +101,17 @@ class PekerjaanHierarchySeeder extends Seeder
         RealisasiPekerjaan::create([
             'pekerjaan_id' => $p1_1_1_1->id,
             'user_id' => $dedi->id,
+            'jenis_laporan' => 'penyelesaian',
             'tanggal' => Carbon::now()->subDays(4)->toDateString(),
-            'progres_capaian' => 100.00,
+            'status_approval' => 'disetujui',
+            'approved_by' => $katim4->id,
+            'approved_at' => Carbon::now()->subDays(3),
             'deskripsi_progres' => 'Telah menyelesaikan dokumen SRS dan disepakati oleh tim teknis.',
             'nama_bukti' => 'Dokumen SRS SILAT v2.pdf',
             'link_bukti' => 'https://drive.google.com/sample-srs-silat',
         ]);
 
-        // 1.1.1.2: Pengembangan Formulir (Bobot 50%, Progres 60% -> Kontribusi 30%)
+        // 1.1.1.2: Pengembangan Formulir
         $p1_1_1_2 = Pekerjaan::create([
             'parent_id' => $p1_1_1->id,
             'kode_tampilan' => '1.1.1.2',
@@ -130,8 +124,6 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $dedi->id,
             'penanggung_jawab_id' => $dedi->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 50.00,
-            'progres' => 60.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'dikerjakan',
         ]);
@@ -139,15 +131,18 @@ class PekerjaanHierarchySeeder extends Seeder
         RealisasiPekerjaan::create([
             'pekerjaan_id' => $p1_1_1_2->id,
             'user_id' => $dedi->id,
+            'jenis_laporan' => 'kemajuan',
             'tanggal' => Carbon::now()->subDay()->toDateString(),
-            'progres_capaian' => 60.00,
+            'status_approval' => 'disetujui',
+            'approved_by' => $katim4->id,
+            'approved_at' => Carbon::now()->subDay(),
             'deskripsi_progres' => 'Form pendaftaran dan validasi step 1-3 telah selesai diimplementasikan.',
             'kendala' => 'Menunggu integrasi API Dapodik untuk validasi otomatis.',
             'tindak_lanjut' => 'Koordinasi teknis dengan admin database.',
             'nama_bukti' => 'Screenshot Implementasi Form.png',
         ]);
 
-        // 1.1.1.3: Pengujian (Bobot 30%, Progres 0% -> Kontribusi 0%)
+        // 1.1.1.3: Pengujian
         Pekerjaan::create([
             'parent_id' => $p1_1_1->id,
             'kode_tampilan' => '1.1.1.3',
@@ -160,8 +155,6 @@ class PekerjaanHierarchySeeder extends Seeder
             'pembuat_id' => $dedi->id,
             'penanggung_jawab_id' => $dedi->id,
             'pokja_id' => $tim4?->id,
-            'bobot' => 30.00,
-            'progres' => 0.00,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'belum_dimulai',
         ]);
@@ -185,8 +178,6 @@ class PekerjaanHierarchySeeder extends Seeder
                 'pembuat_id' => $katim3->id,
                 'penanggung_jawab_id' => $dedi->id,
                 'pokja_id' => $tim3?->id,
-                'bobot' => 100.00,
-                'progres' => 25.00,
                 'status_persetujuan' => 'disetujui',
                 'status_pelaksanaan' => 'dikerjakan',
             ]);
@@ -203,8 +194,6 @@ class PekerjaanHierarchySeeder extends Seeder
                 'pembuat_id' => $dedi->id,
                 'penanggung_jawab_id' => $dedi->id,
                 'pokja_id' => $tim3?->id,
-                'bobot' => 40.00,
-                'progres' => 62.50,
                 'status_persetujuan' => 'disetujui',
                 'status_pelaksanaan' => 'dikerjakan',
             ]);
@@ -221,8 +210,6 @@ class PekerjaanHierarchySeeder extends Seeder
                 'pembuat_id' => $dedi->id,
                 'penanggung_jawab_id' => $dedi->id,
                 'pokja_id' => $tim3?->id,
-                'bobot' => 60.00,
-                'progres' => 0.00,
                 'status_persetujuan' => 'disetujui',
                 'status_pelaksanaan' => 'belum_dimulai',
             ]);

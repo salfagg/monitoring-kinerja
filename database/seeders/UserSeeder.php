@@ -621,18 +621,28 @@ class UserSeeder extends Seeder
 
         // Tautkan Katim pada masing-masing Tim Kerja resmi
         $widiatmoko = User::where('email', 'widiatmoko@bgtk.go.id')->first();
-        if ($tim1 && $widiatmoko) $tim1->update(['katim_id' => $widiatmoko->id]);
+        if ($tim1 && $widiatmoko) {
+            $tim1->update(['katim_id' => $widiatmoko->id]);
+        }
 
         $ghozy = User::where('email', 'ahmad.ghozy@bgtk.go.id')->first();
-        if ($tim2 && $ghozy) $tim2->update(['katim_id' => $ghozy->id]);
+        if ($tim2 && $ghozy) {
+            $tim2->update(['katim_id' => $ghozy->id]);
+        }
 
         $endang = User::where('email', 'endang@bgtk.go.id')->first();
-        if ($tim3 && $endang) $tim3->update(['katim_id' => $endang->id]);
+        if ($tim3 && $endang) {
+            $tim3->update(['katim_id' => $endang->id]);
+        }
 
         $widyatmo = User::where('email', 'widyatmo@bgtk.go.id')->first();
-        if ($tim4 && $widyatmo) $tim4->update(['katim_id' => $widyatmo->id]);
+        if ($tim4 && $widyatmo) {
+            $tim4->update(['katim_id' => $widyatmo->id]);
+        }
 
         $ikrar = User::where('email', 'ikrar@bgtk.go.id')->first();
-        if ($tim5 && $ikrar) $tim5->update(['katim_id' => $ikrar->id]);
+        if ($tim5 && $ikrar) {
+            $tim5->update(['katim_id' => $ikrar->id]);
+        }
     }
 }

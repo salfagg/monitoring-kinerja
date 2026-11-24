@@ -14,9 +14,13 @@ class PersetujuanTest extends TestCase
     use RefreshDatabase;
 
     protected User $katim;
+
     protected User $pegawai;
+
     protected Pokja $pokja;
+
     protected Pekerjaan $parentJob;
+
     protected Pekerjaan $subJob;
 
     protected function setUp(): void
@@ -60,8 +64,6 @@ class PersetujuanTest extends TestCase
             'penanggung_jawab_id' => $this->katim->id,
             'pembuat_id' => $this->katim->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 100,
-            'progres' => 0,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'belum_dimulai',
         ]);
@@ -77,8 +79,6 @@ class PersetujuanTest extends TestCase
             'penanggung_jawab_id' => $this->pegawai->id,
             'pembuat_id' => $this->pegawai->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 100,
-            'progres' => 0,
             'status_persetujuan' => 'diajukan',
             'status_pelaksanaan' => 'belum_dimulai',
         ]);
@@ -89,9 +89,8 @@ class PersetujuanTest extends TestCase
         $response = $this->actingAs($this->katim)->get(route('persetujuan.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Pusat Persetujuan & Verifikasi');
-        $response->assertSee('Tahap 1: Persetujuan Struktur Rincian');
-        $response->assertSee('Penyusunan Modul Ajar dan Rubrik Penilaian');
+        $response->assertSee('Pusat Persetujuan Laporan Progres Pegawai');
+        $response->assertSee('Antrean Laporan Progres Pegawai');
     }
 
     public function test_katim_can_approve_rincian_pekerjaan(): void
@@ -135,14 +134,13 @@ class PersetujuanTest extends TestCase
         $this->subJob->update([
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'hasil_diajukan',
-            'progres' => 100,
         ]);
 
         RealisasiPekerjaan::create([
             'pekerjaan_id' => $this->subJob->id,
             'user_id' => $this->pegawai->id,
+            'jenis_laporan' => 'penyelesaian',
             'tanggal' => now()->toDateString(),
-            'progres_capaian' => 100,
             'deskripsi_progres' => 'Pekerjaan modul telah rampung dan siap diperiksa.',
         ]);
 

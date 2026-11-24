@@ -4,241 +4,7 @@
 @section('page-title', 'Daftar Pekerjaan & Penugasan')
 
 @section('styles')
-<style>
-    /* Summary KPI Cards */
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .summary-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-    }
-
-    .summary-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .summary-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .icon-blue { background: #e8f2fb; color: #0a6fb5; }
-    .icon-amber { background: #fff3d9; color: #b87400; }
-    .icon-purple { background: #efe8fa; color: #6f45bd; }
-    .icon-green { background: #e3f6ee; color: #0c8a5d; }
-
-    .summary-info h4 {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--text-dark);
-        line-height: 1.1;
-    }
-
-    .summary-info p {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 3px;
-    }
-
-    /* Actions & Filter Toolbar */
-    .toolbar-wrapper {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 20px 24px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .toolbar-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-        gap: 14px;
-    }
-
-    .btn-create-main {
-        background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
-        color: white;
-        padding: 9px 18px;
-        border-radius: var(--radius-md);
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 14px rgba(11, 74, 130, 0.22);
-        transition: var(--transition);
-    }
-
-    .btn-create-main:hover {
-        background: linear-gradient(135deg, var(--navy-deep) 0%, var(--primary-hover) 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(11, 74, 130, 0.28);
-    }
-
-    .filter-grid {
-        display: grid;
-        grid-template-columns: 2fr 1.2fr 1.2fr auto;
-        gap: 12px;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .filter-control {
-        width: 100%;
-        padding: 9px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        background: #f8fafc;
-        outline: none;
-    }
-
-    .filter-control:focus {
-        background: #fff;
-        border-color: var(--primary);
-    }
-
-    /* Modern Table Card */
-    .table-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        padding: 14px 18px;
-        font-size: 11.5px;
-        font-weight: 800;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .data-table td {
-        padding: 16px 18px;
-        border-bottom: 1px solid #f1f5f9;
-        font-size: 13px;
-        color: #1e293b;
-        vertical-align: middle;
-    }
-
-    .data-table tbody tr:hover {
-        background: #fafbfc;
-    }
-
-    /* Badges */
-    .badge-code {
-        font-family: monospace;
-        background: #eff6ff;
-        color: #1d4ed8;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 11.5px;
-        font-weight: 800;
-        border: 1px solid #bfdbfe;
-        display: inline-block;
-        margin-bottom: 4px;
-    }
-
-    .badge-status {
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        white-space: nowrap;
-    }
-
-    .badge-belum_dimulai { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-    .badge-dikerjakan { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .badge-hasil_diajukan { background: #faf5ff; color: #86198f; border: 1px solid #f5d0fe; font-weight: 800; }
-    .badge-selesai_terverifikasi { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 800; }
-    .badge-perlu_perbaikan_hasil { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-
-    /* Progress bar */
-    .progress-bar-wrap {
-        width: 110px;
-        height: 7px;
-        background: #e2e8f0;
-        border-radius: 999px;
-        overflow: hidden;
-        display: inline-block;
-        margin-right: 8px;
-        vertical-align: middle;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #3b82f6, #10b981);
-    }
-
-    .btn-action-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        color: #475569;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        text-decoration: none;
-        transition: var(--transition);
-        cursor: pointer;
-    }
-
-    .btn-action-icon:hover {
-        background: #ffffff;
-        color: #2563eb;
-        border-color: #2563eb;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/pekerjaan.css') }}">
 @endsection
 
 @section('content')
@@ -353,12 +119,12 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 32%;">Pekerjaan & Unit Kerja</th>
+                        <th style="width: 30%;">Pekerjaan & Unit Kerja</th>
                         <th style="width: 16%;">Pemberi Tugas</th>
-                        <th style="width: 22%;">Tim Pelaksana</th>
+                        <th style="width: 20%;">Tim Pelaksana</th>
                         <th style="width: 12%;">Tenggat</th>
-                        <th style="width: 18%;">Progres Akumulasi</th>
-                        <th style="width: 12%;">Status</th>
+                        <th style="width: 20%;">Status & Aktivitas</th>
+                        <th style="width: 12%;">Persetujuan</th>
                         <th style="text-align: right; width: 10%;">Aksi</th>
                     </tr>
                 </thead>
@@ -452,33 +218,51 @@
                                 @endif
                             </td>
 
-                            <!-- Progres Akumulasi Tim -->
+                            <!-- Status & Aktivitas -->
                             <td>
-                                <div style="display: flex; align-items: center;">
-                                    <div class="progress-bar-wrap">
-                                        <div class="progress-bar-fill" style="width: {{ $p->progres }}%;"></div>
-                                    </div>
-                                    <strong style="font-size: 13px; font-family: monospace; color: {{ $p->progres >= 100 ? '#059669' : '#2563eb' }};">
-                                        {{ number_format($p->progres, 1) }}%
-                                    </strong>
+                                <div>
+                                    @if($p->status_pelaksanaan === 'selesai_terverifikasi')
+                                        <span class="badge-status badge-disetujui" style="font-size: 11px; padding: 3px 8px; font-weight: 700;">
+                                            <i class="ph-bold ph-check-circle"></i> Selesai
+                                        </span>
+                                    @elseif($p->status_pelaksanaan === 'hasil_diajukan')
+                                        <span class="badge-status" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-size: 11px; padding: 3px 8px; font-weight: 700;">
+                                            <i class="ph-bold ph-clock"></i> Verifikasi Hasil
+                                        </span>
+                                    @elseif($p->status_pelaksanaan === 'dikerjakan')
+                                        <span class="badge-status badge-perlu_perbaikan" style="background: #eff6ff; color: #2563eb; border-color: #bfdbfe; font-size: 11px; padding: 3px 8px; font-weight: 700;">
+                                            <i class="ph-bold ph-spinner"></i> Dikerjakan
+                                        </span>
+                                    @elseif($p->status_pelaksanaan === 'perlu_perbaikan_hasil')
+                                        <span class="badge-status badge-dibatalkan" style="background: #fef2f2; color: #dc2626; border-color: #fecaca; font-size: 11px; padding: 3px 8px; font-weight: 700;">
+                                            <i class="ph-bold ph-warning"></i> Perlu Revisi
+                                        </span>
+                                    @else
+                                        <span class="badge-status badge-dibatalkan" style="background: #f8fafc; color: #64748b; border-color: #e2e8f0; font-size: 11px; padding: 3px 8px; font-weight: 700;">
+                                            <i class="ph-bold ph-circle-dashed"></i> Belum Mulai
+                                        </span>
+                                    @endif
                                 </div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-                                    {{ $p->realisasi->count() }} kali lapor progres
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; display: flex; flex-direction: column; gap: 3px;">
+                                    @if($p->children->isNotEmpty())
+                                        <span><i class="ph-bold ph-git-fork"></i> {{ $p->children->where('status_pelaksanaan', 'selesai_terverifikasi')->count() }}/{{ $p->children->count() }} Subtugas Tuntas</span>
+                                    @else
+                                        <span><i class="ph-bold ph-chats-circle"></i> {{ $p->realisasi->where('status_approval', 'disetujui')->count() }} Laporan di-ACC</span>
+                                    @endif
+
+                                    @php $pendingCnt = $p->realisasi->where('status_approval', 'menunggu_persetujuan')->count(); @endphp
+                                    @if($pendingCnt > 0)
+                                        <span style="font-size: 10px; background: #fef3c7; color: #b45309; padding: 1px 6px; border-radius: 4px; font-weight: 700; width: fit-content;">
+                                            <i class="ph-bold ph-bell"></i> {{ $pendingCnt }} butuh ACC Katim
+                                        </span>
+                                    @endif
                                 </div>
                             </td>
 
-                            <!-- Status Pelaksanaan -->
+                            <!-- Status Persetujuan -->
                             <td>
-                                <span class="badge-status badge-{{ $p->status_pelaksanaan }}">
-                                    @if($p->status_pelaksanaan === 'selesai_terverifikasi')
-                                        <i class="ph-bold ph-check-circle"></i> Selesai
-                                    @elseif($p->status_pelaksanaan === 'hasil_diajukan')
-                                        <i class="ph-bold ph-clock"></i> Verifikasi
-                                    @elseif($p->status_pelaksanaan === 'dikerjakan')
-                                        <i class="ph-bold ph-spinner"></i> Dikerjakan
-                                    @else
-                                        <i class="ph-bold ph-hourglass"></i> Belum Mulai
-                                    @endif
+                                <span class="badge-status badge-{{ $p->status_persetujuan }}">
+                                    {{ str_replace('_', ' ', $p->status_persetujuan) }}
                                 </span>
                             </td>
 
@@ -526,41 +310,29 @@
         @endif
     </div>
 
-    <!-- Modal Konfirmasi Hapus Sederhana -->
-    <div id="modalHapusIndex" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: white; border-radius: 14px; max-width: 440px; width: 100%; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; color: #dc2626;">
-                <i class="ph-bold ph-warning-octagon" style="font-size: 28px;"></i>
-                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Konfirmasi Hapus Pekerjaan</h4>
-            </div>
-            <p style="font-size: 13.5px; color: #475569; margin-bottom: 20px; line-height: 1.5;">
-                Apakah Anda yakin ingin menghapus penugasan: <strong id="deleteJobTitle">-</strong>? Seluruh berkas dan riwayat progres di dalamnya akan ikut terhapus.
-            </p>
-            <form id="formHapusIndex" method="POST" style="display: flex; justify-content: flex-end; gap: 10px;">
-                @csrf
-                @method('DELETE')
-                <button type="button" onclick="closeHapusModal()" style="padding: 9px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; font-weight: 600; font-size: 13px; cursor: pointer;">
-                    Batal
-                </button>
-                <button type="submit" style="padding: 9px 20px; border-radius: 8px; border: none; background: #dc2626; color: white; font-weight: 700; font-size: 13px; cursor: pointer;">
-                    Ya, Hapus
-                </button>
-            </form>
-        </div>
-    </div>
-
+    <!-- Form Hidden Hapus Pekerjaan -->
+    <form id="formHapusIndex" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 @endsection
 
 @section('scripts')
 <script>
     function confirmDeletePekerjaan(id, title) {
-        document.getElementById('formHapusIndex').action = `/pekerjaan/${id}`;
-        document.getElementById('deleteJobTitle').textContent = title;
-        document.getElementById('modalHapusIndex').style.display = 'flex';
-    }
-
-    function closeHapusModal() {
-        document.getElementById('modalHapusIndex').style.display = 'none';
+        window.tanjidorConfirm({
+            title: 'Konfirmasi Hapus Pekerjaan',
+            text: `Apakah Anda yakin ingin menghapus penugasan "${title}"? Seluruh berkas dan riwayat progres di dalamnya akan ikut terhapus.`,
+            confirmButtonText: 'Ya, Hapus',
+            type: 'danger',
+            icon: 'warning'
+        }).then(confirmed => {
+            if (confirmed) {
+                const form = document.getElementById('formHapusIndex');
+                form.action = `/pekerjaan/${id}`;
+                form.submit();
+            }
+        });
     }
 </script>
 @endsection

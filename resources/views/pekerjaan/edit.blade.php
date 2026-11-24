@@ -4,602 +4,7 @@
 @section('page-title', "Edit Pekerjaan: {$pekerjaan->kode_tampilan}")
 
 @section('styles')
-<style>
-    /* Layout Container & Grid */
-    .form-page-layout {
-        display: grid;
-        grid-template-columns: 1fr 340px;
-        gap: 28px;
-        align-items: start;
-        margin-bottom: 50px;
-    }
-
-    @media (max-width: 1024px) {
-        .form-page-layout {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-    }
-
-    /* Form Section Card */
-    .form-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-        padding: 28px 32px;
-        margin-bottom: 24px;
-        transition: var(--transition);
-        position: relative;
-    }
-
-    .form-card:hover {
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
-        border-color: #cbd5e1;
-    }
-
-    .form-card-header {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 22px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .card-step-badge {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: #fffbeb;
-        color: #d97706;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 15px;
-        flex-shrink: 0;
-    }
-
-    .form-card-header h3 {
-        font-size: 16px;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.01em;
-    }
-
-    .form-card-header p {
-        font-size: 12.5px;
-        color: var(--text-muted);
-        margin: 2px 0 0 0;
-    }
-
-    /* Grids inside form */
-    .form-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-    }
-
-    @media (max-width: 640px) {
-        .form-card {
-            padding: 20px 18px;
-        }
-        .form-grid-2 {
-            grid-template-columns: 1fr;
-            gap: 14px;
-        }
-    }
-
-    .form-group {
-        margin-bottom: 18px;
-    }
-
-    .form-group:last-child {
-        margin-bottom: 0;
-    }
-
-    .form-label {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 13px;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 6px;
-    }
-
-    .form-label .required {
-        color: #ef4444;
-        margin-left: 2px;
-    }
-
-    .form-label-hint {
-        font-size: 11.5px;
-        color: var(--text-muted);
-        font-weight: 500;
-    }
-
-    /* Input Wrappers with Icons */
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .input-icon {
-        position: absolute;
-        left: 14px;
-        color: #94a3b8;
-        font-size: 18px;
-        pointer-events: none;
-        transition: var(--transition);
-    }
-
-    .form-input, .form-select, .form-textarea {
-        width: 100%;
-        padding: 11px 14px 11px 42px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        font-size: 13.5px;
-        color: #0f172a;
-        background: #ffffff;
-        outline: none;
-        transition: var(--transition);
-        font-family: inherit;
-    }
-
-    .form-textarea {
-        padding: 12px 14px;
-        line-height: 1.5;
-        resize: vertical;
-    }
-
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-        border-color: #d97706;
-        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
-    }
-
-    .form-input.is-invalid, .form-select.is-invalid, .form-textarea.is-invalid {
-        border-color: #ef4444;
-        background-color: #fef2f2;
-    }
-
-    .error-feedback {
-        font-size: 12px;
-        color: #dc2626;
-        margin-top: 5px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    /* Dropzone Upload ST */
-    .dropzone-container {
-        border: 2px dashed #cbd5e1;
-        border-radius: var(--radius-md);
-        padding: 22px 20px;
-        text-align: center;
-        background: #fffdfa;
-        cursor: pointer;
-        transition: var(--transition);
-        position: relative;
-    }
-
-    .dropzone-container:hover, .dropzone-container.drag-over {
-        border-color: #d97706;
-        background: #fffbeb;
-    }
-
-    .dropzone-icon {
-        font-size: 32px;
-        color: #d97706;
-        margin-bottom: 6px;
-    }
-
-    .dropzone-text {
-        font-size: 13.5px;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
-    .dropzone-sub {
-        font-size: 11.5px;
-        color: var(--text-muted);
-        margin-top: 2px;
-    }
-
-    .dropzone-file-info {
-        background: #ffffff;
-        border: 1px solid #fde68a;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        text-align: left;
-    }
-
-    /* Live Summary Preview Sidebar */
-    .preview-card-sticky {
-        position: sticky;
-        top: 90px;
-        background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-        overflow: hidden;
-    }
-
-    .preview-header {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        color: #ffffff;
-        padding: 18px 20px;
-    }
-
-    .preview-badge-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: rgba(255, 255, 255, 0.15);
-        color: #ffffff;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .preview-title {
-        font-size: 14.5px;
-        font-weight: 800;
-        line-height: 1.4;
-        margin: 0;
-        color: #f8fafc;
-        word-break: break-word;
-    }
-
-    .preview-body {
-        padding: 18px 20px;
-    }
-
-    .preview-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 9px 0;
-        border-bottom: 1px dashed #e2e8f0;
-        font-size: 12.5px;
-        gap: 10px;
-    }
-
-    .preview-item:last-child {
-        border-bottom: none;
-    }
-
-    .preview-label {
-        color: #64748b;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-shrink: 0;
-    }
-
-    .preview-val {
-        color: #0f172a;
-        font-weight: 700;
-        text-align: right;
-        word-break: break-word;
-    }
-
-    .form-checklist {
-        margin-top: 16px;
-        padding-top: 14px;
-        border-top: 1px solid #f1f5f9;
-    }
-
-    .checklist-title {
-        font-size: 11.5px;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .progress-micro {
-        height: 6px;
-        background: #f1f5f9;
-        border-radius: 999px;
-        overflow: hidden;
-    }
-
-    .progress-micro-fill {
-        height: 100%;
-        background: #10b981;
-        transition: width 0.3s ease;
-    }
-
-    /* Actions Bar */
-    .form-actions-desktop {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-    }
-
-    .btn-submit-main {
-        background: #d97706;
-        color: #ffffff;
-        padding: 12px 28px;
-        border-radius: var(--radius-md);
-        font-weight: 700;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: var(--transition);
-        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
-    }
-
-    .btn-submit-main:hover {
-        background: #b45309;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.32);
-    }
-
-    .btn-cancel-main {
-        background: #ffffff;
-        color: #475569;
-        padding: 12px 22px;
-        border-radius: var(--radius-md);
-        font-weight: 600;
-        font-size: 14px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 1px solid var(--border);
-        transition: var(--transition);
-    }
-
-    .btn-cancel-main:hover {
-        background: #f1f5f9;
-        color: #0f172a;
-    }
-
-    /* Mobile Floating Bar */
-    .mobile-floating-bar {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        .form-actions-desktop {
-            display: none;
-        }
-
-        .mobile-floating-bar {
-            display: flex;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            padding: 12px 18px;
-            border-top: 1px solid var(--border);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-            z-index: 99;
-            gap: 10px;
-        }
-
-        .mobile-floating-bar .btn-submit-main {
-            flex: 1;
-            justify-content: center;
-            padding: 13px;
-        }
-
-        .mobile-floating-bar .btn-cancel-main {
-            padding: 13px 18px;
-        }
-
-        body {
-            padding-bottom: 70px;
-        }
-    }
-
-    /* Multi-Assignee Interactive Selector Styles */
-    .pelaksana-card {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 9px 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: var(--radius-md);
-        background: #f8fafc;
-        cursor: pointer;
-        transition: var(--transition);
-        user-select: none;
-        position: relative;
-    }
-
-    .pelaksana-card:hover {
-        background: #ffffff;
-        border-color: #cbd5e1;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .pelaksana-card.selected {
-        background: #f0fdf4;
-        border-color: #86efac;
-    }
-
-    .pelaksana-card.is-pic {
-        background: #eff6ff;
-        border-color: #93c5fd;
-    }
-
-    .pelaksana-checkbox {
-        width: 17px;
-        height: 17px;
-        accent-color: var(--primary);
-        cursor: pointer;
-    }
-
-    .pelaksana-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        background: #e2e8f0;
-        color: #334155;
-        font-weight: 800;
-        font-size: 11px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .pelaksana-card.selected .pelaksana-avatar {
-        background: #16a34a;
-        color: #ffffff;
-    }
-
-    .pelaksana-card.is-pic .pelaksana-avatar {
-        background: var(--primary);
-        color: #ffffff;
-    }
-
-    .pelaksana-meta {
-        overflow: hidden;
-        flex: 1;
-    }
-
-    .pelaksana-name {
-        font-size: 12.5px;
-        font-weight: 700;
-        color: #0f172a;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .pelaksana-sub {
-        font-size: 11px;
-        color: #64748b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .pic-tag {
-        font-size: 10px;
-        font-weight: 800;
-        background: #2563eb;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        letter-spacing: 0.03em;
-    }
-
-    .pelaksana-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        padding: 3px 9px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #1e293b;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    }
-
-    .pelaksana-chip.is-pic-chip {
-        background: #eff6ff;
-        border-color: #93c5fd;
-        color: #1e40af;
-        font-weight: 700;
-    }
-
-    .pelaksana-chip .btn-remove-chip {
-        background: none;
-        border: none;
-        color: #94a3b8;
-        cursor: pointer;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        line-height: 1;
-    }
-
-    .pelaksana-chip .btn-remove-chip:hover {
-        color: #ef4444;
-    }
-
-    /* Kategori / Sumber Penugasan Card */
-    .sumber-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 18px;
-        background: #ffffff;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        position: relative;
-    }
-    .sumber-card:hover {
-        border-color: #cbd5e1;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-    }
-    .sumber-card.active {
-        border-color: #0284c7;
-        background: #f0f9ff;
-        box-shadow: 0 4px 16px rgba(2, 132, 199, 0.12);
-    }
-    .sumber-icon-box {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        flex-shrink: 0;
-        transition: all 0.2s ease;
-    }
-    .sumber-check-badge {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #e2e8f0;
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        transition: all 0.2s ease;
-    }
-    .sumber-card.active .sumber-check-badge {
-        background: #0284c7;
-        color: #ffffff;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/forms.css') }}">
 @endsection
 
 @section('content')
@@ -683,7 +88,7 @@
                             <i class="ph-bold ph-crosshair"></i> Pilih Butir Rencana Kinerja SKP (RHK)
                         </div>
                         <span style="font-size: 11px; color: #0284c7; background: #f0f9ff; padding: 2px 8px; border-radius: 99px; font-weight: 700;">
-                            ✨ Auto-Fill Form
+                            âœ¨ Auto-Fill Form
                         </span>
                     </div>
 
@@ -702,7 +107,7 @@
                                             data-tahun="{{ $skp->tahun }}"
                                             data-iki="{{ $skp->indikator_kinerja }}"
                                             {{ $currentSkpId == $skp->id ? 'selected' : '' }}>
-                                        [{{ $skp->tahun }}] {{ $skp->user?->name ?? 'Pegawai' }} — {{ Str::limit($skp->rencana_kinerja, 75) }} ({{ (float)$skp->target_max }} {{ $skp->satuan }})
+                                        [{{ $skp->tahun }}] {{ $skp->user?->name ?? 'Pegawai' }} â€” {{ Str::limit($skp->rencana_kinerja, 75) }} ({{ (float)$skp->target_max }} {{ $skp->satuan }})
                                     </option>
                                 @endforeach
                             </select>
@@ -719,7 +124,7 @@
                             <div style="font-size: 12px; color: #166534; line-height: 1.45;">
                                 <div><strong>RHK Terpilih:</strong> <span id="skpRhkText">{{ $pekerjaan->skpTahunan?->rencana_kinerja ?? '-' }}</span></div>
                                 <div style="margin-top: 3px; font-size: 11px; color: #15803d;">
-                                    Pegawai Pemilik: <strong id="skpOwnerText">{{ $pekerjaan->skpTahunan?->user?->name ?? '-' }}</strong> • Target: <strong id="skpTargetText">{{ (float)($pekerjaan->skpTahunan?->target_max ?? 1) }} {{ $pekerjaan->skpTahunan?->satuan ?? '' }}</strong>
+                                    Pegawai Pemilik: <strong id="skpOwnerText">{{ $pekerjaan->skpTahunan?->user?->name ?? '-' }}</strong> â€¢ Target: <strong id="skpTargetText">{{ (float)($pekerjaan->skpTahunan?->target_max ?? 1) }} {{ $pekerjaan->skpTahunan?->satuan ?? '' }}</strong>
                                 </div>
                             </div>
                         </div>
@@ -886,9 +291,14 @@
                                         <div id="fileSizeDisplay" style="font-size: 11px; color: #64748b;">Berkas Terunggah Saat Ini</div>
                                     </div>
                                 </div>
-                                <a href="{{ asset('storage/' . $pekerjaan->file_st) }}" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline; font-size: 12px;">
-                                    Unduh
-                                </a>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <button type="button" onclick="previewBuktiDukung('{{ asset('storage/' . $pekerjaan->file_st) }}', 'Surat Tugas: {{ basename($pekerjaan->file_st) }}')" style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 700; border-radius: 6px; padding: 3px 8px; font-size: 11.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="ph-bold ph-eye"></i> Pratinjau
+                                    </button>
+                                    <a href="{{ asset('storage/' . $pekerjaan->file_st) }}" download target="_blank" style="color: #64748b; font-weight: 600; text-decoration: underline; font-size: 12px;">
+                                        Unduh
+                                    </a>
+                                </div>
                             </div>
                         @else
                             <div id="dropzoneFileInfo" class="dropzone-file-info" style="display: none;" onclick="event.stopPropagation()">
@@ -1030,7 +440,7 @@
                                     onchange="handlePicChange()">
                                 <option value="">-- Pilih PIC Utama --</option>
                                 @if($teamUsers->isNotEmpty())
-                                    <optgroup label="⭐ Anggota Tim Kerja / Pokja Anda">
+                                    <optgroup label="â­ Anggota Tim Kerja / Pokja Anda">
                                         @foreach($teamUsers as $u)
                                             <option value="{{ $u->id }}" {{ $currentPicId == $u->id ? 'selected' : '' }} data-name="{{ $u->name }}" data-pokja="{{ $u->pokja?->nama_pokja ?? 'BGTK' }}">
                                                 {{ $u->name }} ({{ $u->nip ?? 'Pegawai' }}) - {{ $u->role_label }}
@@ -1038,7 +448,7 @@
                                         @endforeach
                                     </optgroup>
                                 @endif
-                                <optgroup label="👥 Seluruh Pegawai BGTK">
+                                <optgroup label="ðŸ‘¥ Seluruh Pegawai BGTK">
                                     @foreach($otherUsers as $u)
                                         <option value="{{ $u->id }}" {{ $currentPicId == $u->id ? 'selected' : '' }} data-name="{{ $u->name }}" data-pokja="{{ $u->pokja?->nama_pokja ?? 'BGTK' }}">
                                             {{ $u->name }} ({{ $u->nip ?? 'Pegawai' }}) - {{ $u->pokja?->nama_pokja ?? 'BGTK' }} ({{ $u->role_label }})
@@ -1113,7 +523,7 @@
                     <div class="pelaksana-selection-container" style="max-height: 270px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; background: #ffffff;">
                         @if($teamUsers->isNotEmpty())
                             <div class="pelaksana-group-title" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #2563eb; letter-spacing: 0.04em; margin-bottom: 8px; padding: 2px 4px;">
-                                ⭐ Anggota Tim Kerja / Pokja Anda
+                                â­ Anggota Tim Kerja / Pokja Anda
                             </div>
                             <div class="pelaksana-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; margin-bottom: 16px;">
                                 @foreach($teamUsers as $u)
@@ -1137,7 +547,7 @@
                         @endif
 
                         <div class="pelaksana-group-title" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 0.04em; margin-bottom: 8px; padding: 2px 4px;">
-                            👥 Seluruh Pegawai BGTK
+                            ðŸ‘¥ Seluruh Pegawai BGTK
                         </div>
                         <div class="pelaksana-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px;">
                             @foreach($otherUsers as $u)
@@ -1505,7 +915,7 @@
                 const chip = document.createElement('div');
                 chip.className = `pelaksana-chip ${isPic ? 'is-pic-chip' : ''}`;
                 chip.innerHTML = `
-                    <span>${isPic ? '⭐ ' : ''}${name}</span>
+                    <span>${isPic ? 'â­ ' : ''}${name}</span>
                     ${!isPic ? `<button type="button" class="btn-remove-chip" onclick="uncheckPelaksana('${id}')" title="Hapus dari penugasan">&times;</button>` : ''}
                 `;
                 chipsContainer.appendChild(chip);

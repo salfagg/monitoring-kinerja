@@ -32,8 +32,6 @@ class Pekerjaan extends Model
         'pembuat_id',
         'penanggung_jawab_id',
         'pokja_id',
-        'bobot',
-        'progres',
         'status_persetujuan',
         'catatan_persetujuan',
         'status_pelaksanaan',
@@ -45,8 +43,6 @@ class Pekerjaan extends Model
     {
         return [
             'target' => 'decimal:2',
-            'bobot' => 'decimal:2',
-            'progres' => 'decimal:2',
             'tenggat' => 'date',
             'tanggal_st' => 'date',
             'tanggal_selesai_terverifikasi' => 'datetime',
@@ -105,7 +101,7 @@ class Pekerjaan extends Model
 
     public function isFromSkp(): bool
     {
-        return $this->sumber_pekerjaan === 'skp' || !is_null($this->skp_tahunan_id) || !is_null($this->skp_target_bulanan_id);
+        return $this->sumber_pekerjaan === 'skp' || ! is_null($this->skp_tahunan_id) || ! is_null($this->skp_target_bulanan_id);
     }
 
     // Realisasi & Riwayat
@@ -156,8 +152,8 @@ class Pekerjaan extends Model
     }
 
     /**
-     * Hitung ulang progres induk secara otomatis dari bobot anak-anak yang berstatus disetujui
-     * (Sesuai Aturan PRD Bagian 9)
+     * Selaraskan status pekerjaan induk secara otomatis dari status anak-anak yang disetujui.
+     * Jika semua anak tuntas, induk otomatis tuntas terverifikasi.
      */
     public function recalculateProgresFromChildren(): void
     {
@@ -166,25 +162,20 @@ class Pekerjaan extends Model
             ->get();
 
         if ($activeChildren->isNotEmpty()) {
-            $totalBobot = $activeChildren->sum('bobot');
-            if ($totalBobot > 0) {
-                $weightedSum = $activeChildren->sum(function ($child) {
-                    return ($child->bobot * $child->progres);
-                });
-                $this->progres = round($weightedSum / $totalBobot, 2);
-            } else {
-                $this->progres = round($activeChildren->avg('progres'), 2);
-            }
-
-            // Update status pelaksanaan induk
-            if ($this->progres > 0 && $this->status_pelaksanaan === 'belum_dimulai') {
+            // Update status pelaksanaan induk: aktif jika ada anak yang mulai dikerjakan
+            $anyActive = $activeChildren->contains(fn ($c) => in_array($c->status_pelaksanaan, ['dikerjakan', 'hasil_diajukan', 'selesai_terverifikasi']));
+            if ($anyActive && $this->status_pelaksanaan === 'belum_dimulai') {
                 $this->status_pelaksanaan = 'dikerjakan';
             }
 
-            // Jika semua anak sudah selesai terverifikasi, tandai pelaksanaan induk
-            $allDone = $activeChildren->every(fn($c) => $c->status_pelaksanaan === 'selesai_terverifikasi');
+            // Jika semua anak sudah selesai terverifikasi, tandai pelaksanaan induk selesai
+            $allDone = $activeChildren->every(fn ($c) => $c->status_pelaksanaan === 'selesai_terverifikasi');
             if ($allDone && $this->status_pelaksanaan !== 'selesai_terverifikasi') {
-                $this->status_pelaksanaan = 'hasil_diajukan';
+                $this->status_pelaksanaan = 'selesai_terverifikasi';
+                $this->tanggal_selesai_terverifikasi = now();
+            } elseif (! $allDone && $this->status_pelaksanaan === 'selesai_terverifikasi') {
+                $this->status_pelaksanaan = 'dikerjakan';
+                $this->tanggal_selesai_terverifikasi = null;
             }
 
             $this->saveQuietly();
@@ -197,30 +188,49 @@ class Pekerjaan extends Model
     }
 
     /**
-     * Hitung ulang progres pekerjaan dari akumulasi realisasi pelaksana yang telah disetujui oleh pembuat tugas
+     * Hitung ulang status pekerjaan dari realisasi pelaksana yang telah disetujui oleh pembuat tugas
      */
     public function recalculateProgresFromRealisasi(): void
     {
-        $totalCapaian = (float) $this->realisasi()
+        $hasApprovedPenyelesaian = $this->realisasi()
             ->where('status_approval', 'disetujui')
-            ->sum('progres_capaian');
+            ->where('jenis_laporan', 'penyelesaian')
+            ->exists();
 
-        $this->progres = min(100, round($totalCapaian, 2));
+        $hasApprovedKemajuan = $this->realisasi()
+            ->where('status_approval', 'disetujui')
+            ->exists();
 
-        if ($this->progres > 0 && in_array($this->status_pelaksanaan, ['belum_dimulai', 'perlu_perbaikan_hasil'])) {
-            $this->status_pelaksanaan = 'dikerjakan';
-        }
-
-        if ($this->progres >= 100.00) {
+        if ($hasApprovedPenyelesaian) {
             $this->status_pelaksanaan = 'selesai_terverifikasi';
             if (! $this->tanggal_selesai_terverifikasi) {
                 $this->tanggal_selesai_terverifikasi = now();
             }
-        } elseif ($this->progres < 100.00 && $this->status_pelaksanaan === 'selesai_terverifikasi') {
+        } elseif ($hasApprovedKemajuan && in_array($this->status_pelaksanaan, ['belum_dimulai', 'perlu_perbaikan_hasil'])) {
+            $this->status_pelaksanaan = 'dikerjakan';
+        } elseif (! $hasApprovedPenyelesaian && $this->status_pelaksanaan === 'selesai_terverifikasi') {
             $this->status_pelaksanaan = 'dikerjakan';
             $this->tanggal_selesai_terverifikasi = null;
         }
 
         $this->saveQuietly();
+
+        if ($this->parent) {
+            $this->parent->recalculateProgresFromChildren();
+        }
+    }
+
+    /**
+     * Label resmi status pelaksanaan untuk antarmuka alur kerja.
+     */
+    public function getStatusPelaksanaanLabelAttribute(): string
+    {
+        return match ($this->status_pelaksanaan) {
+            'selesai_terverifikasi' => 'Selesai Terverifikasi',
+            'hasil_diajukan' => 'Menunggu Verifikasi',
+            'dikerjakan' => 'Sedang Dikerjakan',
+            'perlu_perbaikan_hasil' => 'Perlu Perbaikan',
+            default => 'Belum Dimulai',
+        };
     }
 }

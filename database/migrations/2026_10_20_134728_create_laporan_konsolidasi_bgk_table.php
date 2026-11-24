@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('tahun');
             $table->string('judul_laporan');
             $table->foreignId('kasubag_id')->constrained('users')->cascadeOnDelete();
-            
+
             // Rekapitulasi Data
             $table->integer('total_pegawai')->default(0);
             $table->integer('total_laporan_selesai')->default(0);
@@ -29,13 +29,13 @@ return new class extends Migration
             // Status Tanda Tangan Kasubag
             $table->boolean('ttd_kasubag')->default(false);
             $table->timestamp('tanggal_ttd_kasubag')->nullable();
-            
+
             // Approval & Evaluasi Kabal
             $table->foreignId('kabal_id')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status_kabal', ['draft', 'diajukan', 'disetujui', 'dikembalikan'])->default('draft');
             $table->timestamp('tanggal_approval_kabal')->nullable();
             $table->text('catatan_evaluasi_kabal')->nullable();
-            
+
             // Rekomendasi / Tindak Lanjut Kabal
             $table->text('rekomendasi_reward')->nullable();
             $table->text('rekomendasi_punishment')->nullable();

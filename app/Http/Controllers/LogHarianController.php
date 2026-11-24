@@ -8,6 +8,7 @@ use App\Models\Pekerjaan;
 use App\Models\Pokja;
 use App\Models\SkpTahunan;
 use App\Models\User;
+use App\Services\LogHarianService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +48,7 @@ class LogHarianController extends Controller
         $targetUser = User::with('pokja')->findOrFail($targetUserId);
 
         // Jika bukan pimpinan/admin dan mencoba melihat user lain, kembalikan ke diri sendiri
-        if (!$canManage && $targetUserId !== $currentUser->id) {
+        if (! $canManage && $targetUserId !== $currentUser->id) {
             $targetUser = $currentUser;
             $targetUserId = $currentUser->id;
         }
@@ -76,8 +77,10 @@ class LogHarianController extends Controller
             if ($log->jam_mulai && $log->jam_selesai) {
                 $start = Carbon::parse($log->jam_mulai);
                 $end = Carbon::parse($log->jam_selesai);
+
                 return $carry + max(0, $start->diffInMinutes($end));
             }
+
             return $carry;
         }, 0);
 
@@ -157,12 +160,12 @@ class LogHarianController extends Controller
         // Daftar Pekerjaan aktif untuk pilihan cepat modal
         $activePekerjaan = Pekerjaan::where(function ($q) use ($targetUserId) {
             $q->where('penanggung_jawab_id', $targetUserId)
-              ->orWhere('pembuat_id', $targetUserId)
-              ->orWhereHas('pelaksana', fn($p) => $p->where('users.id', $targetUserId));
+                ->orWhere('pembuat_id', $targetUserId)
+                ->orWhereHas('pelaksana', fn ($p) => $p->where('users.id', $targetUserId));
         })->where('status_persetujuan', 'disetujui')
-          ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
-          ->orderBy('judul')
-          ->get();
+            ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+            ->orderBy('judul')
+            ->get();
 
         // Daftar SKP untuk pilihan cepat modal
         $skpList = SkpTahunan::where('user_id', $targetUserId)
@@ -174,7 +177,7 @@ class LogHarianController extends Controller
         $namaBulanIndo = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
         return view('log_harian.index', compact(
@@ -205,182 +208,19 @@ class LogHarianController extends Controller
     /**
      * Tampilan Rekap Bulanan Siap Cetak & Tarik Data
      */
-    public function rekap(Request $request): View
+    public function rekap(Request $request, LogHarianService $logHarianService): View
     {
-        $currentUser = Auth::user();
+        $data = $logHarianService->getRekapData(Auth::user(), $request);
 
-        $month = (int) $request->input('bulan', Carbon::now()->month);
-        $year = (int) $request->input('tahun', Carbon::now()->year);
-
-        $targetUserId = $currentUser->id;
-        $canManage = $currentUser->canManagePekerjaan() || $currentUser->isAdmin();
-
-        if ($canManage && $request->filled('user_id')) {
-            $targetUserId = (int) $request->user_id;
-        }
-
-        $targetUser = User::with(['pokja.katim'])->findOrFail($targetUserId);
-
-        // Ambil seluruh log bulan ini
-        $logs = LogHarian::with(['pekerjaan', 'skpTahunan', 'buktiDukung', 'verifikatorPokja', 'katim'])
-            ->where('user_id', $targetUserId)
-            ->where('bulan', $month)
-            ->where('tahun', $year)
-            ->orderBy('tanggal_kegiatan', 'asc')
-            ->orderBy('jam_mulai', 'asc')
-            ->get();
-
-        // Hitung statistik
-        $totalLogs = $logs->count();
-        $totalHariAktif = $logs->groupBy(fn($i) => Carbon::parse($i->tanggal_kegiatan)->format('Y-m-d'))->count();
-        $totalVolume = $logs->sum('volume_capaian');
-
-        $totalDurasiMenit = $logs->reduce(function ($carry, $log) {
-            if ($log->jam_mulai && $log->jam_selesai) {
-                $start = Carbon::parse($log->jam_mulai);
-                $end = Carbon::parse($log->jam_selesai);
-                return $carry + max(0, $start->diffInMinutes($end));
-            }
-            return $carry;
-        }, 0);
-        $totalJamKerja = round($totalDurasiMenit / 60, 1);
-
-        $namaBulanIndo = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-        ];
-
-        // Pejabat Penilai / Katim
-        $pejabatPenilai = null;
-        if ($targetUser->pokja && $targetUser->pokja->katim) {
-            $pejabatPenilai = $targetUser->pokja->katim;
-        } else {
-            // Kasubag atau Kabal
-            $pejabatPenilai = User::whereIn('role', ['kasubag', 'kabal'])->first();
-        }
-
-        return view('log_harian.rekap', compact(
-            'targetUser',
-            'month',
-            'year',
-            'namaBulanIndo',
-            'logs',
-            'totalLogs',
-            'totalHariAktif',
-            'totalVolume',
-            'totalJamKerja',
-            'pejabatPenilai'
-        ));
+        return view('log_harian.rekap', $data);
     }
 
     /**
      * Ekspor Rekap Bulanan ke CSV (Bisa dibuka di Excel)
      */
-    public function exportCsv(Request $request): StreamedResponse
+    public function exportCsv(Request $request, LogHarianService $logHarianService): StreamedResponse
     {
-        $currentUser = Auth::user();
-
-        $month = (int) $request->input('bulan', Carbon::now()->month);
-        $year = (int) $request->input('tahun', Carbon::now()->year);
-
-        $targetUserId = $currentUser->id;
-        $canManage = $currentUser->canManagePekerjaan() || $currentUser->isAdmin();
-
-        if ($canManage && $request->filled('user_id')) {
-            $targetUserId = (int) $request->user_id;
-        }
-
-        $targetUser = User::with('pokja')->findOrFail($targetUserId);
-
-        $logs = LogHarian::with(['pekerjaan', 'skpTahunan', 'buktiDukung'])
-            ->where('user_id', $targetUserId)
-            ->where('bulan', $month)
-            ->where('tahun', $year)
-            ->orderBy('tanggal_kegiatan', 'asc')
-            ->orderBy('jam_mulai', 'asc')
-            ->get();
-
-        $filename = 'Log_Harian_' . str_replace(' ', '_', $targetUser->name) . '_' . sprintf('%02d', $month) . '_' . $year . '.csv';
-
-        $headers = [
-            'Content-Type' => 'text/csv; charset=utf-8',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-            'Pragma' => 'no-cache',
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0',
-        ];
-
-        $callback = function () use ($logs, $targetUser, $month, $year) {
-            $file = fopen('php://output', 'w');
-            
-            // UTF-8 BOM untuk Excel Indonesia
-            fputs($file, "\xEF\xBB\xBF");
-
-            // Header Informasi Pegawai
-            fputcsv($file, ['REKAPITULASI LOG HARIAN KINERJA PEGAWAI']);
-            fputcsv($file, ['BGTK PROVINSI DKI JAKARTA']);
-            fputcsv($file, ['Periode', sprintf('%02d/%d', $month, $year)]);
-            fputcsv($file, ['Nama Pegawai', $targetUser->name]);
-            fputcsv($file, ['NIP', $targetUser->nip ?? '-']);
-            fputcsv($file, ['Jabatan', $targetUser->jabatan ?? 'Pegawai']);
-            fputcsv($file, ['Unit Kerja / Pokja', $targetUser->pokja?->nama_pokja ?? '-']);
-            fputcsv($file, []);
-
-            // Header Tabel
-            fputcsv($file, [
-                'No',
-                'Tanggal',
-                'Jam Mulai',
-                'Jam Selesai',
-                'Durasi',
-                'Uraian Kegiatan',
-                'Output / Hasil',
-                'Volume',
-                'Satuan',
-                'Rujukan Pekerjaan',
-                'Rujukan SKP',
-                'Status',
-                'Bukti Dukung',
-                'Catatan Katim'
-            ]);
-
-            $no = 1;
-            foreach ($logs as $log) {
-                $durasi = '-';
-                if ($log->jam_mulai && $log->jam_selesai) {
-                    $start = Carbon::parse($log->jam_mulai);
-                    $end = Carbon::parse($log->jam_selesai);
-                    $durasi = $start->diffInMinutes($end) . ' Menit';
-                }
-
-                $buktiText = '-';
-                if ($log->buktiDukung->isNotEmpty()) {
-                    $buktiText = $log->buktiDukung->pluck('nama_dokumen')->implode('; ');
-                }
-
-                fputcsv($file, [
-                    $no++,
-                    Carbon::parse($log->tanggal_kegiatan)->format('d/m/Y'),
-                    $log->jam_mulai ? Carbon::parse($log->jam_mulai)->format('H:i') : '-',
-                    $log->jam_selesai ? Carbon::parse($log->jam_selesai)->format('H:i') : '-',
-                    $durasi,
-                    $log->uraian_kegiatan,
-                    $log->output_kegiatan,
-                    $log->volume_capaian,
-                    $log->satuan,
-                    $log->pekerjaan?->judul ?? '-',
-                    $log->skpTahunan?->rencana_hasil_kerja ?? '-',
-                    $log->status_label,
-                    $buktiText,
-                    $log->catatan_katim ?? ($log->catatan_pokja ?? '-')
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $logHarianService->exportCsv(Auth::user(), $request);
     }
 
     /**
@@ -451,7 +291,7 @@ class LogHarianController extends Controller
 
         return redirect()->route('log-harian.index', [
             'bulan' => $tanggal->month,
-            'tahun' => $tanggal->year
+            'tahun' => $tanggal->year,
         ])->with('success', 'Log harian berhasil disimpan.');
     }
 
@@ -477,7 +317,7 @@ class LogHarianController extends Controller
         $user = Auth::user();
 
         // Hanya pemilik log atau admin yang boleh mengedit jika belum disetujui
-        if ($logHarian->user_id !== $user->id && !$user->isAdmin()) {
+        if ($logHarian->user_id !== $user->id && ! $user->isAdmin()) {
             abort(403, 'Anda tidak berhak mengedit log harian ini.');
         }
 
@@ -485,11 +325,11 @@ class LogHarianController extends Controller
 
         $activePekerjaan = Pekerjaan::where(function ($q) use ($user) {
             $q->where('penanggung_jawab_id', $user->id)
-              ->orWhere('pembuat_id', $user->id)
-              ->orWhereHas('pelaksana', fn($p) => $p->where('users.id', $user->id));
+                ->orWhere('pembuat_id', $user->id)
+                ->orWhereHas('pelaksana', fn ($p) => $p->where('users.id', $user->id));
         })->where('status_persetujuan', 'disetujui')
-          ->orderBy('judul')
-          ->get();
+            ->orderBy('judul')
+            ->get();
 
         $skpList = SkpTahunan::where('user_id', $user->id)
             ->where('tahun', $logHarian->tahun)
@@ -506,7 +346,7 @@ class LogHarianController extends Controller
     {
         $user = Auth::user();
 
-        if ($logHarian->user_id !== $user->id && !$user->isAdmin()) {
+        if ($logHarian->user_id !== $user->id && ! $user->isAdmin()) {
             abort(403, 'Anda tidak berhak mengubah log harian ini.');
         }
 
@@ -573,7 +413,7 @@ class LogHarianController extends Controller
 
         return redirect()->route('log-harian.index', [
             'bulan' => $tanggal->month,
-            'tahun' => $tanggal->year
+            'tahun' => $tanggal->year,
         ])->with('success', 'Log harian berhasil diperbarui.');
     }
 
@@ -584,7 +424,7 @@ class LogHarianController extends Controller
     {
         $user = Auth::user();
 
-        if ($logHarian->user_id !== $user->id && !$user->isAdmin()) {
+        if ($logHarian->user_id !== $user->id && ! $user->isAdmin()) {
             abort(403, 'Anda tidak berhak menghapus log harian ini.');
         }
 
@@ -603,7 +443,7 @@ class LogHarianController extends Controller
 
         return redirect()->route('log-harian.index', [
             'bulan' => $month,
-            'tahun' => $year
+            'tahun' => $year,
         ])->with('success', 'Log harian berhasil dihapus.');
     }
 
@@ -614,7 +454,7 @@ class LogHarianController extends Controller
     {
         $user = Auth::user();
 
-        if ($logHarian->user_id !== $user->id && !$user->isAdmin()) {
+        if ($logHarian->user_id !== $user->id && ! $user->isAdmin()) {
             abort(403, 'Aksi tidak diizinkan.');
         }
 
@@ -650,7 +490,7 @@ class LogHarianController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->canManagePekerjaan() && !$user->isAdmin() && !$user->isTimPokja()) {
+        if (! $user->canManagePekerjaan() && ! $user->isAdmin() && ! $user->isTimPokja()) {
             abort(403, 'Anda tidak memiliki wewenang untuk menyetujui log harian.');
         }
 
@@ -674,4 +514,3 @@ class LogHarianController extends Controller
         return back()->with('success', 'Log harian berhasil disetujui.');
     }
 }
-

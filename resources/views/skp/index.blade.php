@@ -4,231 +4,7 @@
 @section('page-title', $isManager ? 'Sasaran Kinerja Pegawai (SKP)' : 'Sasaran Kinerja Saya (SKP)')
 
 @section('styles')
-<style>
-    /* Summary KPI Cards */
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .summary-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        box-shadow: var(--shadow-sm);
-        transition: var(--transition);
-    }
-
-    .summary-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-
-    .summary-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .icon-blue { background: #e8f2fb; color: #0a6fb5; }
-    .icon-green { background: #e3f6ee; color: #0c8a5d; }
-    .icon-amber { background: #fff3d9; color: #b87400; }
-    .icon-gray { background: #f1f5f9; color: #475569; }
-
-    .summary-info h4 {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--text-dark);
-        line-height: 1.1;
-    }
-
-    .summary-info p {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-        margin-top: 3px;
-    }
-
-    /* Actions & Filter Toolbar */
-    .toolbar-wrapper {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        padding: 20px 24px;
-        margin-bottom: 24px;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .toolbar-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-        gap: 14px;
-    }
-
-    .btn-create-main {
-        background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
-        color: white;
-        padding: 9px 18px;
-        border-radius: var(--radius-md);
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 14px rgba(11, 74, 130, 0.22);
-        transition: var(--transition);
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-create-main:hover {
-        background: linear-gradient(135deg, var(--navy-deep) 0%, var(--primary-hover) 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(11, 74, 130, 0.28);
-        color: white;
-    }
-
-    .filter-grid {
-        display: grid;
-        grid-template-columns: 2fr 1.1fr 1.1fr {{ $isManager ? '1.4fr' : '' }} auto;
-        gap: 12px;
-        align-items: center;
-    }
-
-    @media (max-width: 900px) {
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .filter-control {
-        width: 100%;
-        padding: 9px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        background: #f8fafc;
-        transition: var(--transition);
-    }
-
-    .filter-control:focus {
-        border-color: var(--primary);
-        background: #ffffff;
-        box-shadow: 0 0 0 3px var(--primary-light);
-    }
-
-    /* Table Styles */
-    .table-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        padding: 12px 18px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: #64748b;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .data-table td {
-        padding: 14px 18px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: top;
-        color: #1e293b;
-    }
-
-    .data-table tbody tr:hover {
-        background: #f8fbfe;
-    }
-
-    .badge-status-skp {
-        font-size: 10.5px;
-        font-weight: 800;
-        padding: 3px 8px;
-        border-radius: 99px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .status-disetujui { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .status-diajukan { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
-    .status-draft { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-    .status-revisi { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-
-    .btn-action-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        border: 1px solid var(--border);
-        background: #ffffff;
-        color: #475569;
-        cursor: pointer;
-        transition: var(--transition);
-        text-decoration: none;
-    }
-
-    .btn-action-icon:hover {
-        background: #f1f5f9;
-        color: var(--primary);
-        border-color: #cbd5e1;
-    }
-
-    .btn-approve-quick {
-        background: #10b981;
-        color: white;
-        border: none;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: var(--transition);
-    }
-
-    .btn-approve-quick:hover {
-        background: #059669;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/master-data.css') }}">
 @endsection
 
 @section('content')
@@ -453,9 +229,13 @@
                                 </span>
 
                                 @if($isManager && $s->status === 'diajukan')
-                                    <form action="{{ route('skp.approve', $s) }}" method="POST" style="margin-top: 6px;">
+                                    <form action="{{ route('skp.approve', $s) }}" method="POST" style="margin-top: 6px;"
+                                          data-confirm="Setujui butir SKP ini?"
+                                          data-confirm-title="Persetujuan SKP"
+                                          data-confirm-btn="Ya, Setujui"
+                                          data-confirm-type="success">
                                         @csrf
-                                        <button type="submit" class="btn-approve-quick" onclick="return confirm('Setujui butir SKP ini?')">
+                                        <button type="submit" class="btn-approve-quick">
                                             <i class="ph-bold ph-check"></i> Setujui
                                         </button>
                                     </form>
@@ -473,7 +253,11 @@
                                         <i class="ph-bold ph-pencil-simple"></i>
                                     </a>
 
-                                    <form action="{{ route('skp.destroy', $s) }}" method="POST" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus butir SKP ini?')">
+                                    <form action="{{ route('skp.destroy', $s) }}" method="POST" style="display: inline;"
+                                          data-confirm="Apakah Anda yakin ingin menghapus butir SKP ini?"
+                                          data-confirm-title="Hapus Butir SKP"
+                                          data-confirm-btn="Ya, Hapus"
+                                          data-confirm-type="danger">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-action-icon" style="color: #dc2626;" title="Hapus SKP">

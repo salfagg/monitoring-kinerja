@@ -10,6 +10,7 @@ use App\Models\RencanaMingguan;
 use App\Models\SkpTahunan;
 use App\Models\SkpTargetBulanan;
 use App\Models\User;
+use App\Services\DashboardMetricService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,10 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected DashboardMetricService $metricService
+    ) {}
+
     public function index(Request $request): View
     {
         $user = Auth::user()->load('pokja');
@@ -25,55 +30,26 @@ class DashboardController extends Controller
 
         $tugasAktifSaya = Pekerjaan::where(function ($q) use ($user) {
             $q->where('penanggung_jawab_id', $user->id)
-              ->orWhere('pembuat_id', $user->id)
-              ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
+                ->orWhere('pembuat_id', $user->id)
+                ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
         })->where('status_persetujuan', 'disetujui')
-          ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil'])
-          ->with(['parent', 'pokja'])
-          ->orderBy('tenggat')
-          ->take(5)
-          ->get();
+            ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil'])
+            ->with(['parent', 'pokja'])
+            ->orderBy('tenggat')
+            ->take(5)
+            ->get();
 
         $totalPekerjaanBalai = Pekerjaan::count();
-        $avgProgresBalai = $totalPekerjaanBalai > 0 ? round((float) Pekerjaan::avg('progres'), 1) : 0;
-
-        $statusCounts = [
-            'selesai' => Pekerjaan::where('status_pelaksanaan', 'selesai_terverifikasi')->count(),
-            'dikerjakan' => Pekerjaan::where('status_pelaksanaan', 'dikerjakan')->count(),
-            'menunggu_verifikasi' => Pekerjaan::where(function ($q) {
-                $q->where('status_pelaksanaan', 'hasil_diajukan')
-                  ->orWhere(function ($sub) {
-                      $sub->where('progres', '>=', 100)
-                          ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                  });
-            })->count(),
-            'belum_dimulai' => Pekerjaan::where('status_pelaksanaan', 'belum_dimulai')->count(),
-            'perlu_revisi' => Pekerjaan::where('status_pelaksanaan', 'perlu_perbaikan_hasil')->count(),
-        ];
+        $statusCounts = $this->metricService->getStatusCounts();
+        $selesaiBalai = $statusCounts['selesai'] ?? 0;
+        $avgProgresBalai = $totalPekerjaanBalai > 0 ? round(($selesaiBalai / $totalPekerjaanBalai) * 100, 1) : 0;
 
         $pekerjaanTerlambatCount = Pekerjaan::where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
             ->whereDate('tenggat', '<', Carbon::today())
             ->count();
 
         // Data Unit & Tim Kerja untuk Bar Chart Kinerja
-        $chartPokjas = Pokja::whereIn('tipe', ['tim_kerja', 'subbag_pilar'])
-            ->with('pekerjaan')
-            ->get()
-            ->map(function ($p) {
-                $totalTugas = $p->pekerjaan->count();
-                $avg = $totalTugas > 0 ? round((float)$p->pekerjaan->avg('progres'), 1) : 0;
-                $selesai = $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
-                return [
-                    'id' => $p->id,
-                    'kode' => $p->kode_pokja,
-                    'nama' => $p->nama_pokja,
-                    'total' => $totalTugas,
-                    'selesai' => $selesai,
-                    'progres' => $avg,
-                ];
-            })
-            ->sortByDesc('total')
-            ->values();
+        $chartPokjas = $this->metricService->getChartPokjas();
 
         $data = [
             'user' => $user,
@@ -96,10 +72,10 @@ class DashboardController extends Controller
                 $data['pokjas'] = Pokja::with([
                     'katim',
                     'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
                     ]),
-                    'pekerjaan'
+                    'pekerjaan',
                 ])->withCount('anggota')->orderBy('id')->get();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
@@ -115,10 +91,10 @@ class DashboardController extends Controller
                 $data['pokjas'] = Pokja::with([
                     'katim',
                     'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
                     ]),
-                    'pekerjaan'
+                    'pekerjaan',
                 ])->withCount('anggota')->orderBy('id')->get();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
@@ -141,10 +117,10 @@ class DashboardController extends Controller
                 $data['pokjas'] = Pokja::with([
                     'katim',
                     'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
                     ]),
-                    'pekerjaan'
+                    'pekerjaan',
                 ])->withCount('anggota')->orderBy('id')->get();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
@@ -233,12 +209,13 @@ class DashboardController extends Controller
         return User::whereIn('role', ['pegawai', 'tim_pokja', 'katim', 'korjafung', 'korlayanan'])
             ->withCount([
                 'pekerjaanSebagaiPj as tugas_pic_count' => fn ($q) => $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                'pekerjaanDitugaskan as tugas_anggota_count' => fn ($q) => $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+                'pekerjaanDitugaskan as tugas_anggota_count' => fn ($q) => $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
             ])
             ->with(['pokja'])
             ->get()
             ->map(function ($u) {
                 $u->total_beban = $u->tugas_pic_count + $u->tugas_anggota_count;
+
                 return $u;
             })
             ->sortByDesc(fn ($u) => [$u->total_beban, $u->tugas_pic_count, $u->name])
@@ -256,13 +233,7 @@ class DashboardController extends Controller
         $countPekerjaanBerjalan = Pekerjaan::where('status_persetujuan', 'disetujui')
             ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil'])
             ->count();
-        $countPekerjaanMenungguVerifikasi = Pekerjaan::where(function ($q) {
-            $q->where('status_pelaksanaan', 'hasil_diajukan')
-              ->orWhere(function ($sub) {
-                  $sub->where('progres', '>=', 100)
-                      ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-              });
-        })->count();
+        $countPekerjaanMenungguVerifikasi = Pekerjaan::where('status_pelaksanaan', 'hasil_diajukan')->count();
         $countPekerjaanSelesai = Pekerjaan::where('status_pelaksanaan', 'selesai_terverifikasi')->count();
         $countPekerjaanTerlambat = Pekerjaan::where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
             ->whereDate('tenggat', '<', Carbon::today())
@@ -275,7 +246,7 @@ class DashboardController extends Controller
             'pembuat',
             'pokja',
             'parent',
-            'realisasi' => fn ($r) => $r->latest()
+            'realisasi' => fn ($r) => $r->latest(),
         ]);
 
         // Filter Pencarian Teks (Judul / Kode / No ST)
@@ -283,8 +254,8 @@ class DashboardController extends Controller
             $search = trim($request->q_pekerjaan);
             $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('kode_tampilan', 'like', "%{$search}%")
-                  ->orWhere('nomor_st', 'like', "%{$search}%");
+                    ->orWhere('kode_tampilan', 'like', "%{$search}%")
+                    ->orWhere('nomor_st', 'like', "%{$search}%");
             });
         }
 
@@ -298,7 +269,7 @@ class DashboardController extends Controller
             $pegawaiId = $request->filter_pegawai;
             $query->where(function ($q) use ($pegawaiId) {
                 $q->where('penanggung_jawab_id', $pegawaiId)
-                  ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $pegawaiId));
+                    ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $pegawaiId));
             });
         }
 
@@ -307,20 +278,14 @@ class DashboardController extends Controller
             $status = $request->filter_status;
             if ($status === 'berjalan') {
                 $query->where('status_persetujuan', 'disetujui')
-                      ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil']);
+                    ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil']);
             } elseif ($status === 'menunggu_verifikasi') {
-                $query->where(function ($q) {
-                    $q->where('status_pelaksanaan', 'hasil_diajukan')
-                      ->orWhere(function ($sub) {
-                          $sub->where('progres', '>=', 100)
-                              ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                      });
-                });
+                $query->where('status_pelaksanaan', 'hasil_diajukan');
             } elseif ($status === 'selesai') {
                 $query->where('status_pelaksanaan', 'selesai_terverifikasi');
             } elseif ($status === 'terlambat') {
                 $query->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
-                      ->whereDate('tenggat', '<', Carbon::today());
+                    ->whereDate('tenggat', '<', Carbon::today());
             } elseif ($status === 'diajukan') {
                 $query->where('status_persetujuan', 'diajukan');
             }
@@ -341,7 +306,7 @@ class DashboardController extends Controller
                 },
                 'pekerjaanDitugaskan as tugas_anggota_count' => function ($q) {
                     $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                }
+                },
             ])
             ->with(['pokja'])
             ->orderByDesc('tugas_pic_count')
@@ -367,137 +332,8 @@ class DashboardController extends Controller
      */
     public function commandCenter(Request $request): View
     {
-        // 1. Metrik Global Balai
-        $totalPekerjaan = Pekerjaan::count();
-        $pekerjaanBerjalan = Pekerjaan::where('status_persetujuan', 'disetujui')
-            ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil'])
-            ->count();
-        $menungguVerifikasi = Pekerjaan::where(function ($q) {
-            $q->where('status_pelaksanaan', 'hasil_diajukan')
-              ->orWhere(function ($sub) {
-                  $sub->where('progres', '>=', 100)
-                      ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-              });
-        })->count();
-        $selesaiTerverifikasi = Pekerjaan::where('status_pelaksanaan', 'selesai_terverifikasi')->count();
-        $lewatTenggat = Pekerjaan::where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
-            ->whereDate('tenggat', '<', Carbon::today())
-            ->count();
-        
-        $avgProgres = $totalPekerjaan > 0 ? (float) Pekerjaan::avg('progres') : 0;
+        $commandCenterData = $this->metricService->getCommandCenterData($request);
 
-        // 2. Capaian Kinerja per Pokja / Tim Kerja
-        $pokjas = Pokja::with([
-            'katim',
-            'anggota' => fn ($q) => $q->withCount([
-                'pekerjaanSebagaiPj as pic_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                'pekerjaanDitugaskan as member_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
-            ]),
-            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'progres', 'status_pelaksanaan')
-        ])->orderBy('kode_pokja')->get()->map(function ($p) {
-            $totalTugas = $p->pekerjaan->count();
-            $avgPokja = $totalTugas > 0 ? $p->pekerjaan->avg('progres') : 0;
-            $selesai = $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
-            $berjalan = $p->pekerjaan->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan'])->count();
-            return (object) [
-                'id' => $p->id,
-                'kode_pokja' => $p->kode_pokja,
-                'nama_pokja' => $p->nama_pokja,
-                'katim_name' => $p->katim?->name ?? 'Belum Ditunjuk',
-                'total_tugas' => $totalTugas,
-                'avg_progres' => round($avgPokja, 1),
-                'tugas_selesai' => $selesai,
-                'tugas_berjalan' => $berjalan,
-                'anggota' => $p->anggota,
-                'anggota_count' => $p->anggota->count(),
-            ];
-        });
-
-        // 3. Query Utama Pekerjaan untuk Tampilan Big Screen
-        $query = Pekerjaan::with([
-            'penanggungJawab.pokja',
-            'pelaksana.pokja',
-            'pembuat',
-            'pokja',
-            'parent',
-            'realisasi' => fn ($r) => $r->latest()
-        ]);
-
-        if ($request->filled('pokja_id')) {
-            $query->where('pokja_id', $request->pokja_id);
-        }
-
-        if ($request->filled('status')) {
-            $st = $request->status;
-            if ($st === 'berjalan') {
-                $query->where('status_persetujuan', 'disetujui')
-                      ->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil']);
-            } elseif ($st === 'menunggu_verifikasi') {
-                $query->where(function ($q) {
-                    $q->where('status_pelaksanaan', 'hasil_diajukan')
-                      ->orWhere(function ($sub) {
-                          $sub->where('progres', '>=', 100)
-                              ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                      });
-                });
-            } elseif ($st === 'selesai') {
-                $query->where('status_pelaksanaan', 'selesai_terverifikasi');
-            } elseif ($st === 'terlambat') {
-                $query->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
-                      ->whereDate('tenggat', '<', Carbon::today());
-            }
-        }
-
-        if ($request->filled('q')) {
-            $qText = trim($request->q);
-            $query->where(function ($q) use ($qText) {
-                $q->where('judul', 'like', "%{$qText}%")
-                  ->orWhere('kode_tampilan', 'like', "%{$qText}%")
-                  ->orWhere('nomor_st', 'like', "%{$qText}%")
-                  ->orWhereHas('penanggungJawab', fn($p) => $p->where('name', 'like', "%{$qText}%"));
-            });
-        }
-
-        // Ambil daftar pekerjaan untuk live display big screen
-        $pekerjaanList = $query->orderBy('tenggat', 'asc')->get();
-
-        // 4. Staf Teraktif & Beban Kerja Seluruh Pegawai & Katim
-        $topAssignees = $this->getWorkloadList()->map(function ($u) {
-            $u->pic_count = $u->tugas_pic_count;
-            $u->member_count = $u->tugas_anggota_count;
-            return $u;
-        });
-
-        $allPokjas = Pokja::orderBy('kode_pokja')->get();
-
-        $statusCounts = [
-            'selesai' => $selesaiTerverifikasi,
-            'dikerjakan' => Pekerjaan::where('status_pelaksanaan', 'dikerjakan')->count(),
-            'menunggu_verifikasi' => $menungguVerifikasi,
-            'belum_dimulai' => Pekerjaan::where('status_pelaksanaan', 'belum_dimulai')->count(),
-            'perlu_revisi' => Pekerjaan::where('status_pelaksanaan', 'perlu_perbaikan_hasil')->count(),
-        ];
-
-        // Pokja chart data untuk diagram
-        $pokjaChartData = $pokjas->filter(fn($p) => $p->total_tugas > 0 || in_array($p->kode_pokja, ['TIM-01', 'TIM-02', 'TIM-03', 'TIM-04', 'TIM-05', 'SUBBAG-UMUM']))
-            ->values();
-        if ($pokjaChartData->isEmpty()) {
-            $pokjaChartData = $pokjas->take(8)->values();
-        }
-
-        return view('dashboard.command_center', compact(
-            'totalPekerjaan',
-            'pekerjaanBerjalan',
-            'menungguVerifikasi',
-            'selesaiTerverifikasi',
-            'lewatTenggat',
-            'avgProgres',
-            'pokjas',
-            'pekerjaanList',
-            'topAssignees',
-            'allPokjas',
-            'statusCounts',
-            'pokjaChartData'
-        ));
+        return view('dashboard.command_center', $commandCenterData);
     }
 }

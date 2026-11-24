@@ -27,9 +27,6 @@
                 </div>
 
                 <div style="font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; margin-top: 3px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge-pill badge-bobot">
-                        <i class="ph-bold ph-scales"></i> Bobot: {{ number_format($child->bobot, 1) }}%
-                    </span>
                     <span class="badge-pill badge-pj">
                         <i class="ph-bold ph-user"></i> PJ: {{ $child->penanggungJawab->name }}
                     </span>
@@ -46,20 +43,12 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
-            <!-- Progress Bar -->
+            <!-- Activity & Reports Badge -->
             <div style="text-align: right;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <div class="progress-track">
-                        <div class="progress-fill {{ $child->progres >= 100 ? 'bg-progres-green' : ($child->progres >= 50 ? 'bg-progres-blue' : 'bg-progres-amber') }}" 
-                             style="width: {{ $child->progres }}%;"></div>
-                    </div>
-                    <strong style="font-size: 13px; color: #0f172a; min-width: 44px; display: inline-block;">
-                        {{ number_format($child->progres, 1) }}%
-                    </strong>
+                <div style="font-size: 11.5px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px;">
+                    <i class="ph-bold ph-newspaper-clipping"></i>
+                    <span>{{ $child->realisasi->where('status_approval', 'disetujui')->count() }} Laporan</span>
                 </div>
-                @if($child->children->isNotEmpty())
-                    <div style="font-size: 10.5px; color: #64748b; font-style: italic;">(agregasi anak)</div>
-                @endif
             </div>
 
             <!-- Execution Status Badge -->

@@ -4,282 +4,7 @@
 @section('page-title', 'Beranda Kinerja')
 
 @section('styles')
-<style>
-    /* Hero Banner */
-    .hero-card {
-        background-color: var(--navy);
-        background-image:
-            radial-gradient(rgba(255, 255, 255, 0.12) 1.2px, transparent 1.2px),
-            linear-gradient(135deg, var(--navy-soft) 0%, var(--navy) 50%, var(--navy-deep) 100%);
-        background-size: 22px 22px, 100% 100%;
-        border-radius: var(--radius-lg);
-        padding: 26px 30px;
-        color: white;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 8px 24px rgba(11, 74, 130, 0.18);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .hero-card::after {
-        content: '';
-        position: absolute;
-        right: -30px;
-        bottom: -40px;
-        width: 220px;
-        height: 220px;
-        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
-        border-radius: 50%;
-    }
-
-    .hero-info h2 {
-        font-size: 24px;
-        font-weight: 800;
-        margin-bottom: 6px;
-    }
-
-    .hero-info p {
-        font-size: 13.5px;
-        opacity: 0.92;
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-
-    .hero-badge {
-        background: rgba(255, 255, 255, 0.18);
-        backdrop-filter: blur(4px);
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 11.5px;
-        font-weight: 700;
-        color: #e0f6fd;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    /* Grid KPI Cards */
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .kpi-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        padding: 20px 22px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        position: relative;
-        overflow: hidden;
-        animation: kpiCardIn 0.5s ease both;
-    }
-
-    .kpi-card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(37,99,235,0.03) 0%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-
-    .kpi-card:hover::after { opacity: 1; }
-
-    .kpi-card:hover {
-        transform: translateY(-4px) scale(1.01);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.04);
-        border-color: rgba(37,99,235,0.3);
-    }
-
-    @keyframes kpiCardIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
-    .kpi-card:nth-child(2) { animation-delay: 0.10s; }
-    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
-    .kpi-card:nth-child(4) { animation-delay: 0.20s; }
-
-    .kpi-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 25px;
-        flex-shrink: 0;
-        transition: transform 0.2s;
-    }
-
-    .kpi-card:hover .kpi-icon {
-        transform: scale(1.12) rotate(-5deg);
-    }
-
-    .kpi-blue   { background: #e8f2fb; color: #0a6fb5; }
-    .kpi-green  { background: #e3f6ee; color: #0c8a5d; }
-    .kpi-amber  { background: #fff3d9; color: #b87400; }
-    .kpi-purple { background: #efe8fa; color: #6f45bd; }
-    .kpi-rose   { background: #fdeaea; color: #d03232; }
-
-    .kpi-details h3 {
-        font-size: 26px;
-        font-weight: 900;
-        color: var(--text-dark);
-        line-height: 1.1;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .kpi-details p {
-        font-size: 12.5px;
-        font-weight: 600;
-        color: var(--text-muted);
-        margin-top: 4px;
-    }
-
-    /* Hero card pulse shimmer */
-    .hero-card {
-        position: relative;
-        overflow: hidden;
-    }
-    .hero-card::before {
-        content: '';
-        position: absolute;
-        top: -60%;
-        left: -60%;
-        width: 220%;
-        height: 220%;
-        background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
-        animation: heroShimmer 5s ease-in-out infinite;
-        pointer-events: none;
-    }
-    @keyframes heroShimmer {
-        0%   { transform: translateX(-40%) translateY(-10%); }
-        50%  { transform: translateX(0%) translateY(5%); }
-        100% { transform: translateX(-40%) translateY(-10%); }
-    }
-
-    /* Section Cards */
-    .section-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 28px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .section-header h3 {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-dark);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Tables */
-    .table-container {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13.5px;
-    }
-
-    th {
-        background: #f8fafc;
-        text-align: left;
-        padding: 12px 16px;
-        font-weight: 700;
-        color: #475569;
-        border-bottom: 1px solid var(--border);
-        text-transform: uppercase;
-        font-size: 11px;
-        letter-spacing: 0.05em;
-    }
-
-    td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        color: #334155;
-        vertical-align: middle;
-    }
-
-    tr:hover td {
-        background: #f8fafc;
-    }
-
-    /* Badges Status Workflow */
-    .badge-status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    .status-draft { background: #f1f5f9; color: #475569; }
-    .status-diajukan { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .status-revisi_pokja, .status-revisi_katim { background: #fef2f2; color: #b91c1c; }
-    .status-disetujui_pokja { background: #ecfdf5; color: #047857; }
-    .status-disetujui_katim { background: #f0fdf4; color: #15803d; font-weight: 800; border: 1px solid #86efac; }
-    .status-dikonsolidasi_kasubag { background: #fdf4ff; color: #7e22ce; }
-    .status-disetujui_kabal { background: #f0fdf4; color: #166534; box-shadow: 0 0 0 1px #22c55e; }
-
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: var(--text-muted);
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        color: #cbd5e1;
-        margin-bottom: 12px;
-        display: block;
-    }
-
-    .two-col-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        margin-bottom: 28px;
-    }
-
-    @media (max-width: 900px) {
-        .two-col-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 @endsection
 
 @section('content')
@@ -338,14 +63,13 @@
 
                             <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
                                 <div style="display: flex; align-items: center; gap: 6px;">
-                                    <div style="width: 50px; height: 6px; background: #e2e8f0; border-radius: 6px; overflow: hidden;">
-                                        <div style="height: 100%; width: {{ $task->progres }}%; background: #2563eb; border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 11.5px; font-weight: 800; color: #1e293b;">{{ number_format($task->progres, 0) }}%</span>
+                                    <span class="badge-pill exec-{{ $task->status_pelaksanaan }}" style="font-size: 11px; padding: 2px 8px;">
+                                        {{ $task->status_pelaksanaan_label }}
+                                    </span>
                                 </div>
 
                                 <a href="{{ route('pekerjaan.show', $task) }}" style="font-size: 11.5px; font-weight: 700; background: #ecfdf5; color: #047857; padding: 4px 10px; border-radius: 6px; text-decoration: none; border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 4px;">
-                                    <i class="ph-bold ph-pencil-simple-line"></i> Lapor Progres
+                                    <i class="ph-bold ph-pencil-simple-line"></i> Lapor Kemajuan
                                 </a>
                             </div>
                         </div>
@@ -740,12 +464,6 @@
                 </table>
             </div>
         </div>
-
-        {{-- Section Analitik Visual & Grafik Interaktif --}}
-        @include('dashboard.partials.visual_analytics_section')
-
-        {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
-        @include('dashboard.partials.pokja_monitoring_section')
     @endif
 
     {{-- ROLE: KEPALA BALAI (KABAL) --}}
@@ -786,8 +504,8 @@
                     <i class="ph-duotone ph-chart-line-up"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $avgProgresBalai ?? 43.0 }}%</h3>
-                    <p>Rata-rata Capaian</p>
+                    <h3>{{ $avgProgresBalai ?? 0 }}%</h3>
+                    <p>Ketuntasan Tugas Balai</p>
                 </div>
             </div>
 
@@ -801,15 +519,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Section Analitik Visual & Grafik Interaktif --}}
-        @include('dashboard.partials.visual_analytics_section')
-
-        {{-- Section Analitik Visual & Grafik Interaktif --}}
-        @include('dashboard.partials.visual_analytics_section')
-
-        {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
-        @include('dashboard.partials.pokja_monitoring_section')
     @endif
 
     {{-- ROLE: SUPER ADMIN --}}
@@ -850,14 +559,11 @@
                     <i class="ph-duotone ph-chart-line-up"></i>
                 </div>
                 <div class="kpi-details">
-                    <h3>{{ $avgProgresBalai ?? 43.0 }}%</h3>
-                    <p>Rata-rata Capaian</p>
+                    <h3>{{ $avgProgresBalai ?? 0 }}%</h3>
+                    <p>Ketuntasan Tugas Balai</p>
                 </div>
             </div>
         </div>
-
-        {{-- Section Analitik Visual & Grafik Interaktif --}}
-        @include('dashboard.partials.visual_analytics_section')
 
         <div class="section-card">
             <div class="section-header">
@@ -895,16 +601,660 @@
                 </table>
             </div>
         </div>
+    @endif
 
-        {{-- Section Analitik Visual & Grafik Interaktif --}}
-        @include('dashboard.partials.visual_analytics_section')
+    {{-- Section Analitik Visual & Monitoring Struktur Unit Kerja Balai --}}
+    @if($user->isAdmin() || $user->isKabal() || $user->isKasubag() || $user->isKorlayanan())
+        <!-- ================= VISUAL ANALYTICS SECTION ================= -->
+<!-- Section Analitik Visual & Grafik Kinerja Balai (Formal, Bersih & Interaktif) -->
+<div class="analytics-section-wrapper" style="margin-bottom: 24px;">
+    <div class="analytics-grid">
+        <!-- 1. Donut Chart: Komposisi Status Pelaksanaan Pekerjaan -->
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <div>
+                    <h3 class="analytics-title">
+                        <i class="ph-bold ph-chart-donut"></i>
+                        Status Penugasan & Beban Kerja Balai
+                    </h3>
+                    <p class="analytics-subtitle">Distribusi status dari seluruh target pekerjaan institusi</p>
+                </div>
+                <span class="analytics-badge-count">
+                    {{ $totalPekerjaanBalai ?? 0 }} Penugasan
+                </span>
+            </div>
 
-        {{-- Monitoring Struktur Unit Kerja & Pilar Subbag Umum --}}
-        @include('dashboard.partials.pokja_monitoring_section')
+            <div class="analytics-body">
+                <div class="donut-chart-container">
+                    <canvas id="chartStatusTugas"></canvas>
+                    <div class="donut-center-metric">
+                        <span class="donut-big-num">{{ $totalPekerjaanBalai ?? 0 }}</span>
+                        <span class="donut-sub-lbl">Tugas Total</span>
+                    </div>
+                </div>
+
+                <div class="analytics-legend-grid">
+                    <div class="legend-box" style="border-left-color: #10b981;">
+                        <div class="legend-row">
+                            <span class="legend-name"><i class="ph-fill ph-check-circle" style="color: #10b981;"></i> Selesai Terverifikasi</span>
+                            <span class="legend-val">{{ $statusCounts['selesai'] ?? 0 }}</span>
+                        </div>
+                        <div class="legend-pct">
+                            {{ ($totalPekerjaanBalai ?? 0) > 0 ? round((($statusCounts['selesai'] ?? 0) / $totalPekerjaanBalai) * 100, 0) : 0 }}% dari total
+                        </div>
+                    </div>
+
+                    <div class="legend-box" style="border-left-color: #0a6fb5;">
+                        <div class="legend-row">
+                            <span class="legend-name"><i class="ph-fill ph-rocket-launch" style="color: #0a6fb5;"></i> Sedang Dikerjakan</span>
+                            <span class="legend-val">{{ $statusCounts['dikerjakan'] ?? 0 }}</span>
+                        </div>
+                        <div class="legend-pct">
+                            {{ ($totalPekerjaanBalai ?? 0) > 0 ? round((($statusCounts['dikerjakan'] ?? 0) / $totalPekerjaanBalai) * 100, 0) : 0 }}% dari total
+                        </div>
+                    </div>
+
+                    <div class="legend-box" style="border-left-color: #8b5cf6;">
+                        <div class="legend-row">
+                            <span class="legend-name"><i class="ph-fill ph-seal-check" style="color: #8b5cf6;"></i> Menunggu Verifikasi</span>
+                            <span class="legend-val">{{ $statusCounts['menunggu_verifikasi'] ?? 0 }}</span>
+                        </div>
+                        <div class="legend-pct">
+                            {{ ($totalPekerjaanBalai ?? 0) > 0 ? round((($statusCounts['menunggu_verifikasi'] ?? 0) / $totalPekerjaanBalai) * 100, 0) : 0 }}% dari total
+                        </div>
+                    </div>
+
+                    <div class="legend-box" style="border-left-color: #94a3b8;">
+                        <div class="legend-row">
+                            <span class="legend-name"><i class="ph-fill ph-clock" style="color: #94a3b8;"></i> Belum Dimulai / Draf</span>
+                            <span class="legend-val">{{ $statusCounts['belum_dimulai'] ?? 0 }}</span>
+                        </div>
+                        <div class="legend-pct">
+                            {{ ($totalPekerjaanBalai ?? 0) > 0 ? round((($statusCounts['belum_dimulai'] ?? 0) / $totalPekerjaanBalai) * 100, 0) : 0 }}% dari total
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Bar Chart: Capaian Progres per Tim Kerja / Unit -->
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <div>
+                    <h3 class="analytics-title">
+                        <i class="ph-bold ph-chart-bar"></i>
+                        Tingkat Ketuntasan per Tim Kerja & Unit
+                    </h3>
+                    <p class="analytics-subtitle">Jumlah penyelesaian tugas per unit kerja</p>
+                </div>
+                <span class="analytics-badge-avg">
+                    <i class="ph-bold ph-trend-up"></i> Balai: {{ $statusCounts['selesai'] ?? 0 }} / {{ $totalPekerjaanBalai ?? 0 }} Tugas Tuntas
+                </span>
+            </div>
+
+            <div class="analytics-body" style="flex-direction: column; justify-content: space-between;">
+                <div style="height: 185px; width: 100%; position: relative;">
+                    <canvas id="chartPokjaProgres"></canvas>
+                </div>
+
+                <!-- Footer Indikator Cepat -->
+                <div class="analytics-mini-stats">
+                    <div class="mini-stat-item">
+                        <span class="stat-lbl"><i class="ph-bold ph-gauge"></i> Ketuntasan Balai</span>
+                        <span class="stat-num" style="color: #0a6fb5;">{{ $statusCounts['selesai'] ?? 0 }} / {{ $totalPekerjaanBalai ?? 0 }}</span>
+                    </div>
+                    <div class="mini-stat-item">
+                        <span class="stat-lbl"><i class="ph-bold ph-shield-check"></i> Ketepatan Waktu</span>
+                        <span class="stat-num" style="color: {{ ($pekerjaanTerlambatCount ?? 0) > 0 ? '#d03232' : '#0c8a5d' }};">
+                            {{ ($pekerjaanTerlambatCount ?? 0) > 0 ? $pekerjaanTerlambatCount . ' Terlambat' : 'Semua On-Track' }}
+                        </span>
+                    </div>
+                    <div class="mini-stat-item">
+                        <span class="stat-lbl"><i class="ph-bold ph-check-circle"></i> Selesai Tuntas</span>
+                        <span class="stat-num" style="color: #0c8a5d;">{{ $statusCounts['selesai'] ?? 0 }} Tugas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- ================= POKJA MONITORING SECTION ================= -->
+<!-- Section Monitoring Unit Kerja & Pilar Subbag (Interactive Enhanced) -->
+<div class="section-card"
+    style="margin-top: 10px; border-radius: var(--radius-md); box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+    <div class="dash-pokja-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="dash-pokja-icon-badge">
+                <i class="ph-duotone ph-tree-structure"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-dark); margin: 0; line-height: 1.2;">
+                    Struktur Unit Kerja, 6 Pilar Subbag &amp; Satgas RBI
+                </h3>
+                <p style="font-size: 11.5px; color: var(--text-muted); margin: 2px 0 0 0;">
+                    Klik kartu unit kerja untuk melihat rincian personil dan penanggung jawab
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <!-- Live search -->
+            <div style="position: relative;">
+                <i class="ph-bold ph-magnifying-glass"
+                    style="position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none;"></i>
+                <input type="text" id="pokjaCardSearch" placeholder="Cari unit kerja..."
+                    oninput="searchPokjaCards(this.value)"
+                    style="font-size: 12px; padding: 6px 10px 6px 30px; border: 1px solid var(--border); border-radius: 8px; background: white; outline: none; width: 180px; transition: all 0.2s;">
+            </div>
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('pokjas.index') }}" class="btn-primary"
+                    style="padding: 5px 11px; font-size: 11.5px; border-radius: 6px;">
+                    <i class="ph-bold ph-gear-six"></i>
+                    <span>Kelola Master</span>
+                </a>
+            @endif
+        </div>
+    </div>
+
+    <div style="padding: 12px 18px 16px 18px;">
+        @php
+            $timKerjaCount = $pokjas->where('tipe', 'tim_kerja')->count();
+            $pilarSubbagCount = $pokjas->where('tipe', 'subbag_pilar')->count();
+            $kelompokKerjaCount = $pokjas->where('tipe', 'kelompok_kerja')->count();
+        @endphp
+
+        <!-- Tab Switcher Minimalis / Compact Pills -->
+        <div class="dash-pokja-tabs-bar">
+            <button type="button" class="dash-mini-tab active" onclick="switchDashboardPokjaTab('all', this)">
+                <span>Semua Unit</span>
+                <span class="dash-mini-count">{{ $pokjas->count() }}</span>
+            </button>
+            <button type="button" class="dash-mini-tab" onclick="switchDashboardPokjaTab('tim_kerja', this)">
+                <i class="ph-bold ph-buildings" style="font-size: 12px;"></i>
+                <span>Tim Kerja &amp; TU Balai</span>
+                <span class="dash-mini-count">{{ $timKerjaCount }}</span>
+            </button>
+            <button type="button" class="dash-mini-tab" onclick="switchDashboardPokjaTab('subbag_pilar', this)">
+                <i class="ph-bold ph-gear-six" style="font-size: 12px;"></i>
+                <span>6 Pilar Operasional Subbag</span>
+                <span class="dash-mini-count">{{ $pilarSubbagCount }}</span>
+            </button>
+            <button type="button" class="dash-mini-tab" onclick="switchDashboardPokjaTab('kelompok_kerja', this)">
+                <i class="ph-bold ph-lightning" style="font-size: 12px;"></i>
+                <span>Satgas Ad Hoc RBI</span>
+                <span class="dash-mini-count">{{ $kelompokKerjaCount }}</span>
+            </button>
+            @if(isset($bebanKerjaPegawai) && $bebanKerjaPegawai->isNotEmpty())
+                <button type="button" class="dash-mini-tab" onclick="switchDashboardPokjaTab('beban_kerja', this)"
+                    style="border-color: rgba(37,99,235,0.3); color: var(--primary); background: rgba(37,99,235,0.06);">
+                    <i class="ph-bold ph-chart-donut" style="font-size: 12px;"></i>
+                    <span>Beban Kerja Pegawai &amp; Katim</span>
+                    <span class="dash-mini-count"
+                        style="background: var(--primary); color: white;">{{ $bebanKerjaPegawai->count() }}</span>
+                </button>
+            @endif
+        </div>
+
+        <!-- Grid Cards Interaktif -->
+        <div class="dash-pokja-compact-grid" id="dashboardPokjaGrid">
+            @foreach($pokjas as $pIdx => $p)
+                @php
+                    $isSubbag = ($p->kode_pokja === 'SUBBAG-UMUM');
+                    $isPilar = ($p->tipe === 'subbag_pilar');
+                    $isAdhoc = ($p->tipe === 'kelompok_kerja');
+
+                    $themeClass = $isSubbag ? 'type-subbag' : ($isPilar ? 'type-pilar' : ($isAdhoc ? 'type-adhoc' : 'type-timker'));
+                    $typeBadgeText = $isSubbag ? 'TU Balai' : ($isPilar ? 'Pilar Subbag' : ($isAdhoc ? 'Satgas RBI' : 'Tim Kerja'));
+                    $leaderRoleText = $isSubbag ? 'Kasubag' : ($isPilar ? 'PIC Pilar' : ($isAdhoc ? 'Ketua Satgas' : 'Katim'));
+                    $leaderName = $p->katim?->name ?? 'Belum Ditunjuk';
+
+                    // Hitung ketuntasan pekerjaan
+                    $totalTugas = $p->pekerjaan ? $p->pekerjaan->count() : 0;
+                    $selesaiTugas = $p->pekerjaan ? $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count() : 0;
+                    $ketuntasan = $totalTugas > 0 ? round(($selesaiTugas / $totalTugas) * 100, 0) : 0;
+                    $progressPct = $ketuntasan;
+
+                    $progressColor = $progressPct >= 75 ? '#10b981' : ($progressPct >= 40 ? '#f59e0b' : '#3b82f6');
+                    $progressBg = $progressPct >= 75 ? 'rgba(16,185,129,0.12)' : ($progressPct >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(59,130,246,0.12)');
+                @endphp
+
+                <div class="dash-mini-card {{ $themeClass }}" data-tipe="{{ $p->tipe ?? 'tim_kerja' }}"
+                    data-name="{{ strtolower($p->nama_pokja) }} {{ strtolower($p->kode_pokja) }}"
+                    onclick="openDashMemberModal('{{ $p->id }}')" title="Klik untuk melihat personil {{ $p->nama_pokja }}"
+                    style="animation-delay: {{ $pIdx * 0.04 }}s;">
+
+                    <!-- Header mini card: Kode & Tipe Badge -->
+                    <div class="dash-mini-card-head">
+                        <span class="dash-mini-code">{{ $p->kode_pokja }}</span>
+                        <span class="dash-mini-type">{{ $typeBadgeText }}</span>
+                    </div>
+
+                    <!-- Judul Unit -->
+                    <div class="dash-mini-card-title" title="{{ $p->nama_pokja }}">
+                        {{ $p->nama_pokja }}
+                    </div>
+
+                    <!-- Progress bar tugas -->
+                    @if($totalTugas > 0)
+                        <div style="margin-bottom: 6px;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                                <span style="font-size: 9.5px; color: var(--text-muted); font-weight: 600;">Ketuntasan</span>
+                                <span
+                                    style="font-size: 9.5px; font-weight: 800; color: #10b981;">{{ $selesaiTugas }}/{{ $totalTugas }} Tuntas</span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">
+                                {{ $p->pekerjaan->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan'])->count() }} sedang aktif
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Footer mini card: Penanggung Jawab & Total Personil -->
+                    <div class="dash-mini-card-foot">
+                        <div class="dash-mini-leader" title="{{ $leaderRoleText }}: {{ $leaderName }}">
+                            <i class="ph-bold ph-user" style="font-size: 11px;"></i>
+                            <span>{{ $leaderName }}</span>
+                        </div>
+                        <div class="dash-mini-members" title="Total personil {{ $p->anggota->count() }} orang">
+                            <i class="ph-bold ph-users"></i>
+                            <span>{{ $p->anggota->count() }}</span>
+                        </div>
+                    </div>
+
+                    @if($p->anggota && $p->anggota->count() > 0)
+                        <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                            title="Pegawai: {{ $p->anggota->pluck('name')->implode(', ') }}">
+                            <span style="font-weight: 700; color: var(--primary);">Staf:</span>
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ $p->anggota->take(2)->pluck('name')->implode(', ') }}{{ $p->anggota->count() > 2 ? ' +' . ($p->anggota->count() - 2) : '' }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <!-- Hover detail overlay -->
+                    <div class="dash-card-hover-cta">
+                        <i class="ph-bold ph-arrow-square-out" style="font-size: 12px;"></i>
+                        <span>Lihat Detail</span>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Empty state saat search tidak ketemu -->
+        <div id="pokjaSearchEmpty" style="display: none; text-align: center; padding: 24px; color: var(--text-muted);">
+            <i class="ph-duotone ph-magnifying-glass" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>
+            <p style="font-size: 13px;">Tidak ada unit kerja yang cocok dengan pencarian.</p>
+        </div>
+
+        @if(isset($bebanKerjaPegawai) && $bebanKerjaPegawai->isNotEmpty())
+            <!-- Container Pemantauan Beban Kerja -->
+            <div id="dashWorkloadContainer" style="display: none; flex-direction: column; gap: 12px; margin-top: 4px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: var(--bg-hover, #f8fafc); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button type="button" class="dash-mini-tab active" id="btnWorkloadTabAll"
+                            onclick="filterDashWorkload('all', this)">
+                            Semua ({{ $bebanKerjaPegawai->count() }})
+                        </button>
+                        <button type="button" class="dash-mini-tab" onclick="filterDashWorkload('pegawai', this)">
+                            Pegawai Pelaksana
+                            ({{ $bebanKerjaPegawai->filter(fn($u) => in_array($u->role, ['pegawai', 'tim_pokja']))->count() }})
+                        </button>
+                        <button type="button" class="dash-mini-tab" onclick="filterDashWorkload('katim', this)">
+                            Katim &amp; Koor
+                            ({{ $bebanKerjaPegawai->filter(fn($u) => in_array($u->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']))->count() }})
+                        </button>
+                    </div>
+                    <div style="max-width: 260px; width: 100%;">
+                        <input type="text" id="dashWorkloadSearch" placeholder="Cari nama pegawai / staf..."
+                            oninput="searchDashWorkload(this.value)"
+                            style="width: 100%; font-size: 12px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: white; outline: none;">
+                    </div>
+                </div>
+
+                <div class="dash-pokja-compact-grid" id="dashWorkloadGrid">
+                    @foreach($bebanKerjaPegawai as $staf)
+                        @php
+                            $isKatimOrKoor = in_array($staf->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']);
+                            $cat = $isKatimOrKoor ? 'katim' : 'pegawai';
+                            $bebanLevel = $staf->total_beban >= 10 ? 'high' : ($staf->total_beban >= 5 ? 'med' : 'low');
+                            $bebanColor = $staf->total_beban >= 10 ? '#dc2626' : ($staf->total_beban >= 5 ? '#d97706' : '#059669');
+                            $bebanBg = $staf->total_beban >= 10 ? '#fef2f2' : ($staf->total_beban >= 5 ? '#fffbeb' : '#ecfdf5');
+                        @endphp
+                        <div class="dash-workload-card" data-cat="{{ $cat }}" data-name="{{ strtolower($staf->name) }}"
+                            style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; transition: all 0.18s; cursor: default;">
+                            <div
+                                style="width: 34px; height: 34px; border-radius: 50%; background: {{ $isKatimOrKoor ? '#2563eb' : '#64748b' }}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; flex-shrink: 0;">
+                                {{ strtoupper(substr($staf->name, 0, 2)) }}
+                            </div>
+                            <div style="overflow: hidden; flex: 1;">
+                                <div style="font-size: 12.5px; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                    title="{{ $staf->name }}">
+                                    {{ $staf->name }}
+                                </div>
+                                <div
+                                    style="font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $staf->pokja?->kode_pokja ?? 'BGTK' }} &bull; {{ $staf->role_label }}
+                                </div>
+                                <!-- Mini bar beban kerja -->
+                                <div
+                                    style="margin-top: 4px; height: 3px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden; max-width: 120px;">
+                                    <div
+                                        style="height: 100%; width: {{ min(100, $staf->total_beban * 10) }}%; background: {{ $bebanColor }}; border-radius: 3px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="flex-shrink: 0; text-align: right;">
+                                <span
+                                    style="font-family: monospace; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: {{ $bebanBg }}; color: {{ $bebanColor }}; display: inline-block;">
+                                    {{ $staf->total_beban }} Tugas
+                                </span>
+                                <div style="font-size: 9.5px; color: var(--text-muted); margin-top: 2px;">
+                                    {{ $staf->tugas_pic_count }} PIC &bull; {{ $staf->tugas_anggota_count }} Tim
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+
+<!-- Container Modal Personil -->
+<div id="dashPokjaModalsContainer">
+    @foreach($pokjas as $p)
+        @php
+            $isSubbag = ($p->kode_pokja === 'SUBBAG-UMUM');
+            $isPilar = ($p->tipe === 'subbag_pilar');
+            $isAdhoc = ($p->tipe === 'kelompok_kerja');
+
+            $typeBadgeText = $isSubbag ? 'TU Balai' : ($isPilar ? 'Pilar Subbag' : ($isAdhoc ? 'Satgas RBI' : 'Tim Kerja'));
+            $leaderRoleText = $isSubbag ? 'Kasubag' : ($isPilar ? 'PIC Pilar' : ($isAdhoc ? 'Ketua Satgas' : 'Katim'));
+            $leaderName = $p->katim?->name ?? 'Belum Ditunjuk';
+
+            $totalTugasModal = $p->pekerjaan ? $p->pekerjaan->count() : 0;
+            $selesaiModal = $p->pekerjaan ? $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count() : 0;
+            $berjalanModal = $p->pekerjaan ? $p->pekerjaan->whereIn('status_pelaksanaan', ['dikerjakan', 'belum_dimulai'])->count() : 0;
+            $ketuntasanModal = $totalTugasModal > 0 ? round(($selesaiModal / $totalTugasModal) * 100, 1) : 0;
+        @endphp
+
+        <div id="dashMemberModal_{{ $p->id }}" class="modal-backdrop" onclick="handleBackdropClick(event, '{{ $p->id }}')">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                            <span class="dash-mini-code" style="font-size: 10px;">{{ $p->kode_pokja }}</span>
+                            <span class="dash-mini-type">{{ $typeBadgeText }}</span>
+                        </div>
+                        <h4
+                            style="font-size: 14.5px; font-weight: 800; color: var(--text-dark); margin: 0; line-height: 1.3;">
+                            {{ $p->nama_pokja }}
+                        </h4>
+                    </div>
+                    <button type="button" class="modal-close" onclick="closeDashMemberModal('{{ $p->id }}')"
+                        title="Tutup Modal">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <!-- Mini KPI strip di dalam modal -->
+                @if($totalTugasModal > 0)
+                    <div
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-top: none; border-bottom: 1px solid var(--border);">
+                        <div style="background: white; padding: 10px 14px; text-align: center;">
+                            <div style="font-size: 18px; font-weight: 900; color: var(--primary);">{{ $totalTugasModal }}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Total Tugas</div>
+                        </div>
+                        <div style="background: white; padding: 10px 14px; text-align: center;">
+                            <div style="font-size: 18px; font-weight: 900; color: #10b981;">{{ $selesaiModal }}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Selesai</div>
+                        </div>
+                        <div style="background: white; padding: 10px 14px; text-align: center;">
+                            <div style="font-size: 18px; font-weight: 900; color: #0284c7;">{{ $berjalanModal }}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Berjalan</div>
+                        </div>
+                    </div>
+                    <!-- Progress bar overall -->
+                    <div style="padding: 8px 18px; background: white; border-bottom: 1px solid var(--border);">
+                        @php
+                            $ketuntasanModal = $totalTugasModal > 0 ? round(($selesaiModal / $totalTugasModal) * 100, 1) : 0;
+                        @endphp
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 600;">Tingkat Ketuntasan Unit</span>
+                            <span style="font-size: 10.5px; font-weight: 800; color: #10b981;">{{ $selesaiModal }}/{{ $totalTugasModal }} Selesai ({{ $ketuntasanModal }}%)</span>
+                        </div>
+                        <div style="height: 6px; background: #f1f5f9; border-radius: 6px; overflow: hidden;">
+                            <div
+                                style="height: 100%; width: {{ $ketuntasanModal }}%; background: #10b981; border-radius: 6px; transition: width 0.8s ease;">
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="modal-body" style="padding: 14px 18px; max-height: 350px; overflow-y: auto;">
+                    <!-- Highlight Penanggung Jawab -->
+                    <div class="dash-modal-leader-box">
+                        <div>
+                            <span
+                                style="font-size: 11px; color: var(--text-muted); font-weight: 600; display: block;">{{ $leaderRoleText }}:</span>
+                            <strong style="font-size: 13px; color: var(--text-dark);">{{ $leaderName }}</strong>
+                        </div>
+                        <span class="dash-badge-count">{{ $p->anggota->count() }} Pegawai</span>
+                    </div>
+
+                    <div
+                        style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Daftar Anggota &amp; Personil
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        @forelse($p->anggota as $m)
+                            @php
+                                $isLeader = ($m->pivot->peran ?? '') === 'ketua' || $m->id === $p->katim_id;
+                                $bebanMember = ($m->active_pic_count ?? 0) + ($m->active_member_count ?? 0);
+                            @endphp
+                            <div class="dash-member-row {{ $isLeader ? 'is-leader' : '' }}">
+                                <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                                    <div class="dash-member-avatar {{ $isLeader ? 'avatar-leader' : '' }}">
+                                        {{ strtoupper(substr($m->name, 0, 1)) }}
+                                    </div>
+                                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <div
+                                            style="font-size: 12.5px; font-weight: 700; color: var(--text-dark); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                                            {{ $m->name }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">
+                                            NIP: {{ $m->nip ?? '-' }} &bull; {{ $m->jabatan ?? 'Pegawai' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                                    <span
+                                        style="font-family: monospace; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: {{ $bebanMember > 0 ? 'rgba(16,185,129,0.12)' : 'rgba(148,163,184,0.12)' }}; color: {{ $bebanMember > 0 ? '#059669' : '#64748b' }};"
+                                        title="{{ $m->active_pic_count ?? 0 }} Tugas PIC, {{ $m->active_member_count ?? 0 }} Tugas Tim">
+                                        {{ $bebanMember }} Tugas
+                                    </span>
+                                    @if($isLeader)
+                                        <span class="badge-role-leader">
+                                            â­ {{ $leaderRoleText }}
+                                        </span>
+                                    @else
+                                        <span class="badge-role-member">
+                                            Anggota
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div
+                                style="text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); background: var(--bg-hover, #f8fafc); border-radius: 8px; border: 1px dashed var(--border);">
+                                Belum ada personil yang terdaftar pada unit ini.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="modal-footer"
+                    style="padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--border); background: var(--bg-hover, #f8fafc);">
+                    <a href="{{ route('pekerjaan.index', ['pokja_id' => $p->id]) }}"
+                        style="font-size: 11.5px; font-weight: 700; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="ph-bold ph-list-bullets"></i>
+                        Lihat Daftar Pekerjaan
+                    </a>
+                    <div style="display: flex; gap: 8px;">
+                        @if(Auth::user()->isAdmin())
+                            <a href="{{ route('pokjas.index') }}" class="btn-primary"
+                                style="font-size: 11.5px; padding: 5px 11px;">
+                                <i class="ph-bold ph-pencil-simple"></i>
+                                <span>Master Pokja</span>
+                            </a>
+                        @endif
+                        <button type="button" class="btn-manage-members" style="font-size: 11.5px; padding: 5px 14px;"
+                            onclick="closeDashMemberModal('{{ $p->id }}')">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+</div>
+
+<script>
+    // ========== Tab Switcher ==========
+    function switchDashboardPokjaTab(type, btn) {
+        document.querySelectorAll('.dash-mini-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const pokjaGrid = document.getElementById('dashboardPokjaGrid');
+        const workloadContainer = document.getElementById('dashWorkloadContainer');
+        const searchEmpty = document.getElementById('pokjaSearchEmpty');
+
+        if (type === 'beban_kerja') {
+            if (pokjaGrid) pokjaGrid.style.display = 'none';
+            if (workloadContainer) workloadContainer.style.display = 'flex';
+            if (searchEmpty) searchEmpty.style.display = 'none';
+            return;
+        } else {
+            if (pokjaGrid) pokjaGrid.style.display = 'grid';
+            if (workloadContainer) workloadContainer.style.display = 'none';
+        }
+
+        // Clear search
+        const searchInput = document.getElementById('pokjaCardSearch');
+        if (searchInput) searchInput.value = '';
+
+        const cards = document.querySelectorAll('.dash-mini-card');
+        cards.forEach(card => {
+            const cardType = card.getAttribute('data-tipe');
+            if (type === 'all') {
+                card.style.display = '';
+            } else if (type === 'tim_kerja') {
+                card.style.display = (cardType === 'tim_kerja') ? '' : 'none';
+            } else if (type === 'subbag_pilar') {
+                card.style.display = (cardType === 'subbag_pilar' || card.getAttribute('data-name').includes('subbag')) ? '' : 'none';
+            } else if (type === 'kelompok_kerja') {
+                card.style.display = (cardType === 'kelompok_kerja') ? '' : 'none';
+            }
+        });
+        if (searchEmpty) searchEmpty.style.display = 'none';
+    }
+
+    // ========== Search Pokja Cards ==========
+    function searchPokjaCards(q) {
+        const cards = document.querySelectorAll('.dash-mini-card');
+        const searchEmpty = document.getElementById('pokjaSearchEmpty');
+        const qLower = q.toLowerCase().trim();
+        let visible = 0;
+
+        cards.forEach(card => {
+            const name = (card.getAttribute('data-name') || '').toLowerCase();
+            const show = !qLower || name.includes(qLower);
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        if (searchEmpty) searchEmpty.style.display = (visible === 0 && qLower) ? 'block' : 'none';
+    }
+
+    // ========== Workload Filter ==========
+    let currentWorkloadCat = 'all';
+
+    function filterDashWorkload(cat, btn) {
+        currentWorkloadCat = cat;
+        if (btn) {
+            btn.parentElement.querySelectorAll('.dash-mini-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        applyDashWorkloadFilter();
+    }
+
+    function searchDashWorkload(q) {
+        applyDashWorkloadFilter();
+    }
+
+    function applyDashWorkloadFilter() {
+        const searchInput = document.getElementById('dashWorkloadSearch');
+        const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        const cards = document.querySelectorAll('.dash-workload-card');
+
+        cards.forEach(card => {
+            const cat = card.getAttribute('data-cat');
+            const name = (card.getAttribute('data-name') || '').toLowerCase();
+            const matchCat = (currentWorkloadCat === 'all') || (cat === currentWorkloadCat);
+            const matchSearch = !q || name.includes(q);
+            card.style.display = (matchCat && matchSearch) ? 'flex' : 'none';
+        });
+    }
+
+    // ========== Modal ==========
+    function openDashMemberModal(id) {
+        const m = document.getElementById('dashMemberModal_' + id);
+        if (m) {
+            m.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeDashMemberModal(id) {
+        const m = document.getElementById('dashMemberModal_' + id);
+        if (m) {
+            m.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function handleBackdropClick(e, id) {
+        if (e.target.id === 'dashMemberModal_' + id) {
+            closeDashMemberModal(id);
+        }
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-backdrop.is-open').forEach(m => {
+                m.classList.remove('is-open');
+            });
+            document.body.style.overflow = '';
+        }
+    });
+
+    // ========== Animate progress bars on load ==========
+    document.addEventListener('DOMContentLoaded', function () {
+        // Animate progress bars
+        setTimeout(() => {
+            document.querySelectorAll('.dash-progress-bar').forEach(bar => {
+                const target = bar.getAttribute('data-width');
+                bar.style.width = target + '%';
+            });
+        }, 350);
+    });
+</script>
     @endif
 
 @endsection
-
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>

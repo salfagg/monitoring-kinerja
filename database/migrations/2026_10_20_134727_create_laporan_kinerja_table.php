@@ -17,18 +17,18 @@ return new class extends Migration
             $table->foreignId('pokja_id')->nullable()->constrained('pokjas')->nullOnDelete();
             $table->foreignId('skp_target_bulanan_id')->nullable()->constrained('skp_target_bulanan')->nullOnDelete();
             $table->foreignId('rencana_mingguan_id')->nullable()->constrained('rencana_mingguan')->nullOnDelete();
-            
+
             $table->date('tanggal_kegiatan');
             $table->time('jam_mulai')->nullable();
             $table->time('jam_selesai')->nullable();
             $table->unsignedTinyInteger('bulan');
             $table->integer('tahun');
-            
+
             $table->text('uraian_kegiatan');
             $table->string('output_kegiatan');
             $table->decimal('volume_capaian', 8, 2)->default(1);
             $table->string('satuan')->default('Dokumen');
-            
+
             // Workflow Status
             $table->enum('status', [
                 'draft',
@@ -37,9 +37,9 @@ return new class extends Migration
                 'disetujui_pokja',      // Pokja teruskan ke Katim
                 'revisi_katim',         // Katim tolak/minta revisi
                 'disetujui_katim',      // Katim nilai & teruskan ke Kasubag
-                'dikonsolidasi_kasubag',// Kasubag TTD draft laporan
+                'dikonsolidasi_kasubag', // Kasubag TTD draft laporan
                 'disetujui_kabal',      // Kabal Approve Final & Rekomendasi
-                'ditolak_kabal'         // Kabal kembalikan ke Kasubag
+                'ditolak_kabal',         // Kabal kembalikan ke Kasubag
             ])->default('draft');
 
             // 1. Catatan Verifikasi Pokja

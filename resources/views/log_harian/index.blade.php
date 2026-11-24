@@ -4,462 +4,7 @@
 @section('page-title', 'Log Harian')
 
 @section('styles')
-<style>
-    /* Header Toolbar */
-    .log-header-bar {
-        background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 18px 24px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-sm);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .log-period-nav {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .log-period-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--bg-hover, #f8fafc);
-        color: var(--text-dark);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .log-period-btn:hover {
-        background: var(--primary-light);
-        color: var(--primary);
-        border-color: var(--primary);
-        transform: translateY(-1px);
-    }
-
-    .log-period-title {
-        font-size: 19px;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .log-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    /* KPI Summary Row */
-    .log-kpi-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 14px;
-        margin-bottom: 22px;
-    }
-
-    .log-kpi-card {
-        background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        padding: 16px 18px;
-        box-shadow: var(--shadow-sm);
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: all 0.2s;
-    }
-
-    .log-kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-card);
-    }
-
-    .log-kpi-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        flex-shrink: 0;
-    }
-
-    .log-kpi-info h4 {
-        font-size: 20px;
-        font-weight: 800;
-        margin: 0;
-        line-height: 1.1;
-        color: var(--text-dark);
-    }
-
-    .log-kpi-info p {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-muted);
-        margin: 3px 0 0 0;
-    }
-
-    /* Calendar Container */
-    .calendar-container {
-        background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 28px;
-    }
-
-    .calendar-weekdays {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        background: #f8fafc;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .weekday-header {
-        padding: 12px 10px;
-        text-align: center;
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--text-muted);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
-    .weekday-header.weekend {
-        color: #ef4444;
-    }
-
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 1px;
-        background: var(--border);
-    }
-
-    .calendar-cell {
-        background: #ffffff;
-        min-height: 120px;
-        padding: 8px 10px;
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
-        transition: all 0.18s;
-        position: relative;
-    }
-
-    .calendar-cell:hover {
-        background: #f8fafc;
-        z-index: 2;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-
-    .calendar-cell.other-month {
-        background: #fbfcfd;
-        opacity: 0.45;
-        cursor: default;
-    }
-
-    .calendar-cell.is-today {
-        background: rgba(10, 111, 181, 0.03);
-    }
-
-    .calendar-cell.is-today .cell-day-number {
-        background: var(--primary);
-        color: white;
-        border-radius: 8px;
-        padding: 2px 7px;
-        font-weight: 800;
-    }
-
-    .calendar-cell.has-logs {
-        background: #ffffff;
-    }
-
-    .calendar-cell.has-logs:hover {
-        background: #f0fdf4;
-    }
-
-    .cell-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 6px;
-    }
-
-    .cell-day-number {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--text-dark);
-    }
-
-    .cell-log-count {
-        font-size: 10px;
-        font-weight: 800;
-        padding: 2px 6px;
-        border-radius: 10px;
-        background: var(--primary-light);
-        color: var(--primary);
-    }
-
-    .cell-log-count.count-approved {
-        background: #ecfdf5;
-        color: #059669;
-    }
-
-    .cell-logs-list {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        overflow: hidden;
-        flex: 1;
-    }
-
-    .mini-log-item {
-        font-size: 11px;
-        padding: 3px 6px;
-        border-radius: 6px;
-        background: #f1f5f9;
-        color: #1e293b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        border-left: 3px solid #94a3b8;
-        line-height: 1.3;
-        transition: transform 0.1s;
-    }
-
-    .mini-log-item:hover {
-        transform: translateX(2px);
-    }
-
-    .mini-log-item.status-disetujui_katim,
-    .mini-log-item.status-disetujui_kabal,
-    .mini-log-item.status-disetujui_pokja {
-        background: #ecfdf5;
-        color: #065f46;
-        border-left-color: #10b981;
-    }
-
-    .mini-log-item.status-diajukan {
-        background: #eff6ff;
-        color: #1e40af;
-        border-left-color: #3b82f6;
-    }
-
-    .mini-log-item.status-draft {
-        background: #f8fafc;
-        color: #475569;
-        border-left-color: #cbd5e1;
-    }
-
-    .mini-log-item.status-revisi_pokja,
-    .mini-log-item.status-revisi_katim {
-        background: #fef2f2;
-        color: #991b1b;
-        border-left-color: #ef4444;
-    }
-
-    .cell-add-hint {
-        opacity: 0;
-        font-size: 10px;
-        color: var(--primary);
-        font-weight: 700;
-        margin-top: auto;
-        display: flex;
-        align-items: center;
-        gap: 3px;
-        padding-top: 4px;
-        transition: opacity 0.15s;
-    }
-
-    .calendar-cell:hover .cell-add-hint {
-        opacity: 1;
-    }
-
-    /* Modal Backdrop & Card */
-    .log-modal-backdrop {
-        position: fixed !important;
-        inset: 0 !important;
-        background: rgba(15, 23, 42, 0.65) !important;
-        backdrop-filter: blur(4px) !important;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-        padding: 16px;
-    }
-
-    .log-modal-backdrop.is-open {
-        display: flex;
-    }
-
-    .log-modal-card {
-        background: #ffffff;
-        border-radius: 16px;
-        width: 100%;
-        max-width: 650px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.25);
-        animation: logModalIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        overflow: hidden;
-        border: 1px solid var(--border);
-    }
-
-    @keyframes logModalIn {
-        from { transform: scale(0.92) translateY(15px); opacity: 0; }
-        to   { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
-    .log-modal-head {
-        padding: 16px 22px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(to right, rgba(10, 111, 181, 0.04), transparent);
-    }
-
-    .log-modal-head h3 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--text-dark);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .log-modal-body {
-        padding: 20px 24px;
-        overflow-y: auto;
-        flex: 1;
-    }
-
-    .log-modal-foot {
-        padding: 12px 22px;
-        border-top: 1px solid var(--border);
-        background: #f8fafc;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Day Detail Card in Modal */
-    .day-log-card {
-        background: #ffffff;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-        transition: all 0.15s;
-    }
-
-    .day-log-card:hover {
-        border-color: rgba(10, 111, 181, 0.3);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    /* Form Styles in Modal */
-    .form-group-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
-        margin-bottom: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 14px;
-    }
-
-    .form-group label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 6px;
-    }
-
-    .form-control {
-        width: 100%;
-        font-size: 13px;
-        padding: 9px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: #ffffff;
-        outline: none;
-        transition: border 0.15s;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(10, 111, 181, 0.12);
-    }
-
-    /* Tab switcher for Bukti Dukung */
-    .bukti-tabs {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 10px;
-    }
-
-    .bukti-tab-btn {
-        padding: 5px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        border: 1px solid var(--border);
-        background: #f8fafc;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.15s;
-    }
-
-    .bukti-tab-btn.active {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .calendar-cell {
-            min-height: 80px;
-            padding: 4px 6px;
-        }
-        .mini-log-item {
-            font-size: 9.5px;
-            padding: 2px 4px;
-        }
-        .form-group-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/log-harian.css') }}">
 @endsection
 
 @section('content')
@@ -610,7 +155,12 @@
                     Anda memiliki <strong>{{ $countDraft }} catatan log</strong> yang masih berstatus Draf untuk bulan {{ $namaBulanIndo[$month] }} {{ $year }}.
                 </span>
             </div>
-            <form action="{{ route('log-harian.ajukan-bulan') }}" method="POST" onsubmit="return confirm('Ajukan seluruh {{ $countDraft }} draf log harian bulan ini untuk diverifikasi?')">
+            <form action="{{ route('log-harian.ajukan-bulan') }}" method="POST"
+                  data-confirm="Ajukan seluruh {{ $countDraft }} draf log harian bulan ini untuk diverifikasi oleh Katim/Pimpinan?"
+                  data-confirm-title="Ajukan Semua Draf Bulan Ini"
+                  data-confirm-btn="Ya, Ajukan Semua"
+                  data-confirm-type="primary"
+                  data-confirm-icon="question">
                 @csrf
                 <input type="hidden" name="bulan" value="{{ $month }}">
                 <input type="hidden" name="tahun" value="{{ $year }}">
@@ -993,7 +543,7 @@
                     buktiHtml = '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); display: flex; gap: 8px; flex-wrap: wrap;">';
                     log.bukti_dukung.forEach(b => {
                         if (b.tipe === 'file') {
-                            buktiHtml += `<a href="/storage/${b.file_path}" target="_blank" style="font-size: 11px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 3px 8px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><i class="ph-bold ph-file-text"></i> ${b.nama_dokumen}</a>`;
+                            buktiHtml += `<button type="button" onclick="previewBuktiDukung('/storage/${b.file_path}', '${b.nama_dokumen}')" style="font-size: 11px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 3px 8px; border-radius: 6px; border: 1px solid #bae6fd; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;"><i class="ph-bold ph-eye"></i> ${b.nama_dokumen}</button>`;
                         } else {
                             buktiHtml += `<a href="${b.link_url}" target="_blank" style="font-size: 11px; font-weight: 700; color: #059669; background: #ecfdf5; padding: 3px 8px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><i class="ph-bold ph-arrow-square-out"></i> ${b.nama_dokumen || 'Tautan Dokumen'}</a>`;
                         }
@@ -1010,13 +560,9 @@
                         <a href="/log-harian/${log.id}/edit" style="font-size: 11.5px; font-weight: 700; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 3px;">
                             <i class="ph-bold ph-pencil-simple"></i> Edit
                         </a>
-                        <form action="/log-harian/${log.id}" method="POST" onsubmit="return confirm('Hapus catatan log ini?')" style="display: inline;">
-                            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" style="background: none; border: none; font-size: 11.5px; font-weight: 700; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
-                                <i class="ph-bold ph-trash"></i> Hapus
-                            </button>
-                        </form>
+                        <button type="button" onclick="confirmDeleteLog(${log.id})" style="background: none; border: none; font-size: 11.5px; font-weight: 700; color: #ef4444; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                            <i class="ph-bold ph-trash"></i> Hapus
+                        </button>
                     `;
                     if (log.status === 'draft') {
                         actionsHtml += `
@@ -1187,6 +733,34 @@
             "'": '&#039;'
         };
         return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function confirmDeleteLog(logId) {
+        window.tanjidorConfirm({
+            title: 'Hapus Catatan Log',
+            text: 'Apakah Anda yakin ingin menghapus catatan log harian ini?',
+            confirmButtonText: 'Ya, Hapus',
+            type: 'danger',
+            icon: 'warning'
+        }).then(confirmed => {
+            if (confirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/log-harian/${logId}`;
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'DELETE';
+                form.appendChild(csrf);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     // Global ESC Listener

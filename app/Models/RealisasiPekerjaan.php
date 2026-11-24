@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Carbon\Carbon;
 
 class RealisasiPekerjaan extends Model
 {
@@ -39,6 +39,10 @@ class RealisasiPekerjaan extends Model
         $kodePekerjaan = $pekerjaan ? $pekerjaan->kode_tampilan : 'TUGAS';
         $judulPekerjaan = $pekerjaan ? $pekerjaan->judul : 'Pekerjaan';
 
+        $outputKegiatan = ($this->jenis_laporan === 'penyelesaian')
+            ? "Penyelesaian Tugas ({$judulPekerjaan})"
+            : "Laporan Kemajuan Progres ({$judulPekerjaan})";
+
         $log = LogHarian::updateOrCreate(
             ['realisasi_pekerjaan_id' => $this->id],
             [
@@ -49,10 +53,10 @@ class RealisasiPekerjaan extends Model
                 'tanggal_kegiatan' => $tanggal->format('Y-m-d'),
                 'bulan' => (int) $tanggal->format('m'),
                 'tahun' => (int) $tanggal->format('Y'),
-                'uraian_kegiatan' => "[{$kodePekerjaan}] " . $this->deskripsi_progres,
-                'output_kegiatan' => "Progres +{$this->progres_capaian}% ({$judulPekerjaan})",
-                'volume_capaian' => $this->progres_capaian,
-                'satuan' => '%',
+                'uraian_kegiatan' => "[{$kodePekerjaan}] ".$this->deskripsi_progres,
+                'output_kegiatan' => $outputKegiatan,
+                'volume_capaian' => 1,
+                'satuan' => 'Laporan',
                 'status' => $statusLog,
                 'katim_id' => $this->approved_by,
                 'catatan_katim' => $this->catatan_approval,
@@ -61,14 +65,14 @@ class RealisasiPekerjaan extends Model
         );
 
         // Sinkronkan bukti dukung jika ada
-        if ($this->file_bukti && !$log->buktiDukung()->where('file_path', $this->file_bukti)->exists()) {
+        if ($this->file_bukti && ! $log->buktiDukung()->where('file_path', $this->file_bukti)->exists()) {
             BuktiDukung::create([
                 'laporan_kinerja_id' => $log->id,
-                'nama_dokumen' => $this->nama_bukti ?: 'Bukti Progres ' . $kodePekerjaan,
+                'nama_dokumen' => $this->nama_bukti ?: 'Bukti Progres '.$kodePekerjaan,
                 'tipe' => 'file',
                 'file_path' => $this->file_bukti,
             ]);
-        } elseif ($this->link_bukti && !$log->buktiDukung()->where('link_url', $this->link_bukti)->exists()) {
+        } elseif ($this->link_bukti && ! $log->buktiDukung()->where('link_url', $this->link_bukti)->exists()) {
             BuktiDukung::create([
                 'laporan_kinerja_id' => $log->id,
                 'nama_dokumen' => $this->nama_bukti ?: 'Tautan Bukti Progres',
@@ -81,8 +85,8 @@ class RealisasiPekerjaan extends Model
     protected $fillable = [
         'pekerjaan_id',
         'user_id',
+        'jenis_laporan',
         'tanggal',
-        'progres_capaian',
         'status_approval',
         'approved_by',
         'approved_at',
@@ -99,7 +103,6 @@ class RealisasiPekerjaan extends Model
     {
         return [
             'tanggal' => 'date',
-            'progres_capaian' => 'decimal:2',
             'approved_at' => 'datetime',
         ];
     }
@@ -132,6 +135,16 @@ class RealisasiPekerjaan extends Model
     public function isDitolak(): bool
     {
         return $this->status_approval === 'ditolak';
+    }
+
+    public function isPenyelesaian(): bool
+    {
+        return $this->jenis_laporan === 'penyelesaian';
+    }
+
+    public function isKemajuan(): bool
+    {
+        return $this->jenis_laporan !== 'penyelesaian';
     }
 
     public function logHarian(): HasOne

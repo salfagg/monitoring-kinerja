@@ -7,8 +7,8 @@ use App\Models\Pokja;
 use App\Models\RealisasiPekerjaan;
 use App\Models\RiwayatPersetujuanPekerjaan;
 use App\Models\SkpTahunan;
-use App\Models\SkpTargetBulanan;
 use App\Models\User;
+use App\Services\PekerjaanPersetujuanService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class PekerjaanController extends Controller
             'pelaksana',
             'skpTahunan.user',
             'skpTargetBulanan',
-            'realisasi' => fn ($r) => $r->latest()
+            'realisasi' => fn ($r) => $r->latest(),
         ]);
 
         // ── Pembatasan Lingkup Data berdasarkan Role ──────────────────────────────
@@ -70,9 +70,9 @@ class PekerjaanController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('kode_tampilan', 'like', "%{$search}%")
-                  ->orWhere('nomor_st', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%");
+                    ->orWhere('kode_tampilan', 'like', "%{$search}%")
+                    ->orWhere('nomor_st', 'like', "%{$search}%")
+                    ->orWhere('deskripsi', 'like', "%{$search}%");
             });
         }
 
@@ -97,14 +97,14 @@ class PekerjaanController extends Controller
                     $q->where('pokja_id', $user->pokja_id);
                 }
                 $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id);
+                    ->orWhere('penanggung_jawab_id', $user->id);
             });
         }
 
-        $totalPekerjaan    = (clone $baseMetrik)->count();
+        $totalPekerjaan = (clone $baseMetrik)->count();
         $pekerjaanBerjalan = (clone $baseMetrik)->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan', 'perlu_perbaikan_hasil'])->count();
-        $antreanHasil      = (clone $baseMetrik)->where('status_pelaksanaan', 'hasil_diajukan')->count();
-        $pekerjaanSelesai  = (clone $baseMetrik)->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
+        $antreanHasil = (clone $baseMetrik)->where('status_pelaksanaan', 'hasil_diajukan')->count();
+        $pekerjaanSelesai = (clone $baseMetrik)->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
 
         return view('pekerjaan.index', compact(
             'pekerjaanList',
@@ -122,7 +122,7 @@ class PekerjaanController extends Controller
     public function create(Request $request): View
     {
         $count = Pekerjaan::count();
-        $suggestedKode = 'TGS-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+        $suggestedKode = 'TGS-'.str_pad($count + 1, 3, '0', STR_PAD_LEFT);
 
         $users = User::with('pokja')->orderBy('name')->get();
         $pokjas = Pokja::orderBy('kode_pokja')->get();
@@ -161,7 +161,7 @@ class PekerjaanController extends Controller
         ]);
 
         if (empty($validated['kode_tampilan'])) {
-            $validated['kode_tampilan'] = 'TGS-' . str_pad(Pekerjaan::count() + 1, 3, '0', STR_PAD_LEFT);
+            $validated['kode_tampilan'] = 'TGS-'.str_pad(Pekerjaan::count() + 1, 3, '0', STR_PAD_LEFT);
         }
 
         // Tentukan Sumber Pekerjaan (Manual atau SKP)
@@ -177,11 +177,9 @@ class PekerjaanController extends Controller
         $user = Auth::user();
         $validated['pembuat_id'] = $user->id;
         $validated['parent_id'] = null;
-        $validated['bobot'] = 100.00;
         // Penugasan oleh Katim/Koor/Pimpinan langsung berstatus disetujui agar anggota dapat langsung update progres!
         $validated['status_persetujuan'] = 'disetujui';
         $validated['status_pelaksanaan'] = 'belum_dimulai';
-        $validated['progres'] = 0.00;
 
         $validated['deskripsi'] = $validated['deskripsi'] ?? null;
         $validated['nomor_st'] = $validated['nomor_st'] ?? null;
@@ -202,13 +200,13 @@ class PekerjaanController extends Controller
 
         // Sinkronisasi Seluruh Tim Pelaksana yang Ditugaskan
         $pelaksanaIds = $request->input('pelaksana_ids', []);
-        if (!in_array($pekerjaan->penanggung_jawab_id, $pelaksanaIds)) {
+        if (! in_array($pekerjaan->penanggung_jawab_id, $pelaksanaIds)) {
             $pelaksanaIds[] = $pekerjaan->penanggung_jawab_id;
         }
         $syncData = [];
         foreach ($pelaksanaIds as $uId) {
             $syncData[$uId] = [
-                'peran' => ((int)$uId === (int)$pekerjaan->penanggung_jawab_id) ? 'pic_utama' : 'anggota',
+                'peran' => ((int) $uId === (int) $pekerjaan->penanggung_jawab_id) ? 'pic_utama' : 'anggota',
             ];
         }
         $pekerjaan->pelaksana()->sync($syncData);
@@ -216,7 +214,7 @@ class PekerjaanController extends Controller
         return redirect()->route('pekerjaan.index')
             ->with('success', "Pekerjaan '{$pekerjaan->judul}' berhasil dibuat dan langsung ditugaskan ke pegawai pelaksana.");
         // Catat riwayat audit penugasan
-        $catatanAwal = !empty($validated['nomor_st'])
+        $catatanAwal = ! empty($validated['nomor_st'])
             ? "Pekerjaan ditugaskan oleh {$user->name} ({$user->role_label}) berdasarkan Surat Tugas No: {$validated['nomor_st']}."
             : "Pekerjaan ditugaskan oleh {$user->name} ({$user->role_label}).";
 
@@ -246,7 +244,7 @@ class PekerjaanController extends Controller
             'skpTahunan.user',
             'skpTargetBulanan',
             'realisasi.user',
-            'riwayatPersetujuan.user'
+            'riwayatPersetujuan.user',
         ]);
 
         $user = Auth::user();
@@ -340,13 +338,13 @@ class PekerjaanController extends Controller
 
         // Sinkronisasi Tim Pelaksana yang Ditugaskan
         $pelaksanaIds = $request->input('pelaksana_ids', []);
-        if (!in_array($pekerjaan->penanggung_jawab_id, $pelaksanaIds)) {
+        if (! in_array($pekerjaan->penanggung_jawab_id, $pelaksanaIds)) {
             $pelaksanaIds[] = $pekerjaan->penanggung_jawab_id;
         }
         $syncData = [];
         foreach ($pelaksanaIds as $uId) {
             $syncData[$uId] = [
-                'peran' => ((int)$uId === (int)$pekerjaan->penanggung_jawab_id) ? 'pic_utama' : 'anggota',
+                'peran' => ((int) $uId === (int) $pekerjaan->penanggung_jawab_id) ? 'pic_utama' : 'anggota',
             ];
         }
         $pekerjaan->pelaksana()->sync($syncData);
@@ -393,15 +391,15 @@ class PekerjaanController extends Controller
 
         $query = Pekerjaan::where(function ($q) use ($user) {
             $q->where('penanggung_jawab_id', $user->id)
-              ->orWhere('pembuat_id', $user->id)
-              ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
+                ->orWhere('pembuat_id', $user->id)
+                ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
         })->with(['parent', 'pokja', 'penanggungJawab', 'pelaksana', 'realisasi' => fn ($r) => $r->latest()]);
 
         if ($request->filled('q')) {
             $qText = $request->q;
             $query->where(function ($q) use ($qText) {
                 $q->where('judul', 'like', "%{$qText}%")
-                  ->orWhere('kode_tampilan', 'like', "%{$qText}%");
+                    ->orWhere('kode_tampilan', 'like', "%{$qText}%");
             });
         }
 
@@ -419,8 +417,8 @@ class PekerjaanController extends Controller
         // Hitung total metrik tugas saya
         $baseCountQuery = Pekerjaan::where(function ($q) use ($user) {
             $q->where('penanggung_jawab_id', $user->id)
-              ->orWhere('pembuat_id', $user->id)
-              ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
+                ->orWhere('pembuat_id', $user->id)
+                ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
         });
 
         $countBerjalan = (clone $baseCountQuery)
@@ -456,41 +454,41 @@ class PekerjaanController extends Controller
 
         // Pastikan rincian struktur telah disetujui (Tahap 1 selesai)
         if (! $pekerjaan->isDisetujui()) {
-            return redirect()->back()->with('error', 'Pekerjaan ' . $pekerjaan->kode_tampilan . ' belum disetujui strukturnya oleh Katim/Pimpinan. Progres baru dapat dilaporkan setelah rincian disetujui.');
+            return redirect()->back()->with('error', 'Pekerjaan '.$pekerjaan->kode_tampilan.' belum disetujui strukturnya oleh Katim/Pimpinan. Progres baru dapat dilaporkan setelah rincian disetujui.');
+        }
+
+        // 1. Aksi Cepat: Mulai Kerjakan (Belum Dimulai -> Dikerjakan)
+        if ($request->input('aksi_status') === 'mulai_kerja') {
+            $pekerjaan->status_pelaksanaan = 'dikerjakan';
+            $pekerjaan->save();
+
+            if ($pekerjaan->parent) {
+                $pekerjaan->parent->recalculateProgresFromChildren();
+            }
+
+            return redirect()->back()->with('success', 'Penugasan '.$pekerjaan->kode_tampilan.' berhasil dimulai. Status kini Sedang Dikerjakan.');
         }
 
         $validated = $request->validate([
             'tanggal' => ['required', 'date'],
-            'progres_capaian' => ['required', 'numeric', 'min:0.01', 'max:100'],
-            'mode_input' => ['nullable', 'string', 'in:tambah,set_total'],
+            'jenis_laporan' => ['nullable', 'string', 'in:kemajuan,penyelesaian'],
             'deskripsi_progres' => ['required', 'string'],
             'kendala' => ['nullable', 'string'],
             'tindak_lanjut' => ['nullable', 'string'],
             'nama_bukti' => ['nullable', 'string', 'max:255'],
             'link_bukti' => ['nullable', 'url'],
             'file_bukti' => ['nullable', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png,docx,xlsx,zip'],
+        ], [
+            'tanggal.required' => 'Tanggal kegiatan/pelaporan wajib diisi.',
+            'tanggal.date' => 'Format tanggal kegiatan tidak valid.',
+            'deskripsi_progres.required' => 'Uraian kemajuan pekerjaan wajib diisi.',
+            'link_bukti.url' => 'Format tautan bukti harus berupa URL yang valid (contoh: https://drive.google.com/...).',
+            'file_bukti.max' => 'Ukuran berkas bukti maksimal 10 MB.',
+            'file_bukti.mimes' => 'Format berkas bukti harus berupa PDF, JPG, PNG, DOCX, XLSX, atau ZIP.',
         ]);
 
-        $progresSaatIni = (float) $pekerjaan->progres;
-        $sisaProgres = max(0, 100 - $progresSaatIni);
-
-        if ($sisaProgres <= 0) {
-            return redirect()->back()->with('info', 'Pekerjaan ' . $pekerjaan->kode_tampilan . ' sudah mencapai 100% dan tidak memerlukan penambahan progres lagi.');
-        }
-
-        // Tentukan nilai kontribusi / penambahan progres pada log ini
-        if ($request->input('mode_input') === 'set_total') {
-            // Mode set total langsung (misal klik Selesaikan / Set 100%)
-            $targetTotal = min(100, max($progresSaatIni, (float) $validated['progres_capaian']));
-            $nilaiKontribusi = round($targetTotal - $progresSaatIni, 2);
-        } else {
-            // Mode default: Akumulasi penambahan progres (+%)
-            $nilaiKontribusi = round(min($sisaProgres, (float) $validated['progres_capaian']), 2);
-        }
-
-        if ($nilaiKontribusi <= 0) {
-            return redirect()->back()->with('error', 'Nilai penambahan progres harus lebih dari 0%.');
-        }
+        $jenisLaporan = $request->input('jenis_laporan', 'kemajuan');
+        $validated['jenis_laporan'] = $jenisLaporan;
 
         // Upload berkas bukti dukung jika ada
         if ($request->hasFile('file_bukti')) {
@@ -503,30 +501,20 @@ class PekerjaanController extends Controller
 
         $validated['pekerjaan_id'] = $pekerjaan->id;
         $validated['user_id'] = $user->id;
-        $validated['progres_capaian'] = $nilaiKontribusi;
-        unset($validated['mode_input']);
+        $validated['status_approval'] = 'menunggu_persetujuan';
 
-        // Jika pelapor adalah pembuat/pemberi tugas itu sendiri, langsung disetujui
-        $isPembuat = ($user->id === $pekerjaan->pembuat_id);
-        if ($isPembuat) {
-            $validated['status_approval'] = 'disetujui';
-            $validated['approved_by'] = $user->id;
-            $validated['approved_at'] = now();
+        RealisasiPekerjaan::create($validated);
+
+        if ($jenisLaporan === 'penyelesaian') {
+            $pekerjaan->status_pelaksanaan = 'hasil_diajukan';
+            $pekerjaan->save();
+            $pesan = 'Laporan penyelesaian tugas '.$pekerjaan->kode_tampilan.' berhasil diajukan! Menunggu peninjauan & verifikasi akhir dari Katim/Pemberi Tugas.';
         } else {
-            $validated['status_approval'] = 'menunggu_persetujuan';
-        }
-
-        $realisasi = RealisasiPekerjaan::create($validated);
-
-        if ($isPembuat) {
-            // Rekalkulasi progres pekerjaan secara otomatis
-            $pekerjaan->recalculateProgresFromRealisasi();
-            $pekerjaan->refresh();
-
-            $pesan = 'Laporan progres ' . $pekerjaan->kode_tampilan . ' berhasil dicatat dan disetujui (+' . number_format($nilaiKontribusi, 1) . '%). Total progres akumulasi saat ini: ' . number_format($pekerjaan->progres, 1) . '%.';
-        } else {
-            $pembuatNama = $pekerjaan->pembuat ? $pekerjaan->pembuat->name : 'Katim/Koordinator';
-            $pesan = 'Laporan progres (+' . number_format($nilaiKontribusi, 1) . '%) berhasil diajukan! Menunggu persetujuan dari ' . $pembuatNama . ' (Pemberi Tugas) sebelum progres ditambahkan ke capaian pekerjaan.';
+            if ($pekerjaan->status_pelaksanaan === 'belum_dimulai') {
+                $pekerjaan->status_pelaksanaan = 'dikerjakan';
+                $pekerjaan->save();
+            }
+            $pesan = 'Laporan kemajuan penugasan '.$pekerjaan->kode_tampilan.' berhasil diajukan! Menunggu persetujuan (ACC) dari pembuat tugas/Katim.';
         }
 
         return redirect()->back()->with('success', $pesan);
@@ -540,11 +528,13 @@ class PekerjaanController extends Controller
         $user = Auth::user();
         $pekerjaan = $realisasi->pekerjaan;
 
-        $isPembuat = ($pekerjaan->pembuat_id === $user->id);
-        $isKatimPokja = ($user->isKatim() && $pekerjaan->pokja && $pekerjaan->pokja->katim_id === $user->id);
+        $pekerjaan->loadMissing(['parent', 'pokja']);
+        $isPembuat = ($pekerjaan->pembuat_id === $user->id)
+            || ($pekerjaan->parent && ($pekerjaan->parent->pembuat_id === $user->id || $pekerjaan->parent->penanggung_jawab_id === $user->id));
+        $isKatimPokja = ($user->isKatim() && $pekerjaan->pokja && ($pekerjaan->pokja->katim_id === $user->id || $pekerjaan->pokja_id === $user->pokja_id));
         $isKoorUnit = (($user->isKorlayanan() || $user->isKorjafung()) && $pekerjaan->pokja_id === $user->pokja_id);
 
-        if (!$isPembuat && !$isKatimPokja && !$isKoorUnit && !$user->isAdmin()) {
+        if (! $isPembuat && ! $isKatimPokja && ! $isKoorUnit && ! $user->isAdmin()) {
             abort(403, 'Hanya Katim / Koordinator pembuat tugas yang berwenang menyetujui laporan progres ini.');
         }
 
@@ -555,22 +545,41 @@ class PekerjaanController extends Controller
             'catatan_approval' => $request->input('catatan'),
         ]);
 
-        // Rekalkulasi progres pekerjaan
-        $pekerjaan->recalculateProgresFromRealisasi();
-        $pekerjaan->refresh();
+        if ($realisasi->jenis_laporan === 'penyelesaian') {
+            $pekerjaan->status_pelaksanaan = 'selesai_terverifikasi';
+            $pekerjaan->tanggal_selesai_terverifikasi = now();
+            $pekerjaan->save();
 
-        RiwayatPersetujuanPekerjaan::create([
-            'pekerjaan_id' => $pekerjaan->id,
-            'user_id' => $user->id,
-            'jenis_aksi' => 'approval_progres_disetujui',
-            'status_sebelumnya' => 'menunggu_persetujuan',
-            'status_baru' => 'disetujui',
-            'catatan' => 'Laporan progres +' . number_format($realisasi->progres_capaian, 1) . '% oleh ' . $realisasi->user->name . ' disetujui.',
-        ]);
+            if ($pekerjaan->parent) {
+                $pekerjaan->parent->recalculateProgresFromChildren();
+            }
 
-        $pesan = 'Laporan progres dari ' . $realisasi->user->name . ' (+' . number_format($realisasi->progres_capaian, 1) . '%) berhasil disetujui! Progres pekerjaan kini ' . number_format($pekerjaan->progres, 1) . '%.';
-        if ($pekerjaan->progres >= 100) {
-            $pesan .= ' Pekerjaan telah tuntas 100% dan dinyatakan Selesai!';
+            RiwayatPersetujuanPekerjaan::create([
+                'pekerjaan_id' => $pekerjaan->id,
+                'user_id' => $user->id,
+                'jenis_aksi' => 'approval_penyelesaian_disetujui',
+                'status_sebelumnya' => 'hasil_diajukan',
+                'status_baru' => 'selesai_terverifikasi',
+                'catatan' => 'Laporan penyelesaian tugas oleh '.$realisasi->user->name.' disetujui. Tugas dinyatakan Selesai Terverifikasi.',
+            ]);
+
+            $pesan = 'Laporan penyelesaian tugas dari '.$realisasi->user->name.' berhasil disetujui! Penugasan resmi dinyatakan Selesai Terverifikasi.';
+        } else {
+            if ($pekerjaan->status_pelaksanaan === 'belum_dimulai') {
+                $pekerjaan->status_pelaksanaan = 'dikerjakan';
+                $pekerjaan->save();
+            }
+
+            RiwayatPersetujuanPekerjaan::create([
+                'pekerjaan_id' => $pekerjaan->id,
+                'user_id' => $user->id,
+                'jenis_aksi' => 'approval_progres_disetujui',
+                'status_sebelumnya' => 'menunggu_persetujuan',
+                'status_baru' => 'disetujui',
+                'catatan' => 'Laporan kemajuan berkala oleh '.$realisasi->user->name.' disetujui.',
+            ]);
+
+            $pesan = 'Laporan kemajuan dari '.$realisasi->user->name.' berhasil disetujui (ACC).';
         }
 
         return redirect()->back()->with('success', $pesan);
@@ -584,11 +593,13 @@ class PekerjaanController extends Controller
         $user = Auth::user();
         $pekerjaan = $realisasi->pekerjaan;
 
-        $isPembuat = ($pekerjaan->pembuat_id === $user->id);
-        $isKatimPokja = ($user->isKatim() && $pekerjaan->pokja && $pekerjaan->pokja->katim_id === $user->id);
+        $pekerjaan->loadMissing(['parent', 'pokja']);
+        $isPembuat = ($pekerjaan->pembuat_id === $user->id)
+            || ($pekerjaan->parent && ($pekerjaan->parent->pembuat_id === $user->id || $pekerjaan->parent->penanggung_jawab_id === $user->id));
+        $isKatimPokja = ($user->isKatim() && $pekerjaan->pokja && ($pekerjaan->pokja->katim_id === $user->id || $pekerjaan->pokja_id === $user->pokja_id));
         $isKoorUnit = (($user->isKorlayanan() || $user->isKorjafung()) && $pekerjaan->pokja_id === $user->pokja_id);
 
-        if (!$isPembuat && !$isKatimPokja && !$isKoorUnit && !$user->isAdmin()) {
+        if (! $isPembuat && ! $isKatimPokja && ! $isKoorUnit && ! $user->isAdmin()) {
             abort(403, 'Hanya Katim / Koordinator pembuat tugas yang berwenang menolak laporan progres ini.');
         }
 
@@ -603,6 +614,22 @@ class PekerjaanController extends Controller
             'catatan_approval' => $validated['catatan'],
         ]);
 
+        if ($realisasi->jenis_laporan === 'penyelesaian') {
+            $pekerjaan->status_pelaksanaan = 'perlu_perbaikan_hasil';
+            $pekerjaan->save();
+        }
+
+        RiwayatPersetujuanPekerjaan::create([
+            'pekerjaan_id' => $pekerjaan->id,
+            'user_id' => $user->id,
+            'jenis_aksi' => 'approval_progres_ditolak',
+            'status_sebelumnya' => 'menunggu_persetujuan',
+            'status_baru' => 'ditolak',
+            'catatan' => 'Laporan oleh '.$realisasi->user->name.' ditolak: '.$validated['catatan'],
+        ]);
+
+        return redirect()->back()->with('success', 'Laporan dari '.$realisasi->user->name.' telah ditolak dengan catatan evaluasi.');
+
         // Rekalkulasi progres pekerjaan
         $pekerjaan->recalculateProgresFromRealisasi();
         $pekerjaan->refresh();
@@ -613,264 +640,20 @@ class PekerjaanController extends Controller
             'jenis_aksi' => 'approval_progres_ditolak',
             'status_sebelumnya' => 'menunggu_persetujuan',
             'status_baru' => 'ditolak',
-            'catatan' => 'Laporan progres oleh ' . $realisasi->user->name . ' ditolak: ' . $validated['catatan'],
+            'catatan' => 'Laporan progres oleh '.$realisasi->user->name.' ditolak: '.$validated['catatan'],
         ]);
 
-        return redirect()->back()->with('info', 'Laporan progres dari ' . $realisasi->user->name . ' ditolak dengan catatan perbaikan.');
+        return redirect()->back()->with('info', 'Laporan progres dari '.$realisasi->user->name.' ditolak dengan catatan perbaikan.');
     }
 
     /**
      * Pusat Persetujuan & Verifikasi Pekerjaan (PRD FR04 & FR07)
      */
-    public function persetujuanIndex(Request $request): View
+    public function persetujuanIndex(Request $request, PekerjaanPersetujuanService $persetujuanService): View
     {
-        $user = Auth::user();
+        $data = $persetujuanService->getPersetujuanData(Auth::user(), $request);
 
-        // Base Query untuk filter lingkup kerja / role
-        $baseQuery = Pekerjaan::query();
-
-        if ($user->isAdmin() || $user->isKabal() || $user->isKasubag()) {
-            // Pimpinan Balai, Kasubag TU, dan Administrator memiliki hak supervisi seluruh unit balai
-            if ($request->filled('pokja_id')) {
-                $baseQuery->where('pokja_id', $request->pokja_id);
-            }
-        } elseif ($user->isKatim()) {
-            // Katim berwenang menyetujui:
-            // 1. Seluruh pekerjaan dalam Pokja yang dipimpinnya
-            // 2. Pekerjaan yang dia buat/tugaskan langsung (pembuat_id)
-            // 3. Subpekerjaan turunan dari tugas induk milik Katim (parent.pembuat_id atau parent.penanggung_jawab_id)
-            $katimPokjaIds = Pokja::where('katim_id', $user->id)->pluck('id')->toArray();
-            if ($user->pokja_id && !in_array($user->pokja_id, $katimPokjaIds)) {
-                $katimPokjaIds[] = $user->pokja_id;
-            }
-
-            $baseQuery->where(function ($q) use ($user, $katimPokjaIds) {
-                if (!empty($katimPokjaIds)) {
-                    $q->whereIn('pokja_id', $katimPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', function ($p) use ($user, $katimPokjaIds) {
-                      $p->where('pembuat_id', $user->id)
-                        ->orWhere('penanggung_jawab_id', $user->id);
-                      if (!empty($katimPokjaIds)) {
-                          $p->orWhereIn('pokja_id', $katimPokjaIds);
-                      }
-                  });
-            });
-
-            if ($request->filled('pokja_id')) {
-                $baseQuery->where('pokja_id', $request->pokja_id);
-            }
-        } elseif ($user->isKorlayanan()) {
-            // Koordinator Bidang/Layanan berwenang menyetujui:
-            // 1. Seluruh pekerjaan lingkup Subbag Umum / unit layanannya
-            // 2. Pekerjaan yang dibuat atau ditugaskannya (pembuat_id)
-            // 3. Subpekerjaan turunan dari tugas induk milik Koordinator
-            $subbagId = Pokja::where('kode_pokja', 'SUBBAG-UMUM')->value('id');
-            $korPokjaIds = array_filter([$user->pokja_id, $subbagId]);
-
-            $baseQuery->where(function ($q) use ($user, $korPokjaIds) {
-                if (!empty($korPokjaIds)) {
-                    $q->whereIn('pokja_id', $korPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', function ($p) use ($user, $korPokjaIds) {
-                      $p->where('pembuat_id', $user->id)
-                        ->orWhere('penanggung_jawab_id', $user->id);
-                      if (!empty($korPokjaIds)) {
-                          $p->orWhereIn('pokja_id', $korPokjaIds);
-                      }
-                  });
-            });
-
-            if ($request->filled('pokja_id')) {
-                $baseQuery->where('pokja_id', $request->pokja_id);
-            }
-        } elseif ($user->isKorjafung()) {
-            // Koordinator Jabatan Fungsional berwenang atas tim fungsional (TIM-01 s.d. TIM-05) dan tugas yang dibuatnya
-            $jfPokjaIds = Pokja::where('kode_pokja', 'LIKE', 'TIM%')->pluck('id')->toArray();
-            $baseQuery->where(function ($q) use ($user, $jfPokjaIds) {
-                if (!empty($jfPokjaIds)) {
-                    $q->whereIn('pokja_id', $jfPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', function ($p) use ($user) {
-                      $p->where('pembuat_id', $user->id)
-                        ->orWhere('penanggung_jawab_id', $user->id);
-                  });
-            });
-
-            if ($request->filled('pokja_id')) {
-                $baseQuery->where('pokja_id', $request->pokja_id);
-            }
-        } elseif ($user->isPegawai()) {
-            // Pegawai biasa: memantau pengajuan miliknya atau yang ditugaskan kepadanya
-            $baseQuery->where(function ($q) use ($user) {
-                $q->where('pembuat_id', $user->id)
-                    ->orWhere('penanggung_jawab_id', $user->id);
-            });
-        }
-
-        // Pencarian Teks
-        if ($request->filled('q')) {
-            $qText = $request->q;
-            $baseQuery->where(function ($q) use ($qText) {
-                $q->where('judul', 'like', "%{$qText}%")
-                    ->orWhere('kode_tampilan', 'like', "%{$qText}%")
-                    ->orWhere('nomor_st', 'like', "%{$qText}%")
-                    ->orWhereHas('penanggungJawab', fn ($pj) => $pj->where('name', 'like', "%{$qText}%"));
-            });
-        }
-
-        // 1. Antrean Persetujuan Laporan Progres Pegawai (Alur Baru: Katim/Koor Pembuat Tugas yang Approve)
-        $progresQuery = RealisasiPekerjaan::with(['pekerjaan.pembuat', 'pekerjaan.pokja', 'pekerjaan.penanggungJawab', 'user'])
-            ->where('status_approval', 'menunggu_persetujuan');
-
-        if ($user->isAdmin() || $user->isKabal() || $user->isKasubag()) {
-            if ($request->filled('pokja_id')) {
-                $progresQuery->whereHas('pekerjaan', fn ($q) => $q->where('pokja_id', $request->pokja_id));
-            }
-        } elseif ($user->isKatim()) {
-            $katimPokjaIds = Pokja::where('katim_id', $user->id)->pluck('id')->toArray();
-            if ($user->pokja_id && !in_array($user->pokja_id, $katimPokjaIds)) {
-                $katimPokjaIds[] = $user->pokja_id;
-            }
-            $progresQuery->whereHas('pekerjaan', function ($q) use ($user, $katimPokjaIds) {
-                $q->where('pembuat_id', $user->id);
-                if (!empty($katimPokjaIds)) {
-                    $q->orWhereIn('pokja_id', $katimPokjaIds);
-                }
-            });
-        } elseif ($user->isKorlayanan() || $user->isKorjafung()) {
-            $progresQuery->whereHas('pekerjaan', function ($q) use ($user) {
-                $q->where('pembuat_id', $user->id);
-                if ($user->pokja_id) {
-                    $q->orWhere('pokja_id', $user->pokja_id);
-                }
-            });
-        } else {
-            // Pegawai biasa: memantau progres yang diajukan oleh dirinya
-            $progresQuery->where('user_id', $user->id);
-        }
-
-        if ($request->filled('q')) {
-            $qText = $request->q;
-            $progresQuery->where(function ($q) use ($qText) {
-                $q->where('deskripsi_progres', 'like', "%{$qText}%")
-                  ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$qText}%"))
-                  ->orWhereHas('pekerjaan', fn ($p) => $p->where('judul', 'like', "%{$qText}%")->orWhere('kode_tampilan', 'like', "%{$qText}%"));
-            });
-        }
-
-        $antreanProgres = $progresQuery->orderBy('created_at', 'desc')->paginate(15, ['*'], 'page_progres');
-        $countProgresPending = (clone $progresQuery)->count();
-
-        // 2. Antrean Persetujuan Struktur Rincian (Draf / Pengajuan Tugas)
-        $antreanRincian = (clone $baseQuery)
-            ->whereIn('status_persetujuan', ['diajukan', 'perlu_perbaikan'])
-            ->with(['parent', 'pembuat', 'penanggungJawab', 'pokja'])
-            ->orderByRaw("FIELD(status_persetujuan, 'diajukan', 'perlu_perbaikan')")
-            ->orderBy('created_at', 'desc')
-            ->paginate(15, ['*'], 'page_rincian');
-
-        // 3. Antrean Hasil Akhir (Legacy / Pimpinan)
-        $antreanHasil = (clone $baseQuery)
-            ->where(function ($q) {
-                $q->where('status_pelaksanaan', 'hasil_diajukan')
-                    ->orWhere(function ($sub) {
-                        $sub->where('progres', '>=', 100)
-                            ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                    });
-            })
-            ->with(['penanggungJawab', 'pokja', 'realisasi' => fn ($r) => $r->latest()->with('user')])
-            ->orderBy('updated_at', 'desc')
-            ->paginate(15, ['*'], 'page_hasil');
-
-        // 4. Riwayat Keputusan Persetujuan & Verifikasi
-        $riwayatQuery = RiwayatPersetujuanPekerjaan::with(['pekerjaan.pokja', 'user'])
-            ->latest();
-
-        if ($user->isAdmin() || $user->isKabal() || $user->isKasubag()) {
-            if ($request->filled('pokja_id')) {
-                $riwayatQuery->whereHas('pekerjaan', fn ($q) => $q->where('pokja_id', $request->pokja_id));
-            }
-        } elseif ($user->isKatim()) {
-            $katimPokjaIds = Pokja::where('katim_id', $user->id)->pluck('id')->toArray();
-            if ($user->pokja_id && !in_array($user->pokja_id, $katimPokjaIds)) {
-                $katimPokjaIds[] = $user->pokja_id;
-            }
-            $riwayatQuery->whereHas('pekerjaan', function ($q) use ($user, $katimPokjaIds) {
-                if (!empty($katimPokjaIds)) {
-                    $q->whereIn('pokja_id', $katimPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', fn ($p) => $p->where('pembuat_id', $user->id)->orWhere('penanggung_jawab_id', $user->id));
-            });
-        } elseif ($user->isKorlayanan()) {
-            $subbagId = Pokja::where('kode_pokja', 'SUBBAG-UMUM')->value('id');
-            $korPokjaIds = array_filter([$user->pokja_id, $subbagId]);
-            $riwayatQuery->whereHas('pekerjaan', function ($q) use ($user, $korPokjaIds) {
-                if (!empty($korPokjaIds)) {
-                    $q->whereIn('pokja_id', $korPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', fn ($p) => $p->where('pembuat_id', $user->id)->orWhere('penanggung_jawab_id', $user->id));
-            });
-        } elseif ($user->isKorjafung()) {
-            $jfPokjaIds = Pokja::where('kode_pokja', 'LIKE', 'TIM%')->pluck('id')->toArray();
-            $riwayatQuery->whereHas('pekerjaan', function ($q) use ($user, $jfPokjaIds) {
-                if (!empty($jfPokjaIds)) {
-                    $q->whereIn('pokja_id', $jfPokjaIds);
-                }
-                $q->orWhere('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('parent', fn ($p) => $p->where('pembuat_id', $user->id)->orWhere('penanggung_jawab_id', $user->id));
-            });
-        } elseif ($user->isPegawai()) {
-            $riwayatQuery->whereHas('pekerjaan', function ($q) use ($user) {
-                $q->where('pembuat_id', $user->id)
-                  ->orWhere('penanggung_jawab_id', $user->id)
-                  ->orWhereHas('pelaksana', fn ($sub) => $sub->where('users.id', $user->id));
-            });
-        }
-
-        $riwayatPersetujuan = $riwayatQuery->paginate(15, ['*'], 'page_riwayat');
-
-        // Metrik Statistik Cepat
-        $countRincianPending = (clone $baseQuery)->where('status_persetujuan', 'diajukan')->count();
-        $countRincianRevisi = (clone $baseQuery)->where('status_persetujuan', 'perlu_perbaikan')->count();
-        $countHasilPending = (clone $baseQuery)->where(function ($q) {
-            $q->where('status_pelaksanaan', 'hasil_diajukan')
-                ->orWhere(function ($sub) {
-                    $sub->where('progres', '>=', 100)
-                        ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                });
-        })->count();
-        $countSelesaiTerverifikasi = (clone $baseQuery)->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
-
-        $pokjas = Pokja::orderBy('kode_pokja')->get();
-        $activeTab = $request->get('tab', 'progres');
-        $canReview = $user->canReviewPekerjaan();
-
-        return view('pekerjaan.persetujuan', compact(
-            'antreanProgres',
-            'countProgresPending',
-            'antreanRincian',
-            'antreanHasil',
-            'riwayatPersetujuan',
-            'countRincianPending',
-            'countRincianRevisi',
-            'countHasilPending',
-            'countSelesaiTerverifikasi',
-            'pokjas',
-            'activeTab',
-            'canReview'
-        ));
+        return view('pekerjaan.persetujuan', $data);
     }
 
     /**
@@ -879,10 +662,10 @@ class PekerjaanController extends Controller
     public function reviewRincian(Request $request, Pekerjaan $pekerjaan): RedirectResponse
     {
         $user = Auth::user();
-        $isPemberiTugas = ($pekerjaan->pembuat_id === $user->id) 
+        $isPemberiTugas = ($pekerjaan->pembuat_id === $user->id)
             || ($pekerjaan->parent && ($pekerjaan->parent->pembuat_id === $user->id || $pekerjaan->parent->penanggung_jawab_id === $user->id));
-        
-        if (! $user->canReviewPekerjaan() && ! $isPemberiTugas) {
+
+        if (! $user->canReviewPekerjaan()) {
             abort(403, 'Anda tidak memiliki hak wewenang untuk menyetujui rincian pekerjaan.');
         }
 
@@ -896,13 +679,13 @@ class PekerjaanController extends Controller
         if ($validated['aksi'] === 'setujui') {
             $pekerjaan->status_persetujuan = 'disetujui';
             $pekerjaan->status_pelaksanaan = $pekerjaan->status_pelaksanaan === 'belum_dimulai' ? 'dikerjakan' : $pekerjaan->status_pelaksanaan;
-            $pesan = 'Rincian pekerjaan ' . $pekerjaan->kode_tampilan . ' berhasil disetujui. Penugasan kini aktif.';
+            $pesan = 'Rincian pekerjaan '.$pekerjaan->kode_tampilan.' berhasil disetujui. Penugasan kini aktif.';
         } elseif ($validated['aksi'] === 'minta_perbaikan') {
             $pekerjaan->status_persetujuan = 'perlu_perbaikan';
-            $pesan = 'Rincian pekerjaan ' . $pekerjaan->kode_tampilan . ' dikembalikan untuk diperbaiki oleh pelaksana.';
+            $pesan = 'Rincian pekerjaan '.$pekerjaan->kode_tampilan.' dikembalikan untuk diperbaiki oleh pelaksana.';
         } else {
             $pekerjaan->status_persetujuan = 'dibatalkan';
-            $pesan = 'Rincian pekerjaan ' . $pekerjaan->kode_tampilan . ' telah dibatalkan.';
+            $pesan = 'Rincian pekerjaan '.$pekerjaan->kode_tampilan.' telah dibatalkan.';
         }
 
         $pekerjaan->catatan_persetujuan = $validated['catatan'] ?? null;
@@ -911,7 +694,7 @@ class PekerjaanController extends Controller
         RiwayatPersetujuanPekerjaan::create([
             'pekerjaan_id' => $pekerjaan->id,
             'user_id' => $user->id,
-            'jenis_aksi' => 'review_rincian_' . $validated['aksi'],
+            'jenis_aksi' => 'review_rincian_'.$validated['aksi'],
             'status_sebelumnya' => $statusSebelumnya,
             'status_baru' => $pekerjaan->status_persetujuan,
             'catatan' => $validated['catatan'] ?? null,
@@ -931,7 +714,7 @@ class PekerjaanController extends Controller
     public function reviewHasil(Request $request, Pekerjaan $pekerjaan): RedirectResponse
     {
         $user = Auth::user();
-        $isPemberiTugas = ($pekerjaan->pembuat_id === $user->id) 
+        $isPemberiTugas = ($pekerjaan->pembuat_id === $user->id)
             || ($pekerjaan->parent && ($pekerjaan->parent->pembuat_id === $user->id || $pekerjaan->parent->penanggung_jawab_id === $user->id));
 
         if (! $user->canReviewPekerjaan() && ! $isPemberiTugas) {
@@ -948,10 +731,10 @@ class PekerjaanController extends Controller
         if ($validated['aksi'] === 'terima') {
             $pekerjaan->status_pelaksanaan = 'selesai_terverifikasi';
             $pekerjaan->tanggal_selesai_terverifikasi = Carbon::now();
-            $pesan = 'Hasil pekerjaan ' . $pekerjaan->kode_tampilan . ' telah diterima dan dinyatakan Selesai Terverifikasi.';
+            $pesan = 'Hasil pekerjaan '.$pekerjaan->kode_tampilan.' telah diterima dan dinyatakan Selesai Terverifikasi.';
         } else {
             $pekerjaan->status_pelaksanaan = 'perlu_perbaikan_hasil';
-            $pesan = 'Hasil pekerjaan ' . $pekerjaan->kode_tampilan . ' dikembalikan untuk diperbaiki oleh pelaksana.';
+            $pesan = 'Hasil pekerjaan '.$pekerjaan->kode_tampilan.' dikembalikan untuk diperbaiki oleh pelaksana.';
         }
 
         $pekerjaan->catatan_hasil = $validated['catatan'] ?? null;
@@ -960,7 +743,7 @@ class PekerjaanController extends Controller
         RiwayatPersetujuanPekerjaan::create([
             'pekerjaan_id' => $pekerjaan->id,
             'user_id' => $user->id,
-            'jenis_aksi' => 'review_hasil_' . $validated['aksi'],
+            'jenis_aksi' => 'review_hasil_'.$validated['aksi'],
             'status_sebelumnya' => $statusSebelumnya,
             'status_baru' => $pekerjaan->status_pelaksanaan,
             'catatan' => $validated['catatan'] ?? null,

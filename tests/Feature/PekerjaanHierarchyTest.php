@@ -13,38 +13,35 @@ class PekerjaanHierarchyTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Pokja $pokja;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->pokja = Pokja::create([
-            'nama_pokja' => 'Tim Pembelajaran',
-            'kode_pokja' => 'TIM-03',
-            'deskripsi' => 'Deskripsi Pokja',
-        ]);
-
-        $this->user = User::create([
-            'name' => 'Dr. Widiatmoko',
-            'nip' => '197001011995011001',
-            'email' => 'widiatmoko@bgtk.go.id',
-            'password' => bcrypt('password'),
+        $this->user = User::factory()->create([
             'role' => 'katim',
             'jabatan' => 'Ketua Tim Kerja',
-            'pokja_id' => $this->pokja->id,
+        ]);
+
+        $this->pokja = Pokja::create([
+            'nama_pokja' => 'Tim Kerja Transformasi Digital',
+            'kode_pokja' => 'TIM-01',
+            'katim_id' => $this->user->id,
+            'keterangan' => 'Pokja pengujian hierarki',
         ]);
     }
 
-    public function test_hierarchy_tree_page_is_accessible_by_authenticated_user(): void
+    public function test_user_can_access_pekerjaan_index_and_see_tree_view(): void
     {
         $response = $this->actingAs($this->user)->get(route('pekerjaan.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Daftar Hierarki Pekerjaan');
+        $response->assertSee('Total Penugasan Balai');
     }
 
-    public function test_detail_pekerjaan_loads_with_correct_breadcrumbs(): void
+    public function test_user_can_view_pekerjaan_detail_with_hierarchy_data(): void
     {
         $pekerjaan = Pekerjaan::create([
             'kode_tampilan' => '1',
@@ -56,10 +53,8 @@ class PekerjaanHierarchyTest extends TestCase
             'penanggung_jawab_id' => $this->user->id,
             'pembuat_id' => $this->user->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 100,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'belum_dimulai',
-            'progres' => 0,
         ]);
 
         $response = $this->actingAs($this->user)->get(route('pekerjaan.show', $pekerjaan));
@@ -69,7 +64,7 @@ class PekerjaanHierarchyTest extends TestCase
         $response->assertSee($pekerjaan->judul);
     }
 
-    public function test_weighted_progress_recalculation_from_approved_children(): void
+    public function test_status_cascade_from_children(): void
     {
         // Buat parent
         $parent = Pekerjaan::create([
@@ -82,13 +77,11 @@ class PekerjaanHierarchyTest extends TestCase
             'penanggung_jawab_id' => $this->user->id,
             'pembuat_id' => $this->user->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 100,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'belum_dimulai',
-            'progres' => 0,
         ]);
 
-        // Buat anak 1: bobot 60, progres 100, disetujui -> kontribusi = 60 * 100 = 6000
+        // Buat anak 1: selesai_terverifikasi
         $child1 = Pekerjaan::create([
             'parent_id' => $parent->id,
             'kode_tampilan' => '99.1',
@@ -100,14 +93,11 @@ class PekerjaanHierarchyTest extends TestCase
             'penanggung_jawab_id' => $this->user->id,
             'pembuat_id' => $this->user->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 60,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'selesai_terverifikasi',
-            'progres' => 100,
         ]);
 
-        // Buat anak 2: bobot 40, progres 50, disetujui -> kontribusi = 40 * 50 = 2000
-        // Total kontribusi = 8000 / 100 = 80%
+        // Buat anak 2: dikerjakan
         $child2 = Pekerjaan::create([
             'parent_id' => $parent->id,
             'kode_tampilan' => '99.2',
@@ -119,17 +109,21 @@ class PekerjaanHierarchyTest extends TestCase
             'penanggung_jawab_id' => $this->user->id,
             'pembuat_id' => $this->user->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 40,
             'status_persetujuan' => 'disetujui',
             'status_pelaksanaan' => 'dikerjakan',
-            'progres' => 50,
         ]);
 
         $parent->recalculateProgresFromChildren();
         $parent->refresh();
 
-        $this->assertEquals(80.0, (float) $parent->progres);
         $this->assertEquals('dikerjakan', $parent->status_pelaksanaan);
+
+        // Jika anak 2 juga selesai terverifikasi, maka induk otomatis selesai terverifikasi
+        $child2->update(['status_pelaksanaan' => 'selesai_terverifikasi']);
+        $parent->recalculateProgresFromChildren();
+        $parent->refresh();
+
+        $this->assertEquals('selesai_terverifikasi', $parent->status_pelaksanaan);
     }
 
     public function test_can_store_root_job_without_parent_id(): void
@@ -144,7 +138,6 @@ class PekerjaanHierarchyTest extends TestCase
             'tenggat' => now()->addDays(30)->format('Y-m-d'),
             'penanggung_jawab_id' => $this->user->id,
             'pokja_id' => $this->pokja->id,
-            'bobot' => 100,
             'status_persetujuan' => 'diajukan',
         ]);
 

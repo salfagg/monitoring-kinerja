@@ -34,7 +34,7 @@ return new class extends Migration
                 'updated_at' => $job->updated_at ?? $now,
             ];
         }
-        if (!empty($inserts)) {
+        if (! empty($inserts)) {
             DB::table('pekerjaan_pelaksana')->insertOrIgnore($inserts);
         }
     }
