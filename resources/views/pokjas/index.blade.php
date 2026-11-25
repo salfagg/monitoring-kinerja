@@ -305,12 +305,12 @@
                                 <span>Personil Anggota</span>
                             </div>
                             <div class="detail-stat-box">
-                                <strong style="color: #059669;">{{ $totalTugas }}</strong>
-                                <span>Tugas / Pekerjaan</span>
+                                <strong style="color: #2563eb;">{{ $totalTugas }}</strong>
+                                <span>Total Tugas</span>
                             </div>
                             <div class="detail-stat-box">
-                                <strong style="color: #d97706;">{{ $avgProgres }}%</strong>
-                                <span>Rata-rata Capaian</span>
+                                <strong style="color: #059669;">{{ $selesaiTugas }} Selesai</strong>
+                                <span>Tuntas Terverifikasi</span>
                             </div>
                         </div>
 
@@ -347,7 +347,7 @@
                                         <div style="flex-shrink: 0; margin-left: 8px;">
                                             @if($isLeaderPerson)
                                                 <span style="font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(37, 99, 235, 0.12); color: #2563eb;">
-                                                    â­ {{ $leaderRoleText }}
+                                                    <i class="ph-fill ph-star" style="color: #f59e0b;"></i> {{ $leaderRoleText }}
                                                 </span>
                                             @else
                                                 <span style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f1f5f9; color: #475569;">
@@ -437,7 +437,7 @@
                                                 <span>{{ $u->name }}</span>
                                                 @if($isLeader)
                                                     <span style="font-size: 10px; color: #2563eb; background: #eff6ff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">
-                                                        â­ {{ $isPilar ? 'PIC Pilar' : 'Ketua' }}
+                                                        <i class="ph-fill ph-star" style="color: #f59e0b;"></i> {{ $isPilar ? 'PIC Pilar' : 'Ketua' }}
                                                     </span>
                                                 @endif
                                             </div>

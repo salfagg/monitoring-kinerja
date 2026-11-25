@@ -16,7 +16,7 @@ class PokjaController extends Controller
         $pokjas = Pokja::with([
             'katim',
             'anggota',
-            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
+            'pekerjaan' => fn($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
         ])
             ->withCount(['anggota', 'pekerjaan'])
             ->orderBy('id')
@@ -48,11 +48,11 @@ class PokjaController extends Controller
 
         $pokja = Pokja::create($validated);
 
-        if (! empty($validated['katim_id'])) {
+        if (!empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);
@@ -70,11 +70,15 @@ class PokjaController extends Controller
 
     public function edit(Pokja $pokja): View
     {
-        $potentialKatims = User::whereIn('role', ['katim_korjafung', 'tim_pokja', 'pegawai', 'kasubag', 'korlayanan'])
-            ->orderBy('name')
-            ->get();
+        $pokja->load(['katim', 'anggota' => fn ($q) => $q->orderBy('name')]);
 
-        return view('pokjas.edit', compact('pokja', 'potentialKatims'));
+        $allUsers = User::orderBy('name')->get();
+
+        $potentialKatims = $allUsers->filter(function ($u) {
+            return in_array($u->role, ['katim_korjafung', 'tim_pokja', 'pegawai', 'kasubag', 'korlayanan', 'korjafung']);
+        });
+
+        return view('pokjas.edit', compact('pokja', 'potentialKatims', 'allUsers'));
     }
 
     public function update(Request $request, Pokja $pokja): RedirectResponse
@@ -85,28 +89,53 @@ class PokjaController extends Controller
             'tipe' => ['required', 'string', 'in:tim_kerja,kelompok_kerja,subbag_pilar'],
             'deskripsi' => ['nullable', 'string'],
             'katim_id' => ['nullable', 'exists:users,id'],
+            'anggota_ids' => ['nullable', 'array'],
+            'anggota_ids.*' => ['exists:users,id'],
         ]);
 
-        $pokja->update($validated);
+        $pokja->update([
+            'nama_pokja' => $validated['nama_pokja'],
+            'kode_pokja' => $validated['kode_pokja'],
+            'tipe' => $validated['tipe'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'katim_id' => $validated['katim_id'] ?? null,
+        ]);
 
-        if (! empty($validated['katim_id'])) {
+        if (!empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);
-
-                // Masukkan ketua ke pivot
-                $pokja->anggota()->syncWithoutDetaching([
-                    $selectedUser->id => ['peran' => 'ketua'],
-                ]);
             }
         }
 
+        // Sinkronisasi personil / anggota jika form mengirimkan bagian personil
+        if ($request->has('manage_members_submitted') || $request->has('anggota_ids')) {
+            $anggotaIds = $validated['anggota_ids'] ?? [];
+            $syncData = [];
+
+            if (! empty($validated['katim_id'])) {
+                $syncData[$validated['katim_id']] = ['peran' => 'ketua'];
+            }
+
+            foreach ($anggotaIds as $id) {
+                if (empty($validated['katim_id']) || $id != $validated['katim_id']) {
+                    $syncData[$id] = ['peran' => 'anggota'];
+                }
+            }
+
+            $pokja->anggota()->sync($syncData);
+        } elseif (! empty($validated['katim_id'])) {
+            $pokja->anggota()->syncWithoutDetaching([
+                $validated['katim_id'] => ['peran' => 'ketua'],
+            ]);
+        }
+
         return redirect()->route('pokjas.index')
-            ->with('success', "Pokja {$pokja->nama_pokja} berhasil diperbarui.");
+            ->with('success', "Pokja {$pokja->nama_pokja} beserta keanggotaan personil berhasil diperbarui.");
     }
 
     public function syncAnggota(Request $request, Pokja $pokja): RedirectResponse

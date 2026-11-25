@@ -60,9 +60,9 @@ class DashboardMetricService
         return User::withCount('realisasiPekerjaan')
             ->with([
                 'pokja',
-                'pekerjaanSebagaiPj' => fn($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
-                'pekerjaanDitugaskan' => fn($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
-                'realisasiPekerjaan' => fn($q) => $q->with(['pekerjaan.pokja'])->latest()->take(30),
+                'pekerjaanSebagaiPj' => fn ($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
+                'pekerjaanDitugaskan' => fn ($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
+                'realisasiPekerjaan' => fn ($q) => $q->with(['pekerjaan.pokja'])->latest()->take(30),
             ])
             ->get()
             ->map(function ($u) {
@@ -77,17 +77,17 @@ class DashboardMetricService
                 $stJobs = $allJobs->filter(function ($job) {
                     $st = trim((string) $job->nomor_st);
 
-                    return !empty($st) && $st !== '-';
+                    return ! empty($st) && $st !== '-';
                 });
                 $stCount = $stJobs->count();
-                $distinctStNumbers = $stJobs->map(fn($job) => trim((string) $job->nomor_st))->unique()->values()->toArray();
+                $distinctStNumbers = $stJobs->map(fn ($job) => trim((string) $job->nomor_st))->unique()->values()->toArray();
                 $totalLaporan = $u->realisasi_pekerjaan_count ?? $u->realisasiPekerjaan->count();
 
                 $jobsPayload = $allJobs->map(function ($job) use ($u) {
                     $isPic = $job->penanggung_jawab_id === $u->id;
                     $isLate = $job->isTerlambat() && $job->status_pelaksanaan !== 'selesai_terverifikasi';
                     $nomorSt = trim((string) $job->nomor_st);
-                    $hasSt = !empty($nomorSt) && $nomorSt !== '-';
+                    $hasSt = ! empty($nomorSt) && $nomorSt !== '-';
 
                     return [
                         'id' => $job->id,
@@ -126,7 +126,7 @@ class DashboardMetricService
                         'kendala' => $r->kendala,
                         'tindak_lanjut' => $r->tindak_lanjut,
                         'catatan_penolakan' => $r->catatan_penolakan,
-                        'file_bukti' => $r->file_bukti ? asset('storage/' . $r->file_bukti) : null,
+                        'file_bukti' => $r->file_bukti ? asset('storage/'.$r->file_bukti) : null,
                         'file_name' => $r->file_bukti ? basename($r->file_bukti) : null,
                         'link_bukti' => $r->link_bukti,
                     ];
@@ -183,11 +183,11 @@ class DashboardMetricService
         // Capaian Kinerja per Pokja
         $pokjas = Pokja::with([
             'katim',
-            'anggota' => fn($q) => $q->withCount([
-                'pekerjaanSebagaiPj as pic_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                'pekerjaanDitugaskan as member_count' => fn($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+            'anggota' => fn ($q) => $q->withCount([
+                'pekerjaanSebagaiPj as pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                'pekerjaanDitugaskan as member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
             ]),
-            'pekerjaan' => fn($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
+            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
         ])->orderBy('kode_pokja')->get()->map(function ($p) {
             $totalTugas = $p->pekerjaan->count();
             $selesai = $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
@@ -209,10 +209,10 @@ class DashboardMetricService
         });
 
         // Data Pokja untuk Chart
-        $pokjaChartData = $pokjas->filter(fn($p) => $p->total_tugas > 0)
+        $pokjaChartData = $pokjas->filter(fn ($p) => $p->total_tugas > 0)
             ->sortByDesc('tugas_selesai')
             ->values()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'kode' => $p->kode_pokja,
                 'nama' => $p->nama_pokja,
                 'total' => $p->total_tugas,
@@ -221,7 +221,7 @@ class DashboardMetricService
             ]);
 
         if ($pokjaChartData->isEmpty()) {
-            $pokjaChartData = $pokjas->take(6)->values()->map(fn($p) => [
+            $pokjaChartData = $pokjas->take(6)->values()->map(fn ($p) => [
                 'kode' => $p->kode_pokja,
                 'nama' => $p->nama_pokja,
                 'total' => $p->total_tugas,
@@ -234,7 +234,7 @@ class DashboardMetricService
         $topAssignees = $this->getWorkloadList(100);
 
         // Leaderboard Pegawai Paling Sering Ikut Kegiatan (Surat Tugas / ST)
-        $topStPersonnel = $topAssignees->filter(fn($u) => $u->st_count > 0)
+        $topStPersonnel = $topAssignees->filter(fn ($u) => $u->st_count > 0)
             ->sortByDesc('st_count')
             ->values()
             ->take(8);
@@ -244,7 +244,7 @@ class DashboardMetricService
         }
 
         // Leaderboard Pegawai Paling Aktif Melaporkan Progres Tugas
-        $topReportPersonnel = $topAssignees->filter(fn($u) => $u->laporan_count > 0)
+        $topReportPersonnel = $topAssignees->filter(fn ($u) => $u->laporan_count > 0)
             ->sortByDesc('laporan_count')
             ->values()
             ->take(8);
@@ -265,10 +265,10 @@ class DashboardMetricService
         $stChartData = $topAssignees->sortByDesc('st_count')
             ->take(8)
             ->values()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
-                'short_name' => explode(' ', trim($u->name))[0] . ' ' . (isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1) . '.' : ''),
+                'short_name' => explode(' ', trim($u->name))[0].' '.(isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1).'.' : ''),
                 'pokja' => $u->pokja_kode,
                 'st_count' => $u->st_count,
                 'total_jobs' => $u->total_semua_tugas,
@@ -277,10 +277,10 @@ class DashboardMetricService
         $reportChartData = $topAssignees->sortByDesc('laporan_count')
             ->take(8)
             ->values()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
-                'short_name' => explode(' ', trim($u->name))[0] . ' ' . (isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1) . '.' : ''),
+                'short_name' => explode(' ', trim($u->name))[0].' '.(isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1).'.' : ''),
                 'pokja' => $u->pokja_kode,
                 'laporan_count' => $u->laporan_count,
                 'total_jobs' => $u->total_semua_tugas,
@@ -293,7 +293,7 @@ class DashboardMetricService
             'pembuat',
             'pokja',
             'parent',
-            'realisasi' => fn($r) => $r->with('user')->latest(),
+            'realisasi' => fn ($r) => $r->with('user')->latest(),
         ]);
 
         if ($request->filled('pokja_id')) {
@@ -321,8 +321,8 @@ class DashboardMetricService
                 $w->where('judul', 'like', "%{$qText}%")
                     ->orWhere('kode_tampilan', 'like', "%{$qText}%")
                     ->orWhere('nomor_st', 'like', "%{$qText}%")
-                    ->orWhereHas('penanggungJawab', fn($u) => $u->where('name', 'like', "%{$qText}%"))
-                    ->orWhereHas('pelaksana', fn($u) => $u->where('name', 'like', "%{$qText}%"));
+                    ->orWhereHas('penanggungJawab', fn ($u) => $u->where('name', 'like', "%{$qText}%"))
+                    ->orWhereHas('pelaksana', fn ($u) => $u->where('name', 'like', "%{$qText}%"));
             });
         }
 

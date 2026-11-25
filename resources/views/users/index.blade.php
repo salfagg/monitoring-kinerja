@@ -105,7 +105,7 @@
                 <label for="role">Filter Role Resmi</label>
                 <select name="role" id="role" class="filter-select">
                     <option value="">-- Semua Role --</option>
-                    <option value="pimpinan_katim" {{ request('role') == 'pimpinan_katim' ? 'selected' : '' }}>ðŸŒŸ Semua Pimpinan & Ketua Tim</option>
+                    <option value="pimpinan_katim" {{ request('role') == 'pimpinan_katim' ? 'selected' : '' }}>⭐ Semua Pimpinan & Ketua Tim</option>
                     <option value="kabal" {{ request('role') == 'kabal' ? 'selected' : '' }}>1. Kepala Balai</option>
                     <option value="kasubag" {{ request('role') == 'kasubag' ? 'selected' : '' }}>2. Kepala Subbagian Umum</option>
                     <option value="korjafung" {{ request('role') == 'korjafung' ? 'selected' : '' }}>3. Koordinator Jabatan Fungsional</option>

@@ -143,7 +143,7 @@
                             @endif
                             @if($log->buktiDukung->isNotEmpty())
                                 <div style="font-size: 10.5px; color: #0284c7; margin-top: 2px;">
-                                    ðŸ“Ž {{ $log->buktiDukung->pluck('nama_dokumen')->implode(', ') }}
+                                    📎 {{ $log->buktiDukung->pluck('nama_dokumen')->implode(', ') }}
                                 </div>
                             @endif
                         </td>

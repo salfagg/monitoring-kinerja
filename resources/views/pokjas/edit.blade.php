@@ -5,6 +5,110 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+<link rel="stylesheet" href="{{ asset('css/master-data.css') }}">
+<style>
+    .personil-management-box {
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1.5px dashed var(--border);
+    }
+    .user-check-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 9px;
+        border: 1.5px solid var(--border);
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        margin-bottom: 6px;
+    }
+    .user-check-item:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .user-check-item.is-selected {
+        border-color: #93c5fd;
+        background: #f0f7ff;
+    }
+    .user-check-item.leader-item {
+        background: rgba(37, 99, 235, 0.06);
+        border-color: rgba(37, 99, 235, 0.35);
+    }
+    .user-check-item input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+    .btn-tool-sm {
+        font-size: 11.5px;
+        padding: 6px 12px;
+        border-radius: 7px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        cursor: pointer;
+        color: #334155;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+    }
+    .btn-tool-sm:hover {
+        background: #f1f5f9;
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+    .preview-member-mini-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 11.5px;
+    }
+    .preview-member-mini-card.is-leader {
+        background: rgba(37, 99, 235, 0.04);
+        border-color: rgba(37, 99, 235, 0.25);
+    }
+    .preview-member-mini-card .mini-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #64748b;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .preview-member-mini-card.is-leader .mini-avatar {
+        background: var(--primary);
+    }
+    [data-theme="dark"] .user-check-item {
+        background: #151e32 !important;
+        border-color: #223049 !important;
+    }
+    [data-theme="dark"] .user-check-item.is-selected {
+        background: #1e293b !important;
+        border-color: #3b82f6 !important;
+    }
+    [data-theme="dark"] .btn-tool-sm {
+        background: #1e293b;
+        border-color: #334155;
+        color: #e2e8f0;
+    }
+    [data-theme="dark"] .preview-member-mini-card {
+        background: #151e32;
+        border-color: #223049;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -92,13 +196,13 @@
                     <div class="input-wrapper">
                         <select name="tipe" id="tipe" class="form-select" required>
                             <option value="tim_kerja" {{ old('tipe', $pokja->tipe) == 'tim_kerja' ? 'selected' : '' }}>
-                                ðŸ›ï¸ Tim Kerja Teknis / Tata Usaha Balai
+                                Tim Kerja Teknis / Tata Usaha Balai
                             </option>
                             <option value="subbag_pilar" {{ old('tipe', $pokja->tipe) == 'subbag_pilar' ? 'selected' : '' }}>
-                                âš™ï¸ Pilar Operasional Subbagian Umum
+                                Pilar Operasional Subbagian Umum
                             </option>
                             <option value="kelompok_kerja" {{ old('tipe', $pokja->tipe) == 'kelompok_kerja' ? 'selected' : '' }}>
-                                âš¡ Satuan Tugas Ad Hoc (Kelompok Kerja Penugasan RBI)
+                                Satuan Tugas Ad Hoc (Kelompok Kerja Penugasan RBI)
                             </option>
                         </select>
                         <i class="ph-bold ph-squares-four prefix-icon"></i>
@@ -123,7 +227,7 @@
                                         data-name="{{ $user->name }}" 
                                         data-role="{{ $user->role }}"
                                         {{ old('katim_id', $pokja->katim_id) == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} (NIP: {{ $user->nip ?? '-' }}) â€” {{ $user->jabatan ?? $user->role }}
+                                    {{ $user->name }} (NIP: {{ $user->nip ?? '-' }}) — {{ $user->jabatan ?? $user->role }}
                                 </option>
                             @endforeach
                         </select>
@@ -150,6 +254,108 @@
                     @error('deskripsi') 
                         <div class="error-feedback"><i class="ph-bold ph-warning-circle"></i> {{ $message }}</div> 
                     @enderror
+                </div>
+
+                <!-- =========================================================================
+                     KELOLA & RINCIAN PERSONIL POKJA
+                     ========================================================================= -->
+                <div class="personil-management-box">
+                    <input type="hidden" name="manage_members_submitted" value="1">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h3 style="font-size: 15.5px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="ph-bold ph-users-three" style="color: var(--primary);"></i>
+                                <span>Kelola & Rincian Personil Pokja</span>
+                                <span class="badge-count" id="memberCountBadge" style="font-size: 11.5px; background: rgba(37, 99, 235, 0.1); color: #2563eb; padding: 2px 9px; border-radius: 999px; font-weight: 800;">
+                                    {{ $pokja->anggota->count() }} Terpilih
+                                </span>
+                            </h3>
+                            <p style="font-size: 12.5px; color: #64748b; margin: 0;">
+                                Pilih dan centang personil pegawai BGTK untuk unit kerja ini. Katim otomatis masuk sebagai Ketua.
+                            </p>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button type="button" class="btn-tool-sm" onclick="selectAllMembers(true)">
+                                <i class="ph-bold ph-check-square"></i>
+                                <span>Pilih Semua</span>
+                            </button>
+                            <button type="button" class="btn-tool-sm" onclick="selectAllMembers(false)">
+                                <i class="ph-bold ph-square"></i>
+                                <span>Kosongkan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pencarian Pegawai -->
+                    <div style="position: relative; margin-bottom: 12px;">
+                        <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 16px; pointer-events: none;"></i>
+                        <input type="text" 
+                               id="searchPegawaiInput"
+                               class="form-input" 
+                               style="padding-left: 42px !important; font-size: 13px; background: #ffffff;" 
+                               placeholder="Cari nama pegawai, NIP, atau jabatan staf..." 
+                               oninput="filterEditMemberList(this.value)">
+                    </div>
+
+                    <!-- Daftar Checklist Pegawai -->
+                    <div class="user-checklist-container" id="editMemberListContainer" style="max-height: 380px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px; background: #f8fafc;">
+                        @php
+                            $currentMemberIds = $pokja->anggota->pluck('id')->toArray();
+                            $activeKatimId = old('katim_id', $pokja->katim_id);
+                        @endphp
+
+                        @foreach($allUsers as $u)
+                            @php
+                                $isKatim = ($u->id == $activeKatimId);
+                                $isMember = in_array($u->id, $currentMemberIds);
+                                $isChecked = $isMember || $isKatim;
+                            @endphp
+                            <label class="user-check-item {{ $isKatim ? 'leader-item' : '' }} {{ $isChecked ? 'is-selected' : '' }}" 
+                                   id="userRow_{{ $u->id }}"
+                                   data-search="{{ strtolower($u->name . ' ' . $u->nip . ' ' . $u->jabatan . ' ' . $u->role) }}">
+                                <input type="checkbox" 
+                                       name="anggota_ids[]" 
+                                       value="{{ $u->id }}" 
+                                       class="member-checkbox"
+                                       id="chk_user_{{ $u->id }}"
+                                       data-user-id="{{ $u->id }}"
+                                       data-user-name="{{ $u->name }}"
+                                       data-user-nip="{{ $u->nip ?? '-' }}"
+                                       data-user-role="{{ $u->jabatan ?? $u->role }}"
+                                       {{ $isChecked ? 'checked' : '' }}
+                                       {{ $isKatim ? 'disabled' : '' }}
+                                       onchange="handleMemberToggle(this)">
+                                
+                                @if($isKatim)
+                                    <input type="hidden" name="anggota_ids[]" value="{{ $u->id }}" id="hiddenKatim_{{ $u->id }}" class="katim-hidden-input">
+                                @endif
+
+                                <div class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: {{ $isKatim ? 'linear-gradient(135deg, #1e40af, #3b82f6)' : '#64748b' }}; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; flex-shrink: 0;">
+                                    {{ strtoupper(substr($u->name, 0, 1)) }}
+                                </div>
+
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span class="user-name-text">{{ $u->name }}</span>
+                                        <span class="badge-leader-tag" id="badgeLeader_{{ $u->id }}" style="font-size: 10px; color: #2563eb; background: #eff6ff; padding: 1px 7px; border-radius: 4px; font-weight: 800; display: {{ $isKatim ? 'inline-flex' : 'none' }}; align-items: center; gap: 4px;">
+                                            <i class="ph-fill ph-star" style="color: #f59e0b;"></i> Katim / Ketua Unit
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                                        NIP: {{ $u->nip ?? '-' }} &bull; {{ $u->jabatan ?? $u->role }}
+                                    </div>
+                                </div>
+
+                                <div class="member-action-indicator" style="flex-shrink: 0;">
+                                    <span class="member-status-tag" id="statusTag_{{ $u->id }}" style="font-size: 11px; font-weight: 700; color: {{ $isKatim ? '#2563eb' : ($isChecked ? '#059669' : '#94a3b8') }};">
+                                        {{ $isKatim ? 'Ketua' : ($isChecked ? 'Anggota' : 'Bukan Anggota') }}
+                                    </span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -213,14 +419,25 @@
                         </div>
                         <div class="preview-meta-row">
                             <span style="color: #64748b;"><i class="ph-bold ph-users-three"></i> Total Anggota:</span>
-                            <strong style="color: var(--primary);">{{ $pokja->anggota()->count() }} Pegawai</strong>
+                            <strong id="previewMemberCount" style="color: var(--primary);">{{ $pokja->anggota->count() }} Pegawai</strong>
+                        </div>
+                    </div>
+
+                    <!-- Mini Live Roster of Selected Members in Preview -->
+                    <div style="margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 12px;">
+                        <div style="font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Daftar Personil Terpilih:</span>
+                            <span id="previewSelectedCountBadge" style="font-size: 11px; color: var(--primary); font-weight: 800;">{{ $pokja->anggota->count() }} personil</span>
+                        </div>
+                        <div id="previewMemberList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding-right: 4px;">
+                            <!-- Populated dynamically by updatePreviewMembers() -->
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-info-box">
                     <strong><i class="ph-bold ph-shield-check"></i> Status Pokja:</strong>
-                    Saat ini kelompok kerja ini menaungi <strong>{{ $pokja->anggota()->count() }} pegawai</strong>. Perubahan data di sini akan langsung disinkronkan ke seluruh modul penugasan dan dashboard pimpinan.
+                    Saat ini kelompok kerja ini menaungi <strong id="previewStatsMemberCount">{{ $pokja->anggota->count() }} pegawai</strong>. Perubahan data di sini akan langsung disinkronkan ke seluruh modul penugasan dan dashboard pimpinan.
                 </div>
             </div>
         </div>
@@ -241,6 +458,13 @@
         const previewDesc = document.getElementById('previewDesc');
         const previewKatim = document.getElementById('previewKatim');
         const previewKatimLabel = document.getElementById('previewKatimLabel');
+        const previewMemberCount = document.getElementById('previewMemberCount');
+        const previewSelectedCountBadge = document.getElementById('previewSelectedCountBadge');
+        const previewStatsMemberCount = document.getElementById('previewStatsMemberCount');
+        const previewMemberList = document.getElementById('previewMemberList');
+        const memberCountBadge = document.getElementById('memberCountBadge');
+
+        let currentKatimId = '{{ old("katim_id", $pokja->katim_id) }}';
 
         function updatePreview() {
             // Update Nama
@@ -276,7 +500,185 @@
             } else {
                 previewKatim.textContent = 'Belum Ditunjuk';
             }
+
+            updatePreviewMembers();
         }
+
+        window.updatePreviewMembers = function() {
+            const allCheckboxes = document.querySelectorAll('.member-checkbox');
+            let selectedMembers = [];
+            const activeKatim = selectKatim.value;
+
+            allCheckboxes.forEach(chk => {
+                const userId = chk.getAttribute('data-user-id');
+                const isKatim = (userId === activeKatim);
+                const isChecked = chk.checked || isKatim;
+
+                if (isChecked) {
+                    selectedMembers.push({
+                        id: userId,
+                        name: chk.getAttribute('data-user-name'),
+                        nip: chk.getAttribute('data-user-nip'),
+                        role: chk.getAttribute('data-user-role'),
+                        isLeader: isKatim
+                    });
+                }
+            });
+
+            // Urutkan: Katim paling atas, selanjutnya sesuai nama
+            selectedMembers.sort((a, b) => {
+                if (a.isLeader) return -1;
+                if (b.isLeader) return 1;
+                return a.name.localeCompare(b.name);
+            });
+
+            const count = selectedMembers.length;
+            if (previewMemberCount) previewMemberCount.textContent = count + ' Pegawai';
+            if (previewSelectedCountBadge) previewSelectedCountBadge.textContent = count + ' personil';
+            if (previewStatsMemberCount) previewStatsMemberCount.textContent = count + ' pegawai';
+            if (memberCountBadge) memberCountBadge.textContent = count + ' Terpilih';
+
+            // Render mini list in preview card
+            if (previewMemberList) {
+                if (selectedMembers.length === 0) {
+                    previewMemberList.innerHTML = '<div style="text-align: center; padding: 12px; font-size: 11px; color: #94a3b8; background: #f8fafc; border-radius: 6px; border: 1px dashed var(--border);">Belum ada personil yang dipilih.</div>';
+                } else {
+                    let html = '';
+                    selectedMembers.forEach(m => {
+                        const initial = m.name.charAt(0).toUpperCase();
+                        html += `
+                            <div class="preview-member-mini-card ${m.isLeader ? 'is-leader' : ''}">
+                                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                                    <div class="mini-avatar">${initial}</div>
+                                    <div style="min-width: 0;">
+                                        <div style="font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${m.name}</div>
+                                        <div style="font-size: 10px; color: #64748b;">${m.role}</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 10px; font-weight: 700; color: ${m.isLeader ? '#2563eb' : '#64748b'};">${m.isLeader ? 'Ketua' : 'Anggota'}</span>
+                            </div>
+                        `;
+                    });
+                    previewMemberList.innerHTML = html;
+                }
+            }
+        };
+
+        window.handleMemberToggle = function(chk) {
+            const userId = chk.getAttribute('data-user-id');
+            const row = document.getElementById('userRow_' + userId);
+            const statusTag = document.getElementById('statusTag_' + userId);
+            const isKatim = (userId === selectKatim.value);
+
+            if (chk.checked || isKatim) {
+                if (row) row.classList.add('is-selected');
+                if (statusTag) {
+                    statusTag.textContent = isKatim ? 'Ketua' : 'Anggota';
+                    statusTag.style.color = isKatim ? '#2563eb' : '#059669';
+                }
+            } else {
+                if (row) row.classList.remove('is-selected');
+                if (statusTag) {
+                    statusTag.textContent = 'Bukan Anggota';
+                    statusTag.style.color = '#94a3b8';
+                }
+            }
+
+            updatePreviewMembers();
+        };
+
+        window.selectAllMembers = function(check) {
+            const activeKatim = selectKatim.value;
+            const container = document.getElementById('editMemberListContainer');
+            if (!container) return;
+
+            const visibleCheckboxes = container.querySelectorAll('.member-checkbox');
+            visibleCheckboxes.forEach(chk => {
+                const userId = chk.getAttribute('data-user-id');
+                const row = document.getElementById('userRow_' + userId);
+                if (row && row.style.display !== 'none') {
+                    if (userId !== activeKatim) {
+                        chk.checked = check;
+                        handleMemberToggle(chk);
+                    }
+                }
+            });
+
+            updatePreviewMembers();
+        };
+
+        window.filterEditMemberList = function(query) {
+            const q = query.toLowerCase().trim();
+            const container = document.getElementById('editMemberListContainer');
+            if (!container) return;
+
+            const items = container.querySelectorAll('.user-check-item');
+            items.forEach(item => {
+                const searchKey = item.getAttribute('data-search') || '';
+                if (searchKey.includes(q)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        };
+
+        // Katim Change Event Handler
+        selectKatim.addEventListener('change', function() {
+            const newKatimId = this.value;
+
+            // Lepaskan katim lama jika ada
+            if (currentKatimId && currentKatimId !== newKatimId) {
+                const oldChk = document.getElementById('chk_user_' + currentKatimId);
+                const oldRow = document.getElementById('userRow_' + currentKatimId);
+                const oldBadge = document.getElementById('badgeLeader_' + currentKatimId);
+                const oldHidden = document.getElementById('hiddenKatim_' + currentKatimId);
+                const oldStatus = document.getElementById('statusTag_' + currentKatimId);
+
+                if (oldChk) oldChk.disabled = false;
+                if (oldRow) oldRow.classList.remove('leader-item');
+                if (oldBadge) oldBadge.style.display = 'none';
+                if (oldHidden) oldHidden.remove();
+                if (oldStatus) {
+                    oldStatus.textContent = (oldChk && oldChk.checked) ? 'Anggota' : 'Bukan Anggota';
+                    oldStatus.style.color = (oldChk && oldChk.checked) ? '#059669' : '#94a3b8';
+                }
+            }
+
+            // Kunci katim baru
+            if (newKatimId) {
+                const newChk = document.getElementById('chk_user_' + newKatimId);
+                const newRow = document.getElementById('userRow_' + newKatimId);
+                const newBadge = document.getElementById('badgeLeader_' + newKatimId);
+                const newStatus = document.getElementById('statusTag_' + newKatimId);
+
+                if (newChk) {
+                    newChk.checked = true;
+                    newChk.disabled = true;
+                }
+                if (newRow) {
+                    newRow.classList.add('leader-item', 'is-selected');
+                    // Tambahkan hidden input jika belum ada
+                    if (!document.getElementById('hiddenKatim_' + newKatimId)) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'anggota_ids[]';
+                        hiddenInput.value = newKatimId;
+                        hiddenInput.id = 'hiddenKatim_' + newKatimId;
+                        hiddenInput.className = 'katim-hidden-input';
+                        newRow.appendChild(hiddenInput);
+                    }
+                }
+                if (newBadge) newBadge.style.display = 'inline-flex';
+                if (newStatus) {
+                    newStatus.textContent = 'Ketua';
+                    newStatus.style.color = '#2563eb';
+                }
+            }
+
+            currentKatimId = newKatimId;
+            updatePreview();
+        });
 
         inputNama.addEventListener('input', updatePreview);
         inputKode.addEventListener('input', function() {
@@ -284,7 +686,6 @@
             updatePreview();
         });
         inputDesc.addEventListener('input', updatePreview);
-        selectKatim.addEventListener('change', updatePreview);
 
         // Initial preview sync
         updatePreview();

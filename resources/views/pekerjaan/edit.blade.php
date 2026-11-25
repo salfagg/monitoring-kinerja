@@ -107,7 +107,7 @@
                                             data-tahun="{{ $skp->tahun }}"
                                             data-iki="{{ $skp->indikator_kinerja }}"
                                             {{ $currentSkpId == $skp->id ? 'selected' : '' }}>
-                                        [{{ $skp->tahun }}] {{ $skp->user?->name ?? 'Pegawai' }} â€” {{ Str::limit($skp->rencana_kinerja, 75) }} ({{ (float)$skp->target_max }} {{ $skp->satuan }})
+                                        [{{ $skp->tahun }}] {{ $skp->user?->name ?? 'Pegawai' }} — {{ Str::limit($skp->rencana_kinerja, 75) }} ({{ (float)$skp->target_max }} {{ $skp->satuan }})
                                     </option>
                                 @endforeach
                             </select>
@@ -448,7 +448,7 @@
                                         @endforeach
                                     </optgroup>
                                 @endif
-                                <optgroup label="ðŸ‘¥ Seluruh Pegawai BGTK">
+                                <optgroup label="👥 Seluruh Pegawai BGTK">
                                     @foreach($otherUsers as $u)
                                         <option value="{{ $u->id }}" {{ $currentPicId == $u->id ? 'selected' : '' }} data-name="{{ $u->name }}" data-pokja="{{ $u->pokja?->nama_pokja ?? 'BGTK' }}">
                                             {{ $u->name }} ({{ $u->nip ?? 'Pegawai' }}) - {{ $u->pokja?->nama_pokja ?? 'BGTK' }} ({{ $u->role_label }})
@@ -547,7 +547,7 @@
                         @endif
 
                         <div class="pelaksana-group-title" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 0.04em; margin-bottom: 8px; padding: 2px 4px;">
-                            ðŸ‘¥ Seluruh Pegawai BGTK
+                            👥 Seluruh Pegawai BGTK
                         </div>
                         <div class="pelaksana-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px;">
                             @foreach($otherUsers as $u)

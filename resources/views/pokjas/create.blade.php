@@ -91,13 +91,13 @@
                     <div class="input-wrapper">
                         <select name="tipe" id="tipe" class="form-select" required>
                             <option value="tim_kerja" {{ old('tipe') == 'tim_kerja' ? 'selected' : '' }}>
-                                ðŸ›ï¸ Tim Kerja Teknis / Tata Usaha Balai
+                                Tim Kerja Teknis / Tata Usaha Balai
                             </option>
                             <option value="subbag_pilar" {{ old('tipe') == 'subbag_pilar' ? 'selected' : '' }}>
-                                âš™ï¸ Pilar Operasional Subbagian Umum
+                                Pilar Operasional Subbagian Umum
                             </option>
                             <option value="kelompok_kerja" {{ old('tipe') == 'kelompok_kerja' ? 'selected' : '' }}>
-                                âš¡ Satuan Tugas Ad Hoc (Kelompok Kerja Penugasan RBI)
+                                Satuan Tugas Ad Hoc (Kelompok Kerja Penugasan RBI)
                             </option>
                         </select>
                         <i class="ph-bold ph-squares-four prefix-icon"></i>
@@ -122,7 +122,7 @@
                                         data-name="{{ $user->name }}" 
                                         data-role="{{ $user->role }}"
                                         {{ old('katim_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} (NIP: {{ $user->nip ?? '-' }}) â€” {{ $user->jabatan ?? $user->role }}
+                                    {{ $user->name }} (NIP: {{ $user->nip ?? '-' }}) — {{ $user->jabatan ?? $user->role }}
                                 </option>
                             @endforeach
                         </select>
