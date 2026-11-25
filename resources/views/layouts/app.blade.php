@@ -21,7 +21,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons CDN -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -30,7 +30,41 @@
     <link rel="stylesheet" href="{{ asset('css/tanjidor-theme.css') }}">
     @yield('styles')
 </head>
-<body>
+<body class="{{ session('login_transition') ? 'has-login-reveal' : '' }}">
+
+    @if(session('login_transition'))
+    <!-- Split-Screen Reveal Overlay setelah Login Berhasil -->
+    <div id="loginRevealOverlay" aria-hidden="true">
+        <div class="reveal-pane-blue">
+            <span class="reveal-tag">BGTK PROVINSI DKI JAKARTA</span>
+            <h2>TANJIDOR</h2>
+            <p>Tata Kelola Kinerja Digital dan Monitoring</p>
+        </div>
+        <div class="reveal-pane-white"></div>
+    </div>
+    <script>
+        (function() {
+            const overlay = document.getElementById('loginRevealOverlay');
+            if (!overlay) return;
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    overlay.classList.add('is-revealing');
+                    document.body.classList.add('is-dashboard-revealed');
+                });
+            });
+            setTimeout(function() {
+                overlay.remove();
+                document.body.classList.remove('has-login-reveal', 'is-dashboard-revealed');
+            }, 820);
+        })();
+    </script>
+    @endif
+
+    <!-- Top Navigation Progress Bar -->
+    <div id="tanjidorTopProgress" aria-hidden="true"></div>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
 
     <!-- Sidebar Navigation Partial -->
     @include('layouts.partials.sidebar')
@@ -92,6 +126,37 @@
             }
         }
         setInterval(updateNavbarLiveClock, 1000);
+
+        // Mobile Sidebar Controls
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) {
+                const isOpen = sidebar.classList.toggle('open');
+                if (backdrop) backdrop.classList.toggle('active', isOpen);
+                document.body.classList.toggle('sidebar-mobile-open', isOpen);
+            }
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
+            document.body.classList.remove('sidebar-mobile-open');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                closeMobileSidebar();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileSidebar();
+            }
+        });
     </script>
 
     <!-- SweetAlert2 Core Script -->
@@ -391,5 +456,40 @@
 
     @yield('scripts')
     @stack('scripts')
+
+    <script>
+        // Smooth Page Transition saat pindah menu di Sidebar & Navbar
+        (function() {
+            const bar = document.getElementById('tanjidorTopProgress');
+
+            window.addEventListener('pageshow', function() {
+                document.body.classList.remove('is-page-leaving');
+                if (bar) bar.classList.remove('is-loading');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.defaultPrevented) return;
+                const link = e.target.closest('a[href]');
+                if (!link) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                if (link.target === '_blank' || link.hasAttribute('download')) return;
+
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (link.origin !== window.location.origin) return;
+                if (href.includes('export-excel') || href.includes('export-csv')) return;
+                if (link.href === window.location.href) return;
+
+                e.preventDefault();
+                if (typeof closeMobileSidebar === 'function') closeMobileSidebar();
+                document.body.classList.add('is-page-leaving');
+                if (bar) bar.classList.add('is-loading');
+
+                setTimeout(function() {
+                    window.location.href = link.href;
+                }, 150);
+            });
+        })();
+    </script>
 </body>
 </html>

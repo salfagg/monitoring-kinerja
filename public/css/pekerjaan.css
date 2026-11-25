@@ -133,43 +133,50 @@
 
     .data-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         text-align: left;
     }
 
     .data-table th {
-        background: #f8fafc;
-        padding: 14px 18px;
-        font-size: 11.5px;
+        background: var(--bg-sub);
+        padding: 12px 16px;
+        font-size: 10.5px;
         font-weight: 800;
-        color: #475569;
+        color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        border-bottom: 1px solid var(--border);
+        letter-spacing: 0.06em;
+        border-bottom: 2px solid var(--border-strong);
+        white-space: nowrap;
     }
 
     .data-table td {
-        padding: 16px 18px;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
         font-size: 13px;
-        color: #1e293b;
+        color: var(--text-body);
         vertical-align: middle;
+        transition: background 0.15s ease;
     }
 
-    .data-table tbody tr:hover {
-        background: #fafbfc;
+    .data-table tbody tr:hover td {
+        background: rgba(10, 111, 181, 0.035);
+    }
+
+    .data-table tbody tr:hover td:first-child {
+        box-shadow: inset 4px 0 0 var(--primary);
     }
 
     /* Badges */
     .badge-code {
-        font-family: monospace;
-        background: #eff6ff;
-        color: #1d4ed8;
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--primary-light);
+        color: var(--primary);
         padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 11.5px;
-        font-weight: 800;
-        border: 1px solid #bfdbfe;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid rgba(10, 111, 181, 0.18);
         display: inline-block;
         margin-bottom: 4px;
     }
@@ -236,14 +243,20 @@
 /* === TANJIDOR Pekerjaan Saya Styles === */
 /* Hero Banner */
     .hero-box {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border-radius: var(--radius-lg);
+        background-color: var(--navy);
+        background-image:
+            radial-gradient(420px 120px at 15% 0%, rgba(34, 184, 232, 0.25), transparent 70%),
+            radial-gradient(rgba(255, 255, 255, 0.10) 1.2px, transparent 1.2px),
+            linear-gradient(135deg, var(--navy-soft) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+        background-size: 100% 100%, 22px 22px, 100% 100%;
+        border-radius: 18px;
         padding: 24px 28px;
         color: #ffffff;
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 10px 28px rgba(11, 74, 130, 0.18);
     }
 
     .hero-box h2 {
@@ -1025,14 +1038,20 @@
 /* === TANJIDOR Persetujuan Progres Styles === */
 /* Hero Header */
     .approval-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border-radius: var(--radius-lg);
+        background-color: var(--navy);
+        background-image:
+            radial-gradient(420px 120px at 15% 0%, rgba(34, 184, 232, 0.25), transparent 70%),
+            radial-gradient(rgba(255, 255, 255, 0.10) 1.2px, transparent 1.2px),
+            linear-gradient(135deg, var(--navy-soft) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+        background-size: 100% 100%, 22px 22px, 100% 100%;
+        border-radius: 18px;
         padding: 24px 28px;
         color: #ffffff;
         margin-bottom: 24px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 10px 28px rgba(11, 74, 130, 0.18);
     }
 
     .approval-header::after {
@@ -1492,4 +1511,202 @@
     border: 1px solid #fecaca;
 }
 
+/* ==========================================================================
+   Responsive Improvements for Pekerjaan, Persetujuan, & Hierarchy
+   ========================================================================== */
+@media (max-width: 900px) {
+    .filter-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .approval-header {
+        padding: 18px 20px;
+    }
+}
 
+@media (max-width: 640px) {
+    .filter-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+    .stat-card {
+        padding: 12px 14px;
+    }
+    .stat-number {
+        font-size: 20px;
+    }
+
+    .toolbar-section, .toolbar-actions, .filter-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px;
+    }
+    .toolbar-actions > * {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table-container, .tree-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100%;
+    }
+    .table-container table, .tree-table {
+        min-width: 650px;
+    }
+
+    .approval-header {
+        padding: 14px 16px;
+        border-radius: 12px;
+    }
+    .approval-header h2 {
+        font-size: 18px;
+    }
+    .action-cards-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+
+    .tabs-bar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        padding-bottom: 4px;
+    }
+}
+
+@media (max-width: 400px) {
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+
+
+/* ==========================================================================
+   DARK MODE OVERRIDES — Pekerjaan & Approval
+   ========================================================================== */
+[data-theme="dark"] .toolbar-wrapper,
+[data-theme="dark"] .table-card,
+[data-theme="dark"] .detail-card {
+    background: #0f1a2c !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .filter-control,
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .filter-select {
+    background: #0a1423 !important;
+    border-color: #2d4263 !important;
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .filter-control:focus,
+[data-theme="dark"] .search-input:focus,
+[data-theme="dark"] .filter-select:focus {
+    background: #0a1423 !important;
+    border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .filter-bar {
+    background: #0f1a2c !important;
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .data-table th {
+    background: #0a1423 !important;
+    color: #7f95ad !important;
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .data-table td {
+    color: #cbd5e1 !important;
+    border-bottom-color: #1a2e46 !important;
+}
+
+[data-theme="dark"] .data-table tr:hover td {
+    background: #13263d !important;
+}
+
+[data-theme="dark"] .empty-icon {
+    background: #1a2a42 !important;
+    color: #64748b !important;
+}
+
+[data-theme="dark"] .empty-state h4 {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .empty-state p {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .tab-badge-amber {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .tab-badge-gray {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .preset-pill {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .preset-pill:hover {
+    background: #27354f !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .action-card {
+    background: #0a1423 !important;
+    border-color: #1c2e47 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .action-card:hover {
+    background: #13263d !important;
+    border-color: #2d4263 !important;
+}
+
+[data-theme="dark"] .action-card.selected-progres {
+    background: rgba(37, 99, 235, 0.16) !important;
+    border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .action-card.selected-selesai {
+    background: rgba(126, 34, 206, 0.18) !important;
+    border-color: #a855f7 !important;
+}
+
+[data-theme="dark"] .badge-wf-belum {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .badge-wf-dikerjakan {
+    background: rgba(59, 130, 246, 0.18) !important;
+    color: #93c5fd !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+[data-theme="dark"] .badge-wf-verifikasi {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}

@@ -1,7 +1,7 @@
-﻿/* === TANJIDOR Log Harian Styles === */
+/* === TANJIDOR Log Harian Styles === */
 /* Header Toolbar */
     .log-header-bar {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         padding: 18px 24px;
@@ -69,7 +69,7 @@
     }
 
     .log-kpi-card {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         padding: 16px 18px;
@@ -113,9 +113,9 @@
 
     /* Calendar Container */
     .calendar-container {
-        background: #ffffff;
+        background: var(--card-bg);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: 18px;
         overflow: hidden;
         box-shadow: var(--shadow-sm);
         margin-bottom: 28px;
@@ -124,8 +124,8 @@
     .calendar-weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        background: #f8fafc;
-        border-bottom: 1px solid var(--border);
+        background: var(--bg-sub);
+        border-bottom: 2px solid var(--border-strong);
     }
 
     .weekday-header {
@@ -150,7 +150,7 @@
     }
 
     .calendar-cell {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         min-height: 120px;
         padding: 8px 10px;
         display: flex;
@@ -161,13 +161,13 @@
     }
 
     .calendar-cell:hover {
-        background: #f8fafc;
+        background: var(--bg-hover, #f8fafc);
         z-index: 2;
         box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
 
     .calendar-cell.other-month {
-        background: #fbfcfd;
+        background: var(--bg-sub, #fbfcfd);
         opacity: 0.45;
         cursor: default;
     }
@@ -185,11 +185,11 @@
     }
 
     .calendar-cell.has-logs {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
     }
 
     .calendar-cell.has-logs:hover {
-        background: #f0fdf4;
+        background: var(--bg-hover, #f0fdf4);
     }
 
     .cell-top {
@@ -231,8 +231,8 @@
         font-size: 11px;
         padding: 3px 6px;
         border-radius: 6px;
-        background: #f1f5f9;
-        color: #1e293b;
+        background: var(--bg-sub, #f1f5f9);
+        color: var(--text-body, #1e293b);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -260,8 +260,8 @@
     }
 
     .mini-log-item.status-draft {
-        background: #f8fafc;
-        color: #475569;
+        background: var(--bg-hover, #f8fafc);
+        color: var(--text-muted, #475569);
         border-left-color: #cbd5e1;
     }
 
@@ -307,7 +307,7 @@
     }
 
     .log-modal-card {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border-radius: 16px;
         width: 100%;
         max-width: 650px;
@@ -318,6 +318,20 @@
         animation: logModalIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         overflow: hidden;
         border: 1px solid var(--border);
+    }
+
+    .log-modal-card > form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    .log-modal-head,
+    .log-modal-foot {
+        flex-shrink: 0;
     }
 
     @keyframes logModalIn {
@@ -347,13 +361,15 @@
     .log-modal-body {
         padding: 20px 24px;
         overflow-y: auto;
-        flex: 1;
+        flex: 1 1 auto;
+        min-height: 0;
+        -webkit-overflow-scrolling: touch;
     }
 
     .log-modal-foot {
         padding: 12px 22px;
         border-top: 1px solid var(--border);
-        background: #f8fafc;
+        background: var(--bg-sub, #f8fafc);
         display: flex;
         justify-content: flex-end;
         align-items: center;
@@ -362,7 +378,7 @@
 
     /* Day Detail Card in Modal */
     .day-log-card {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 14px 16px;
@@ -402,7 +418,8 @@
         padding: 9px 12px;
         border: 1px solid var(--border);
         border-radius: 8px;
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
+        color: var(--text-body);
         outline: none;
         transition: border 0.15s;
     }
@@ -425,7 +442,8 @@
         font-size: 12px;
         font-weight: 700;
         border: 1px solid var(--border);
-        background: #f8fafc;
+        background: var(--bg-hover, #f8fafc);
+        color: var(--text-body);
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -457,13 +475,13 @@
 /* === TANJIDOR Rekap Log Harian Styles === */
 /* Styling Cetak Laporan Resmi */
     .rekap-sheet {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         padding: 36px 40px;
         box-shadow: var(--shadow-sm);
         margin-bottom: 30px;
-        color: #1e293b;
+        color: var(--text-body, #1e293b);
     }
 
     .rekap-header-kop {
@@ -520,7 +538,7 @@
         grid-template-columns: 140px 1fr 140px 1fr;
         gap: 6px 14px;
         font-size: 12.5px;
-        background: #f8fafc;
+        background: var(--bg-sub, #f8fafc);
         border: 1px solid var(--border);
         border-radius: 8px;
         padding: 12px 16px;
@@ -546,7 +564,7 @@
     }
 
     .rekap-summary-box {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: 8px;
         padding: 10px 14px;
@@ -575,9 +593,9 @@
     }
 
     .rekap-table th {
-        background: #f1f5f9;
-        color: #334155;
-        border: 1px solid #cbd5e1;
+        background: var(--bg-sub, #f1f5f9);
+        color: var(--text-body, #334155);
+        border: 1px solid var(--border);
         padding: 8px 10px;
         text-align: center;
         font-weight: 800;
@@ -586,14 +604,14 @@
     }
 
     .rekap-table td {
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--border);
         padding: 8px 10px;
         vertical-align: top;
-        color: #1e293b;
+        color: var(--text-body, #1e293b);
     }
 
     .rekap-table tr:nth-child(even) td {
-        background: #fafbfc;
+        background: var(--bg-hover, #fafbfc);
     }
 
     /* Area Tanda Tangan */
@@ -634,7 +652,7 @@
 
     /* Action bar */
     .rekap-action-bar {
-        background: #ffffff;
+        background: var(--card-bg, #ffffff);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         padding: 14px 20px;
@@ -684,3 +702,264 @@
         }
     }
 
+    /* Mobile & Tablet Responsive Improvements */
+    @media (max-width: 768px) {
+        .log-hero {
+            padding: 16px 18px;
+            border-radius: 12px;
+        }
+        .log-hero h2 {
+            font-size: 18px;
+        }
+        .rekap-action-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px;
+        }
+        .rekap-action-bar > * {
+            width: 100%;
+            justify-content: center;
+        }
+        .table-container, .rekap-table-wrap {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100%;
+        }
+        .rekap-table, .table-container table {
+            min-width: 620px;
+        }
+        .calendar-grid {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .calendar-cell {
+            min-height: 65px;
+            padding: 4px;
+        }
+    }
+
+
+
+/* ============================================================
+   DARK MODE OVERRIDES — Log Harian
+   ============================================================ */
+[data-theme="dark"] .log-header-bar,
+[data-theme="dark"] .log-kpi-card,
+[data-theme="dark"] .log-modal-card,
+[data-theme="dark"] .day-log-card,
+[data-theme="dark"] .rekap-sheet,
+[data-theme="dark"] .rekap-action-bar,
+[data-theme="dark"] .rekap-summary-box {
+    background: #0f1a2c !important;
+    border-color: #1c2e47 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .calendar-cell {
+    background: #0d1929 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .calendar-cell:hover {
+    background: #14263d !important;
+}
+
+[data-theme="dark"] .calendar-cell.other-month {
+    background: #0a1220 !important;
+    opacity: 0.4 !important;
+}
+
+[data-theme="dark"] .calendar-cell.has-logs {
+    background: #0d1929 !important;
+}
+
+[data-theme="dark"] .calendar-cell.has-logs:hover {
+    background: #0f2318 !important;
+}
+
+[data-theme="dark"] .mini-log-item {
+    background: #1a2a42 !important;
+    color: #cbd5e1 !important;
+    border-left-color: #334155 !important;
+}
+
+[data-theme="dark"] .mini-log-item.status-disetujui_katim,
+[data-theme="dark"] .mini-log-item.status-disetujui_kabal,
+[data-theme="dark"] .mini-log-item.status-disetujui_pokja {
+    background: rgba(5, 150, 105, 0.15) !important;
+    color: #6ee7b7 !important;
+    border-left-color: #059669 !important;
+}
+
+[data-theme="dark"] .mini-log-item.status-diajukan {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #93c5fd !important;
+    border-left-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .mini-log-item.status-draft {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-left-color: #475569 !important;
+}
+
+[data-theme="dark"] .mini-log-item.status-revisi_pokja,
+[data-theme="dark"] .mini-log-item.status-revisi_katim {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+    border-left-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .log-modal-foot {
+    background: #0a1423 !important;
+    border-top-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .form-control {
+    background: #0a1423 !important;
+    border-color: #2d4263 !important;
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: #64748b !important;
+}
+
+[data-theme="dark"] .bukti-tab-btn {
+    background: #1a2a42 !important;
+    border-color: #2d4263 !important;
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .rekap-table th {
+    background: #0a1423 !important;
+    color: #94a3b8 !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .rekap-table td {
+    color: #cbd5e1 !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .rekap-table tr:nth-child(even) td {
+    background: #0d1929 !important;
+}
+
+[data-theme="dark"] .identitas-grid {
+    background: #0a1423 !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .identitas-label {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .identitas-value {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .rekap-summary-box strong {
+    color: #60a5fa !important;
+}
+
+[data-theme="dark"] .rekap-summary-box span {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .cell-log-count.count-approved {
+    background: rgba(5, 150, 105, 0.2) !important;
+    color: #34d399 !important;
+}
+
+
+[data-theme="dark"] .log-period-btn {
+    background: #15243a !important;
+    border-color: #2d4263 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .log-period-btn:hover {
+    background: rgba(56, 163, 236, 0.18) !important;
+    border-color: #38a3ec !important;
+    color: #7dd3fc !important;
+}
+
+[data-theme="dark"] .log-header-bar select {
+    background: #0a1423 !important;
+    border-color: #2d4263 !important;
+    color: #f8fafc !important;
+}
+
+/* ============================================================
+   POLISH REKAP TABLE & PRINT MARGINS
+   ============================================================ */
+.rekap-sheet {
+    padding: 32px 36px;
+}
+
+.rekap-header-kop {
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+}
+
+.rekap-title-box {
+    margin-bottom: 20px;
+}
+
+.identitas-grid {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+}
+
+.rekap-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+}
+
+.rekap-table th {
+    padding: 11px 12px !important;
+    vertical-align: middle;
+}
+
+.rekap-table td {
+    padding: 12px 14px !important;
+    line-height: 1.5;
+}
+
+.rekap-cell-item.has-sep {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.rekap-ttd-row {
+    margin-top: 36px;
+    padding: 0 24px;
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .rekap-sheet {
+        padding: 18px 16px;
+    }
+
+    .identitas-grid {
+        grid-template-columns: 120px 1fr;
+        gap: 6px 10px;
+    }
+
+    .rekap-ttd-row {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        gap: 28px;
+    }
+}

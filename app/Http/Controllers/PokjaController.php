@@ -16,7 +16,7 @@ class PokjaController extends Controller
         $pokjas = Pokja::with([
             'katim',
             'anggota',
-            'pekerjaan' => fn($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
+            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
         ])
             ->withCount(['anggota', 'pekerjaan'])
             ->orderBy('id')
@@ -48,11 +48,11 @@ class PokjaController extends Controller
 
         $pokja = Pokja::create($validated);
 
-        if (!empty($validated['katim_id'])) {
+        if (! empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);
@@ -101,11 +101,11 @@ class PokjaController extends Controller
             'katim_id' => $validated['katim_id'] ?? null,
         ]);
 
-        if (!empty($validated['katim_id'])) {
+        if (! empty($validated['katim_id'])) {
             $selectedUser = User::find($validated['katim_id']);
             if ($selectedUser) {
                 $updateData = ['pokja_id' => $pokja->id];
-                if (!in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
+                if (! in_array($selectedUser->role, ['kasubag', 'kabal', 'admin'])) {
                     $updateData['role'] = 'katim_korjafung';
                 }
                 $selectedUser->update($updateData);

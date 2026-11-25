@@ -1,4 +1,4 @@
-﻿/* TANJIDOR Executive Dashboard Styles */
+/* TANJIDOR Executive Dashboard Styles */
 /* Hero Banner */
     .hero-card {
         background-color: var(--navy);
@@ -166,16 +166,18 @@
 
     /* Section Cards */
     .section-card {
-        background: #ffffff;
-        border-radius: var(--radius-lg);
+        background: var(--card-bg);
+        border-radius: 18px;
         border: 1px solid var(--border);
         box-shadow: var(--shadow-sm);
-        margin-bottom: 28px;
+        margin-bottom: 24px;
         overflow: hidden;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .section-header {
-        padding: 20px 24px;
+        padding: 18px 24px;
+        background: var(--bg-sub);
         border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
@@ -183,8 +185,8 @@
     }
 
     .section-header h3 {
-        font-size: 16px;
-        font-weight: 700;
+        font-size: 15.5px;
+        font-weight: 800;
         color: var(--text-dark);
         display: flex;
         align-items: center;
@@ -192,7 +194,7 @@
     }
 
     .section-body {
-        padding: 24px;
+        padding: 22px 24px;
     }
 
     /* Tables */
@@ -202,31 +204,38 @@
 
     table {
         width: 100%;
-        border-collapse: collapse;
-        font-size: 13.5px;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
     }
 
     th {
-        background: #f8fafc;
+        background: var(--bg-sub);
         text-align: left;
         padding: 12px 16px;
-        font-weight: 700;
-        color: #475569;
-        border-bottom: 1px solid var(--border);
+        font-weight: 800;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--border-strong);
         text-transform: uppercase;
-        font-size: 11px;
-        letter-spacing: 0.05em;
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
     }
 
     td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        color: #334155;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-body);
         vertical-align: middle;
+        transition: background 0.15s ease;
     }
 
     tr:hover td {
-        background: #f8fafc;
+        background: rgba(10, 111, 181, 0.035);
+    }
+
+    tbody tr:hover td:first-child {
+        box-shadow: inset 4px 0 0 var(--primary);
     }
 
     /* Badges Status Workflow */
@@ -1038,3 +1047,182 @@
         color: #60a5fa;
     }
 
+/* ==========================================================================
+   Comprehensive Responsive Overhaul for Mobile, Tablet, & Desktop
+   ========================================================================== */
+@media (max-width: 900px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .two-col-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-card {
+        padding: 16px 18px;
+        border-radius: 12px;
+        gap: 14px;
+    }
+    .hero-info h2 {
+        font-size: 19px;
+    }
+    .hero-info p {
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .hero-card > div:last-child {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 22px !important;
+        border-radius: 12px !important;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+    .kpi-card {
+        padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+    .kpi-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 19px;
+        border-radius: 10px;
+    }
+    .kpi-details h3 {
+        font-size: 20px;
+    }
+    .kpi-details p {
+        font-size: 11px;
+    }
+
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 14px;
+    }
+    .analytics-title {
+        font-size: 13.5px;
+    }
+    .analytics-badge-count {
+        align-self: flex-start;
+        font-size: 10.5px;
+    }
+    .analytics-body {
+        padding: 14px;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+    }
+    .analytics-legend-grid {
+        grid-template-columns: 1fr;
+        width: 100%;
+        gap: 6px;
+    }
+    .analytics-mini-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .dash-pokja-header {
+        padding: 10px 14px;
+    }
+    .dash-pokja-compact-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 12px 14px;
+    }
+    .section-header h3 {
+        font-size: 13.5px;
+    }
+    .section-body {
+        padding: 14px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+    .table-container table {
+        min-width: 580px;
+    }
+}
+
+@media (max-width: 380px) {
+    .kpi-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .analytics-mini-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ==========================================================================
+   DARK MODE OVERRIDES — Dashboard Analytics & Charts
+   ========================================================================== */
+[data-theme="dark"] .analytics-card,
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .section-card {
+    background: #0f1a2c !important;
+    border-color: #1c2e47 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .analytics-header,
+[data-theme="dark"] .section-header {
+    background: #0a1423 !important;
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .analytics-title,
+[data-theme="dark"] .donut-big-num,
+[data-theme="dark"] .legend-name,
+[data-theme="dark"] .legend-val {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .analytics-subtitle,
+[data-theme="dark"] .donut-sub-lbl,
+[data-theme="dark"] .legend-pct,
+[data-theme="dark"] .stat-lbl {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .analytics-badge-count {
+    background: rgba(56, 163, 236, 0.16) !important;
+    color: #7dd3fc !important;
+}
+
+[data-theme="dark"] .analytics-badge-avg {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+}
+
+[data-theme="dark"] .legend-box,
+[data-theme="dark"] .mini-stat-item {
+    background: #0a1423 !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .analytics-mini-stats {
+    border-top-color: #1c2e47 !important;
+}

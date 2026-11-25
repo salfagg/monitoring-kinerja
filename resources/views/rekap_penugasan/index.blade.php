@@ -31,8 +31,15 @@
     </div>
 
     <!-- ================= KPI METRICS ROW ================= -->
+    @php
+        $baseFilterParams = request()->except(['filter_tugas', 'expand', 'page']);
+        $activeFilterTugas = $filters['filter_tugas'] ?? 'all';
+        $isExpandedAll = request()->boolean('expand');
+    @endphp
     <div class="kpi-row">
-        <div class="kpi-stat-card">
+        <a href="{{ route('rekap-penugasan.index', array_merge($baseFilterParams, ['filter_tugas' => 'all'])) }}"
+           class="kpi-stat-card is-clickable {{ $activeFilterTugas === 'all' && !$isExpandedAll ? 'is-active' : '' }}"
+           title="Klik untuk menampilkan seluruh personel">
             <div class="kpi-icon-wrap" style="background: rgba(11, 74, 130, 0.1); color: var(--navy);">
                 <i class="ph-bold ph-users"></i>
             </div>
@@ -40,9 +47,11 @@
                 <div class="kpi-val">{{ $kpi['total_pegawai'] }}</div>
                 <div class="kpi-label">Total Personel Terdata</div>
             </div>
-        </div>
+        </a>
 
-        <div class="kpi-stat-card">
+        <a href="{{ route('rekap-penugasan.index', array_merge($baseFilterParams, ['filter_tugas' => 'ada_tugas'])) }}"
+           class="kpi-stat-card is-clickable {{ $activeFilterTugas === 'ada_tugas' && !$isExpandedAll ? 'is-active' : '' }}"
+           title="Klik untuk memfilter pegawai yang memiliki penugasan">
             <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
                 <i class="ph-bold ph-user-check"></i>
             </div>
@@ -50,9 +59,11 @@
                 <div class="kpi-val">{{ $kpi['total_pegawai_bertugas'] }}</div>
                 <div class="kpi-label">Pegawai Memiliki Penugasan</div>
             </div>
-        </div>
+        </a>
 
-        <div class="kpi-stat-card">
+        <a href="{{ route('rekap-penugasan.index', array_merge($baseFilterParams, ['filter_tugas' => 'ada_st'])) }}"
+           class="kpi-stat-card is-clickable {{ $activeFilterTugas === 'ada_st' ? 'is-active' : '' }}"
+           title="Klik untuk memfilter pegawai yang memiliki Surat Tugas (ST)">
             <div class="kpi-icon-wrap" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">
                 <i class="ph-bold ph-file-text"></i>
             </div>
@@ -60,9 +71,11 @@
                 <div class="kpi-val">{{ $kpi['total_st_terbit'] }}</div>
                 <div class="kpi-label">Surat Tugas (ST) Terbit</div>
             </div>
-        </div>
+        </a>
 
-        <div class="kpi-stat-card">
+        <a href="{{ route('rekap-penugasan.index', array_merge($baseFilterParams, ['filter_tugas' => 'ada_tugas', 'expand' => 1])) }}"
+           class="kpi-stat-card is-clickable {{ $activeFilterTugas === 'ada_tugas' && $isExpandedAll ? 'is-active' : '' }}"
+           title="Klik untuk menampilkan dan membuka seluruh rincian penugasan">
             <div class="kpi-icon-wrap" style="background: rgba(124, 58, 237, 0.12); color: #7c3aed;">
                 <i class="ph-bold ph-briefcase"></i>
             </div>
@@ -70,9 +83,11 @@
                 <div class="kpi-val">{{ $kpi['total_penugasan_balai'] }}</div>
                 <div class="kpi-label">Total Penugasan Balai</div>
             </div>
-        </div>
+        </a>
 
-        <div class="kpi-stat-card">
+        <a href="{{ route('rekap-penugasan.index', array_merge($baseFilterParams, ['filter_tugas' => 'tanpa_tugas'])) }}"
+           class="kpi-stat-card is-clickable {{ $activeFilterTugas === 'tanpa_tugas' ? 'is-active' : '' }}"
+           title="Klik untuk memfilter personel yang belum memiliki penugasan">
             <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
                 <i class="ph-bold ph-gauge"></i>
             </div>
@@ -80,7 +95,7 @@
                 <div class="kpi-val">{{ $kpi['rata_beban'] }}</div>
                 <div class="kpi-label">Rata-rata Tugas / Orang</div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- ================= FILTER TOOLBAR ================= -->
@@ -136,6 +151,7 @@
                     <select name="filter_tugas" id="filter_tugas" class="filter-select">
                         <option value="all" {{ $filters['filter_tugas'] === 'all' ? 'selected' : '' }}>Semua Personel</option>
                         <option value="ada_tugas" {{ $filters['filter_tugas'] === 'ada_tugas' ? 'selected' : '' }}>Hanya yang Memiliki Tugas</option>
+                        <option value="ada_st" {{ $filters['filter_tugas'] === 'ada_st' ? 'selected' : '' }}>Hanya yang Memiliki Surat Tugas (ST)</option>
                         <option value="tanpa_tugas" {{ $filters['filter_tugas'] === 'tanpa_tugas' ? 'selected' : '' }}>Belum Ada Penugasan</option>
                     </select>
                 </div>
@@ -460,5 +476,11 @@
         document.getElementById('btnExpandAll').style.display = 'inline-flex';
         document.getElementById('btnCollapseAll').style.display = 'none';
     }
+
+    @if(request()->boolean('expand'))
+    document.addEventListener('DOMContentLoaded', function() {
+        expandAllDetails();
+    });
+    @endif
 </script>
 @endsection

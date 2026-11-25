@@ -1,5 +1,5 @@
 <!-- Sidebar Navigation Component -->
-<aside class="sidebar">
+<aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand">
         <div class="brand-icon">
             <i class="ph-bold ph-chart-line-up"></i>
@@ -8,6 +8,10 @@
             <h2>TANJIDOR</h2>
             <p>BGTK DKI Jakarta</p>
         </div>
+        <!-- Close Button for Mobile Drawer -->
+        <button type="button" class="sidebar-close-btn" onclick="closeMobileSidebar()" aria-label="Tutup Menu Navigasi" title="Tutup Menu">
+            <i class="ph-bold ph-x"></i>
+        </button>
     </div>
 
     <nav class="sidebar-menu">
@@ -23,9 +27,7 @@
             title="Monitoring Seluruh Pekerjaan BGTK (Big Screen / TV Mode)">
             <i class="ph-duotone ph-television"></i>
             <span>Monitoring Balai</span>
-            <span style="margin-left: auto; background: rgba(34, 184, 232, 0.18); border: 1px solid rgba(34, 184, 232, 0.35); color: #0284c7; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; letter-spacing: 0.05em;">
-                TV MODE
-            </span>
+            <span class="nav-tv-badge">TV MODE</span>
         </a>
 
         @if(Auth::user()->canManagePekerjaan())
@@ -42,12 +44,14 @@
             <span>Tugas & Pekerjaan Saya</span>
         </a>
 
+        @if(Auth::user()->canManagePekerjaan())
         <a href="{{ route('rekap-penugasan.index') }}"
             class="nav-item {{ request()->routeIs('rekap-penugasan.*') ? 'active' : '' }}"
             title="Rekap Beban Penugasan & Surat Tugas Seluruh Pegawai (Tarik Excel)">
             <i class="ph-duotone ph-table"></i>
             <span>Rekap Penugasan & ST</span>
         </a>
+        @endif
 
         <a href="{{ route('log-harian.index') }}"
             class="nav-item {{ request()->routeIs('log-harian.*') ? 'active' : '' }}">

@@ -137,9 +137,6 @@ class LogHarianService
             fputcsv($file, [
                 'No',
                 'Tanggal',
-                'Jam Mulai',
-                'Jam Selesai',
-                'Durasi',
                 'Uraian Kegiatan',
                 'Output / Hasil',
                 'Volume',
@@ -152,34 +149,51 @@ class LogHarianService
             ]);
 
             $no = 1;
-            foreach ($logs as $log) {
-                $durasi = '-';
-                if ($log->jam_mulai && $log->jam_selesai) {
-                    $start = Carbon::parse($log->jam_mulai);
-                    $end = Carbon::parse($log->jam_selesai);
-                    $durasi = $start->diffInMinutes($end).' Menit';
-                }
+            $groupedLogs = $logs->groupBy(fn ($item) => Carbon::parse($item->tanggal_kegiatan)->format('Y-m-d'));
 
-                $buktiText = '-';
-                if ($log->buktiDukung->isNotEmpty()) {
-                    $buktiText = $log->buktiDukung->pluck('nama_dokumen')->implode('; ');
+            foreach ($groupedLogs as $dateKey => $dayLogs) {
+                $isMulti = $dayLogs->count() > 1;
+                $prefix = fn (int $idx): string => $isMulti ? ($idx + 1).'. ' : '';
+
+                $uraianList = [];
+                $outputList = [];
+                $volumeList = [];
+                $satuanList = [];
+                $pekerjaanList = [];
+                $skpList = [];
+                $statusList = [];
+                $buktiList = [];
+                $catatanList = [];
+
+                foreach ($dayLogs->values() as $idx => $log) {
+                    $p = $prefix($idx);
+                    $buktiText = $log->buktiDukung->isNotEmpty()
+                        ? $log->buktiDukung->pluck('nama_dokumen')->implode('; ')
+                        : '-';
+
+                    $uraianList[] = $p.$log->uraian_kegiatan;
+                    $outputList[] = $p.$log->output_kegiatan;
+                    $volumeList[] = $p.$log->volume_capaian;
+                    $satuanList[] = $p.$log->satuan;
+                    $pekerjaanList[] = $p.($log->pekerjaan?->judul ?? '-');
+                    $skpList[] = $p.($log->skpTahunan?->rencana_hasil_kerja ?? '-');
+                    $statusList[] = $p.$log->status_label;
+                    $buktiList[] = $p.$buktiText;
+                    $catatanList[] = $p.($log->catatan_katim ?? ($log->catatan_pokja ?? '-'));
                 }
 
                 fputcsv($file, [
                     $no++,
-                    Carbon::parse($log->tanggal_kegiatan)->format('d/m/Y'),
-                    $log->jam_mulai ? Carbon::parse($log->jam_mulai)->format('H:i') : '-',
-                    $log->jam_selesai ? Carbon::parse($log->jam_selesai)->format('H:i') : '-',
-                    $durasi,
-                    $log->uraian_kegiatan,
-                    $log->output_kegiatan,
-                    $log->volume_capaian,
-                    $log->satuan,
-                    $log->pekerjaan?->judul ?? '-',
-                    $log->skpTahunan?->rencana_hasil_kerja ?? '-',
-                    $log->status_label,
-                    $buktiText,
-                    $log->catatan_katim ?? ($log->catatan_pokja ?? '-'),
+                    Carbon::parse($dateKey)->format('d/m/Y'),
+                    implode("\n", $uraianList),
+                    implode("\n", $outputList),
+                    implode("\n", $volumeList),
+                    implode("\n", $satuanList),
+                    implode("\n", $pekerjaanList),
+                    implode("\n", $skpList),
+                    implode("\n", $statusList),
+                    implode("\n", $buktiList),
+                    implode("\n", $catatanList),
                 ]);
             }
 

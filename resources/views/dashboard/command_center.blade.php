@@ -13,14 +13,14 @@
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
     <script>
         // Terapkan tema sebelum render agar tidak berkedip
         try {
-            const t = localStorage.getItem('bgtkTheme');
+            const t = localStorage.getItem('tanjidor_theme') || localStorage.getItem('bgtkTheme');
             if (t) document.documentElement.setAttribute('data-theme', t);
         } catch (e) { }
 
@@ -36,33 +36,51 @@
                     confirmButtonColor: '#0b4a82',
                     background: isDark ? '#0f172a' : '#ffffff',
                     color: isDark ? '#f8fafc' : '#0f172a',
-                    customClass: {
-                        popup: 'cmd-swal-modal',
-                    }
+                    customClass: { popup: 'cmd-swal-modal' }
                 });
             }
             alert(title + (text ? ': ' + text : ''));
         };
     </script>
 
+    <link rel="stylesheet" href="{{ asset('css/tanjidor-theme.css') }}">
     <link rel="stylesheet" href="{{ asset('css/command-center.css') }}">
 </head>
 
-<body>
+<body class="cmd-page">
 
-    <!-- ================= HEADER ================= -->
+    <!-- Top Navigation Progress Bar -->
+    <div id="tanjidorTopProgress" aria-hidden="true"></div>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+    <!-- Sidebar Menu Utama -->
+    @include('layouts.partials.sidebar')
+
+    <div class="cmd-main-wrapper">
+
+    @php
+        $pct = fn($v) => $totalPekerjaan > 0 ? round(($v / $totalPekerjaan) * 100) : 0;
+        $ringOffset = round(326.73 * (1 - min(100, max(0, $tingkatKetuntasan)) / 100), 2);
+        $medal = fn($i) => $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : '#' . ($i + 1)));
+    @endphp
+
     <!-- ================= HEADER COMMAND CENTER ================= -->
     <header class="top-command-bar">
         <div class="brand-section">
+            <button type="button" class="btn-control btn-icon cmd-mobile-menu-btn" onclick="toggleMobileSidebar()"
+                aria-label="Buka Menu Navigasi" title="Menu Navigasi">
+                <i class="ph-bold ph-list"></i>
+            </button>
             <div class="brand-badge"><i class="ph-bold ph-shield-check"></i></div>
             <div>
                 <div class="brand-title">
                     BGTK PROVINSI DKI JAKARTA
-                    <span class="live-tag"
-                        style="background: rgba(34, 184, 232, 0.2); color: #22b8e8; border: 1px solid rgba(34, 184, 232, 0.35); font-weight: 800; margin-right: 4px;">TANJIDOR</span>
+                    <span class="live-tag tag-brand">TANJIDOR</span>
                     <span class="live-tag">LIVE</span>
                 </div>
-                <div class="brand-sub">TANJIDOR â€¢ Tata Kelola Kinerja Digital dan Monitoring</div>
+                <div class="brand-sub">TANJIDOR &bull; Tata Kelola Kinerja Digital dan Monitoring</div>
             </div>
         </div>
 
@@ -109,80 +127,126 @@
 
     <main class="command-container">
 
-        <!-- ================= KPI ================= -->
-        <!-- ================= GIANT KPI METRICS STRIP ================= -->
-        <div class="giant-kpi-grid">
-            <div class="kpi-box kpi-blue">
-                <span class="kpi-title">Total Tugas</span>
-                <div class="kpi-icon-wrap"><i class="ph-duotone ph-tree-structure"></i></div>
-                <div class="kpi-number" data-count="{{ $totalPekerjaan }}">{{ number_format($totalPekerjaan) }}</div>
-                <div class="kpi-subtext"><i class="ph-bold ph-check-circle"></i> Seluruh penugasan balai</div>
-            </div>
+        <!-- ================= HERO + KPI ================= -->
+        <div class="overview-grid">
 
-            <div class="kpi-box kpi-cyan">
-                <span class="kpi-title">Sedang Dikerjakan</span>
-                <div class="kpi-icon-wrap"><i class="ph-duotone ph-rocket-launch"></i></div>
-                <div class="kpi-number" data-count="{{ $pekerjaanBerjalan }}">{{ number_format($pekerjaanBerjalan) }}
+            <section class="hero-card">
+                <div class="hero-glow"></div>
+                <div class="hero-ring">
+                    <svg viewBox="0 0 120 120" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#22d3ee" />
+                                <stop offset="100%" stop-color="#34d399" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="60" cy="60" r="52" />
+                        <circle class="ring-fg" cx="60" cy="60" r="52" style="--off: {{ $ringOffset }}" />
+                    </svg>
+                    <div class="ring-center">
+                        <span class="ring-num"><span class="count-up" data-count="{{ $tingkatKetuntasan }}"
+                                data-decimals="0">{{ round($tingkatKetuntasan) }}</span><small>%</small></span>
+                        <span class="ring-lbl">Tuntas</span>
+                    </div>
                 </div>
-                <div class="kpi-subtext"><i class="ph-bold ph-spinner"></i> Berjalan aktif</div>
-            </div>
+                <div class="hero-text">
+                    <span class="hero-eyebrow"><i class="ph-bold ph-sparkle"></i> Ringkasan Kinerja Balai</span>
+                    <h2>{{ $selesaiTerverifikasi }} dari {{ $totalPekerjaan }} tugas telah tuntas</h2>
+                    <p>
+                        @if($lewatTenggat > 0)
+                            Ada <b>{{ $lewatTenggat }} tugas</b> melewati tenggat. Prioritaskan tindak lanjut bersama Katim
+                            terkait.
+                        @else
+                            Seluruh tugas berjalan tepat waktu. Pertahankan ritme pelaporan tim.
+                        @endif
+                    </p>
+                    <div class="hero-chips">
+                        <span class="chip chip-ok" title="Persentase tugas yang tidak melewati tenggat"><i
+                                class="ph-bold ph-timer"></i> Tepat waktu {{ $onTimeRate }}%</span>
+                        <span class="chip"><i class="ph-bold ph-paper-plane-tilt"></i> {{ $totalLaporanBalai }}
+                            laporan</span>
+                        <span class="chip"><i class="ph-bold ph-file-text"></i> {{ $totalKegiatanSt }} kegiatan
+                            ST</span>
+                    </div>
+                </div>
+            </section>
 
-            <div class="kpi-box kpi-purple">
-                <span class="kpi-title">Menunggu Verifikasi</span>
-                <div class="kpi-icon-wrap"><i class="ph-duotone ph-seal-check"></i></div>
-                <div class="kpi-number" data-count="{{ $menungguVerifikasi }}">{{ number_format($menungguVerifikasi) }}
+            <div class="giant-kpi-grid">
+                <div class="kpi-box kpi-blue">
+                    <span class="kpi-title">Total Tugas</span>
+                    <div class="kpi-icon-wrap"><i class="ph-duotone ph-tree-structure"></i></div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $totalPekerjaan }}">{{ number_format($totalPekerjaan) }}</span></div>
+                    <div class="kpi-subtext"><i class="ph-bold ph-stack"></i> Seluruh penugasan balai</div>
+                    <div class="kpi-bar"><i style="width: 100%"></i></div>
                 </div>
-                <div class="kpi-subtext"><i class="ph-bold ph-clock"></i> Menunggu tinjauan Katim</div>
-            </div>
 
-            <div class="kpi-box kpi-green">
-                <span class="kpi-title">Selesai</span>
-                <div class="kpi-icon-wrap"><i class="ph-duotone ph-check-fat"></i></div>
-                <div class="kpi-number" data-count="{{ $selesaiTerverifikasi }}">
-                    {{ number_format($selesaiTerverifikasi) }}
+                <div class="kpi-box kpi-cyan">
+                    <span class="kpi-title">Sedang Dikerjakan</span>
+                    <div class="kpi-icon-wrap"><i class="ph-duotone ph-rocket-launch"></i></div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $pekerjaanBerjalan }}">{{ number_format($pekerjaanBerjalan) }}</span></div>
+                    <div class="kpi-subtext"><i class="ph-bold ph-spinner"></i> {{ $pct($pekerjaanBerjalan) }}% dari
+                        total</div>
+                    <div class="kpi-bar"><i style="width: {{ $pct($pekerjaanBerjalan) }}%"></i></div>
                 </div>
-                <div class="kpi-subtext"><i class="ph-bold ph-check"></i> Hasil terverifikasi</div>
-            </div>
 
-            <div class="kpi-box kpi-amber">
-                <span class="kpi-title">Ketuntasan Tugas</span>
-                <div class="kpi-icon-wrap"><i class="ph-duotone ph-seal-check"></i></div>
-                <div class="kpi-number" data-count="{{ $selesaiTerverifikasi }}">
-                    {{ $selesaiTerverifikasi }} <span
-                        style="font-size: 15px; color: var(--text-muted); font-weight: 600;">/
-                        {{ $totalPekerjaan }}</span>
+                <div class="kpi-box kpi-purple">
+                    <span class="kpi-title">Menunggu Verifikasi</span>
+                    <div class="kpi-icon-wrap"><i class="ph-duotone ph-seal-check"></i></div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $menungguVerifikasi }}">{{ number_format($menungguVerifikasi) }}</span></div>
+                    <div class="kpi-subtext"><i class="ph-bold ph-clock"></i> Menunggu tinjauan Katim</div>
+                    <div class="kpi-bar"><i style="width: {{ $pct($menungguVerifikasi) }}%"></i></div>
                 </div>
-                <div class="kpi-subtext">
-                    <i class="ph-bold ph-check-fat"></i> Tugas selesai terverifikasi
-                </div>
-            </div>
 
-            <div class="kpi-box {{ $lewatTenggat > 0 ? 'kpi-red is-alert' : 'kpi-green' }}">
-                <span class="kpi-title">Terlambat</span>
-                <div class="kpi-icon-wrap">
-                    <i class="ph-duotone {{ $lewatTenggat > 0 ? 'ph-warning-octagon' : 'ph-check-circle' }}"></i>
+                <div class="kpi-box kpi-green">
+                    <span class="kpi-title">Selesai</span>
+                    <div class="kpi-icon-wrap"><i class="ph-duotone ph-check-fat"></i></div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $selesaiTerverifikasi }}">{{ number_format($selesaiTerverifikasi) }}</span>
+                    </div>
+                    <div class="kpi-subtext"><i class="ph-bold ph-check"></i> Hasil terverifikasi</div>
+                    <div class="kpi-bar"><i style="width: {{ $pct($selesaiTerverifikasi) }}%"></i></div>
                 </div>
-                <div class="kpi-number" data-count="{{ $lewatTenggat }}">{{ number_format($lewatTenggat) }}</div>
-                <div class="kpi-subtext">
-                    @if($lewatTenggat > 0)
-                        <i class="ph-bold ph-warning"></i> Perlu perhatian khusus
-                    @else
-                        <i class="ph-bold ph-check"></i> 100% tepat waktu
-                    @endif
+
+                <div class="kpi-box kpi-amber">
+                    <span class="kpi-title">Laporan Masuk</span>
+                    <div class="kpi-icon-wrap"><i class="ph-duotone ph-paper-plane-tilt"></i></div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $totalLaporanBalai }}">{{ number_format($totalLaporanBalai) }}</span></div>
+                    <div class="kpi-subtext"><i class="ph-bold ph-newspaper-clipping"></i> Progres dihimpun balai</div>
+                    <div class="kpi-bar"><i style="width: 100%"></i></div>
+                </div>
+
+                <div class="kpi-box {{ $lewatTenggat > 0 ? 'kpi-red is-alert' : 'kpi-green' }}">
+                    <span class="kpi-title">Terlambat</span>
+                    <div class="kpi-icon-wrap">
+                        <i class="ph-duotone {{ $lewatTenggat > 0 ? 'ph-warning-octagon' : 'ph-check-circle' }}"></i>
+                    </div>
+                    <div class="kpi-number"><span class="count-up"
+                            data-count="{{ $lewatTenggat }}">{{ number_format($lewatTenggat) }}</span></div>
+                    <div class="kpi-subtext">
+                        @if($lewatTenggat > 0)
+                            <i class="ph-bold ph-warning"></i> Perlu perhatian khusus
+                        @else
+                            <i class="ph-bold ph-check"></i> 100% tepat waktu
+                        @endif
+                    </div>
+                    <div class="kpi-bar"><i style="width: {{ $pct($lewatTenggat) }}%"></i></div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= DIAGRAM ================= -->
-        <!-- ================= DIAGRAM ANALITIK REAL-TIME ================= -->
+        <!-- ================= DIAGRAM ANALITIK ================= -->
         <div class="diagram-section-wrapper" id="diagramSectionWrapper">
             <div class="diagram-header-bar">
                 <div class="diagram-title">
                     <span class="title-ico"><i class="ph-bold ph-chart-donut"></i></span>
                     <span>Diagram Analitik Kinerja Real-Time Balai</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="diagram-hint">Klik status atau bar untuk menyaring tabel</span>
+                <div class="diagram-actions">
+                    <span class="diagram-hint">Klik status, bar, atau nama untuk menyaring &amp; membuka detail</span>
                     <button type="button" class="diagram-btn-toggle" onclick="toggleDiagramBar()">
                         <i class="ph-bold ph-caret-up" id="diagramToggleIcon"></i> <span
                             id="diagramBtnText">Tutup</span>
@@ -191,84 +255,87 @@
             </div>
 
             <div class="diagram-content-grid" id="diagramGridContainer">
-                <!-- Donut Chart Status -->
-                <div class="diagram-donut-box">
-                    <div class="donut-canvas-wrap">
-                        <canvas id="cmdDonutStatus"></canvas>
-                        <div class="donut-center-text">
-                            <span class="donut-num">{{ $totalPekerjaan }}</span>
-                            <span class="donut-lbl">Total Tugas</span>
+
+                <!-- Donut Status -->
+                <div class="tile diagram-donut-box">
+                    <div class="tile-head"><span><i class="ph-bold ph-chart-donut"></i> Komposisi Status</span></div>
+                    <div class="donut-body">
+                        <div class="donut-canvas-wrap">
+                            <canvas id="cmdDonutStatus"></canvas>
+                            <div class="donut-center-text">
+                                <span class="donut-num" id="donutNum">{{ $totalPekerjaan }}</span>
+                                <span class="donut-lbl">Total Tugas</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="donut-legend-mini">
-                        <div class="legend-pill" onclick="filterTableByStatusClick('selesai')"
-                            title="Filter tugas selesai">
-                            <span class="legend-left"><span class="dot-status"
-                                    style="background:#3d9970"></span>Selesai</span>
-                            <strong style="color:var(--text-main)">{{ $statusCounts['selesai'] ?? 0 }}</strong>
-                        </div>
-                        <div class="legend-pill" onclick="filterTableByStatusClick('berjalan')"
-                            title="Filter tugas dikerjakan">
-                            <span class="legend-left"><span class="dot-status"
-                                    style="background:#0b4a82"></span>Dikerjakan</span>
-                            <strong style="color:var(--text-main)">{{ $statusCounts['dikerjakan'] ?? 0 }}</strong>
-                        </div>
-                        <div class="legend-pill" onclick="filterTableByStatusClick('menunggu_verifikasi')"
-                            title="Filter menunggu verifikasi">
-                            <span class="legend-left"><span class="dot-status"
-                                    style="background:#7f9cc0"></span>Verifikasi</span>
-                            <strong
-                                style="color:var(--text-main)">{{ $statusCounts['menunggu_verifikasi'] ?? 0 }}</strong>
-                        </div>
-                        <div class="legend-pill static">
-                            <span class="legend-left"><span class="dot-status" style="background:#d3dce7"></span>Belum
-                                Dimulai</span>
-                            <strong style="color:var(--text-main)">{{ $statusCounts['belum_dimulai'] ?? 0 }}</strong>
-                        </div>
-                        <div class="legend-pill" onclick="filterTableByStatusClick('terlambat')"
-                            title="Filter tugas terlambat">
-                            <span class="legend-left"><span class="dot-status"
-                                    style="background:#c23b3b"></span>Terlambat</span>
-                            <strong style="color:#c23b3b">{{ $lewatTenggat }}</strong>
+                        <div class="donut-legend-mini" id="donutLegend">
+                            <div class="legend-pill" onclick="filterTableByStatusClick('selesai')"
+                                title="Filter tugas selesai">
+                                <span class="legend-left"><span class="dot-status dot-selesai"></span>Selesai</span>
+                                <strong>{{ $statusCounts['selesai'] ?? 0 }}</strong>
+                            </div>
+                            <div class="legend-pill" onclick="filterTableByStatusClick('berjalan')"
+                                title="Filter tugas dikerjakan">
+                                <span class="legend-left"><span
+                                        class="dot-status dot-dikerjakan"></span>Dikerjakan</span>
+                                <strong>{{ $statusCounts['dikerjakan'] ?? 0 }}</strong>
+                            </div>
+                            <div class="legend-pill" onclick="filterTableByStatusClick('menunggu_verifikasi')"
+                                title="Filter menunggu verifikasi">
+                                <span class="legend-left"><span
+                                        class="dot-status dot-verifikasi"></span>Verifikasi</span>
+                                <strong>{{ $statusCounts['menunggu_verifikasi'] ?? 0 }}</strong>
+                            </div>
+                            <div class="legend-pill static">
+                                <span class="legend-left"><span class="dot-status dot-belum"></span>Belum Dimulai</span>
+                                <strong>{{ $statusCounts['belum_dimulai'] ?? 0 }}</strong>
+                            </div>
+                            <div class="legend-pill pill-late" onclick="filterTableByStatusClick('terlambat')"
+                                title="Filter tugas terlambat">
+                                <span class="legend-left"><span class="dot-status dot-late"></span>Terlambat</span>
+                                <strong>{{ $lewatTenggat }}</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bar Chart Pokja & Ranking Keaktifan Personil -->
-                <div class="diagram-bar-box">
-                    <div class="bar-title-sub" style="flex-wrap: wrap; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span id="chartModeTitle"><i class="ph-bold ph-chart-bar"></i> Distribusi Ketuntasan per Tim
+                <!-- Tren Laporan -->
+                <div class="tile diagram-trend-box">
+                    <div class="tile-head">
+                        <span><i class="ph-bold ph-trend-up"></i> Tren Laporan Masuk</span>
+                        <span class="tile-sub" id="trendSummary">14 hari terakhir</span>
+                    </div>
+                    <div class="chart-canvas-wrap"><canvas id="cmdTrend"></canvas></div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="tile diagram-bar-box">
+                    <div class="tile-head">
+                        <div class="tile-title-stack">
+                            <span id="chartModeTitle"><i class="ph-bold ph-chart-bar"></i> Ketuntasan per Tim
                                 Kerja</span>
-                            <span id="chartModeSub"
-                                style="color: var(--primary); font-weight: 800; font-size: 11px;">(Balai:
+                            <span id="chartModeSub" class="tile-sub accent">(Balai:
                                 {{ $selesaiTerverifikasi }}/{{ $totalPekerjaan }} Tuntas)</span>
                         </div>
-                        <div class="cmd-chart-tabs"
-                            style="display: inline-flex; background: var(--bg-sub); border: 1px solid var(--border); border-radius: 8px; padding: 2px; gap: 2px;">
+                        <div class="cmd-chart-tabs">
                             <button type="button" class="btn-cmd-chart-tab active" id="btnChartModePokja"
-                                onclick="switchChartMode('pokja')" title="Lihat Ketuntasan per Tim Kerja">
-                                <i class="ph-bold ph-buildings"></i> Tim Kerja
+                                onclick="switchChartMode('pokja')" title="Ketuntasan per Tim Kerja">
+                                <i class="ph-bold ph-buildings"></i> Tim
                             </button>
                             <button type="button" class="btn-cmd-chart-tab" id="btnChartModeSt"
-                                onclick="switchChartMode('st')"
-                                title="Lihat Pegawai Paling Sering Ikut Kegiatan Surat Tugas (ST)">
-                                <i class="ph-bold ph-file-text"></i> Kegiatan
+                                onclick="switchChartMode('st')" title="Pegawai paling sering ikut Surat Tugas (ST)">
+                                <i class="ph-bold ph-file-text"></i> ST
                             </button>
                             <button type="button" class="btn-cmd-chart-tab" id="btnChartModeLaporan"
-                                onclick="switchChartMode('laporan')"
-                                title="Lihat Pegawai Paling Aktif Melaporkan Progres">
-                                <i class="ph-bold ph-paper-plane-tilt"></i> Aktifitas
+                                onclick="switchChartMode('laporan')" title="Pegawai paling aktif melapor">
+                                <i class="ph-bold ph-paper-plane-tilt"></i> Lapor
                             </button>
                         </div>
                     </div>
-                    <div style="flex: 1; position: relative; min-height: 0;">
-                        <canvas id="cmdBarPokja"></canvas>
-                    </div>
+                    <div class="chart-canvas-wrap"><canvas id="cmdBarPokja"></canvas></div>
                 </div>
 
-                <!-- Leaderboard & Peringkat Keaktifan Personil -->
-                <div class="diagram-leaderboard-box">
+                <!-- Leaderboard -->
+                <div class="tile diagram-leaderboard-box">
                     <div class="leaderboard-tabs-header">
                         <button type="button" class="btn-lead-tab active" id="tabLeadSt"
                             onclick="switchLeaderboardTab('st')">
@@ -280,14 +347,11 @@
                         </button>
                     </div>
 
-                    <!-- Panel 1: Top Ikut ST (Kegiatan Balai) -->
                     <div class="lead-list-panel" id="panelLeadSt">
                         @forelse($topStPersonnel as $idx => $st)
                             <div class="lead-item" onclick="openPersonModalByUserId({{ $st->id }})"
                                 title="Klik untuk melihat detail penugasan {{ $st->name }}">
-                                <div class="lead-rank">
-                                    {{ $idx === 0 ? '🥇' : ($idx === 1 ? '🥈' : ($idx === 2 ? '🥉' : '#' . ($idx + 1))) }}
-                                </div>
+                                <div class="lead-rank">{{ $medal($idx) }}</div>
                                 <div class="lead-info">
                                     <div class="lead-name" title="{{ $st->name }}">{{ $st->name }}</div>
                                     <div class="lead-sub">{{ $st->pokja_kode }} • {{ $st->total_semua_tugas }} Total Tugas
@@ -303,14 +367,11 @@
                         @endforelse
                     </div>
 
-                    <!-- Panel 2: Top Laporan (Paling Aktif Kerja) -->
                     <div class="lead-list-panel" id="panelLeadReport" style="display: none;">
                         @forelse($topReportPersonnel as $idx => $rp)
                             <div class="lead-item" onclick="openPersonModalByUserId({{ $rp->id }})"
                                 title="Klik untuk melihat riwayat laporan {{ $rp->name }}">
-                                <div class="lead-rank">
-                                    {{ $idx === 0 ? '🥇' : ($idx === 1 ? '🥈' : ($idx === 2 ? '🥉' : '#' . ($idx + 1))) }}
-                                </div>
+                                <div class="lead-rank">{{ $medal($idx) }}</div>
                                 <div class="lead-info">
                                     <div class="lead-name" title="{{ $rp->name }}">{{ $rp->name }}</div>
                                     <div class="lead-sub">{{ $rp->pokja_kode }} • {{ $rp->total_semua_tugas }} Total Tugas
@@ -327,12 +388,12 @@
 
                     <div class="lead-footer-stats">
                         <span title="Total pekerjaan yang memiliki nomor Surat Tugas resmi"><i
-                                class="ph-bold ph-file-text"></i> <strong>{{ $totalKegiatanSt }}</strong> Kegiatan
-                            ST</span>
+                                class="ph-bold ph-file-text"></i>
+                            <strong>{{ $totalKegiatanSt }}</strong> Kegiatan ST</span>
                         <span>•</span>
                         <span title="Total laporan progres yang telah dihimpun balai"><i
-                                class="ph-bold ph-paper-plane-tilt"></i> <strong>{{ $totalLaporanBalai }}</strong>
-                            Laporan</span>
+                                class="ph-bold ph-paper-plane-tilt"></i>
+                            <strong>{{ $totalLaporanBalai }}</strong> Laporan</span>
                     </div>
                 </div>
             </div>
@@ -343,52 +404,76 @@
 
             <!-- Kolom kiri -->
             <div class="left-col">
-
                 <div class="panel-card side-card">
 
-                    <!-- Saklar Tim Kerja / Personil -->
                     <div class="side-switch" role="tablist">
-                        <button type="button" class="side-tab active" id="sideTabPokja" data-pane="pokja"
+                        <button type="button" class="side-tab active" id="sideTabPokja"
                             onclick="switchSidePane('pokja')">
-                            <i class="ph-bold ph-buildings"></i> Tim Kerja
+                            <i class="ph-bold ph-buildings"></i> Tim
                             <span class="side-count">{{ $pokjas->count() }}</span>
                         </button>
-                        <button type="button" class="side-tab" id="sideTabStaf" data-pane="staf"
-                            onclick="switchSidePane('staf')">
+                        <button type="button" class="side-tab" id="sideTabStaf" onclick="switchSidePane('staf')">
                             <i class="ph-bold ph-users-three"></i> Personil
                             <span class="side-count">{{ $topAssignees->count() }}</span>
+                        </button>
+                        <button type="button" class="side-tab" id="sideTabRadar" onclick="switchSidePane('radar')">
+                            <i class="ph-bold ph-radar"></i> Radar
+                            <span
+                                class="side-count {{ count($upcomingDeadlines) > 0 ? 'count-warn' : '' }}">{{ count($upcomingDeadlines) }}</span>
                         </button>
                     </div>
 
                     <!-- Panel: Capaian Tim Kerja -->
                     <div class="side-pane" id="panePokja">
-                        <div class="scroll-area" id="pokjaScrollContainer">
-                            <div class="pokja-list">
+                        <div class="scroll-area pokja-cards-container" id="pokjaScrollContainer">
+                            <div class="pokja-card-grid">
                                 <a href="{{ route('monitoring.balai') }}"
-                                    class="pokja-item pokja-item-all {{ !request('pokja_id') ? 'active' : '' }}">
-                                    <span class="lbl"><i class="ph-bold ph-squares-four"></i> Semua Unit &amp;
-                                        Tim</span>
-                                    <span class="cnt">{{ $totalPekerjaan }} tugas</span>
+                                    class="pokja-card-item pokja-item-all pokja-item {{ !request('pokja_id') ? 'active' : '' }}">
+                                    <div class="pcard-all-left">
+                                        <div class="pcard-all-icon"><i class="ph-bold ph-squares-four"></i></div>
+                                        <div>
+                                            <div class="pcard-all-title">Semua Unit Kerja &amp; Tim</div>
+                                            <div class="pcard-all-sub">Monitoring terpadu seluruh balai</div>
+                                        </div>
+                                    </div>
+                                    <span class="pcard-all-badge">{{ $totalPekerjaan }} tugas</span>
                                 </a>
 
                                 @foreach($pokjas as $p)
+                                    @php 
+                                        $pPct = $p->total_tugas > 0 ? round(($p->tugas_selesai / $p->total_tugas) * 100, 1) : 0; 
+                                        $isFullDone = ($p->total_tugas > 0 && $p->tugas_selesai == $p->total_tugas);
+                                    @endphp
                                     <a href="{{ route('monitoring.balai', array_merge(request()->except(['pokja_id']), ['pokja_id' => $p->id])) }}"
-                                        class="pokja-item {{ $p->total_tugas == 0 ? 'is-empty' : '' }} {{ request('pokja_id') == $p->id ? 'active' : '' }}"
+                                        class="pokja-card-item pokja-item {{ $p->total_tugas == 0 ? 'is-empty' : '' }} {{ request('pokja_id') == $p->id ? 'active' : '' }}"
                                         title="{{ $p->nama_pokja }} (Katim: {{ $p->katim_name }})">
-                                        <div class="pokja-top">
-                                            <span class="pokja-name-clean">{{ $p->nama_pokja }}</span>
-                                            <span
-                                                class="pokja-percent">{{ $p->total_tugas > 0 ? $p->tugas_selesai . '/' . $p->total_tugas . ' tuntas' : '-' }}</span>
-                                        </div>
-                                        <div class="pokja-meta">
-                                            <span class="pokja-code-tag">{{ $p->kode_pokja }}</span>
-                                            <span class="pokja-done-badge">
-                                                {{ $p->total_tugas > 0 ? round(($p->tugas_selesai / $p->total_tugas) * 100, 0) . '% Selesai' : 'Belum ada tugas' }}
+                                        
+                                        <div class="pcard-header">
+                                            <div class="pcard-title-wrap">
+                                                <span class="pcard-badge-code">{{ $p->kode_pokja }}</span>
+                                                <span class="pcard-name-clean">{{ $p->nama_pokja }}</span>
+                                            </div>
+                                            <span class="pcard-ratio-badge {{ $p->total_tugas > 0 ? 'ratio-has-tasks' : 'ratio-empty' }}">
+                                                {{ $p->total_tugas > 0 ? $p->tugas_selesai . '/' . $p->total_tugas : '0 tugas' }}
                                             </span>
                                         </div>
-                                        <div class="pokja-track">
-                                            <div class="pokja-fill"
-                                                style="width: {{ $p->total_tugas > 0 ? round(($p->tugas_selesai / $p->total_tugas) * 100, 1) : 0 }}%;">
+
+                                        <div class="pcard-katim-row">
+                                            <i class="ph-bold ph-user-circle"></i>
+                                            <span>Katim: <strong>{{ $p->katim_name }}</strong></span>
+                                        </div>
+
+                                        <div class="pcard-progress-box">
+                                            <div class="pcard-progress-track">
+                                                <div class="pcard-progress-bar {{ $isFullDone ? 'bar-complete' : '' }}" style="width: {{ $pPct }}%;"></div>
+                                            </div>
+                                            <div class="pcard-progress-foot">
+                                                <span class="pcard-pct-label">{{ $p->total_tugas > 0 ? round($pPct, 0) . '% tuntas' : 'Belum ada tugas' }}</span>
+                                                @if($p->tugas_terlambat > 0)
+                                                    <span class="pcard-late-chip" title="{{ $p->tugas_terlambat }} tugas terlambat">
+                                                        <i class="ph-bold ph-warning"></i> {{ $p->tugas_terlambat }} terlambat
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
                                     </a>
@@ -399,113 +484,178 @@
 
                     <!-- Panel: Beban Kerja Personil -->
                     <div class="side-pane" id="paneStaf" hidden>
-                        <div class="assignee-tabs">
-                            <button type="button" class="btn-assignee-tab active"
-                                onclick="switchAssigneeTab('all', this)">
-                                Semua {{ $topAssignees->count() }}
-                            </button>
-                            <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('pegawai', this)">
-                                Pelaksana
-                                {{ $topAssignees->filter(fn($u) => in_array($u->role, ['pegawai', 'tim_pokja']))->count() }}
-                            </button>
-                            <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('katim', this)">
-                                Katim &amp; Koor
-                                {{ $topAssignees->filter(fn($u) => in_array($u->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']))->count() }}
-                            </button>
-                        </div>
+                        
+                        <!-- Toolbar Personil Modern & Rapi -->
+                        <div class="assignee-toolbar-box">
+                            <div class="assignee-search-wrap">
+                                <i class="ph-bold ph-magnifying-glass"></i>
+                                <input type="text" id="assigneeSearchInput" placeholder="Cari personil, NIP, atau unit kerja..."
+                                    class="assignee-search-input" oninput="filterAssigneeRows(this.value)">
+                            </div>
 
-                        <div class="assignee-search-wrap">
-                            <i class="ph-bold ph-magnifying-glass"></i>
-                            <input type="text" id="assigneeSearchInput" placeholder="Cari personil..."
-                                class="assignee-search-input" oninput="filterAssigneeRows(this.value)">
-                        </div>
+                            <div class="assignee-controls-bar">
+                                <div class="assignee-tabs-mini">
+                                    <button type="button" class="btn-assignee-tab active"
+                                        onclick="switchAssigneeTab('all', this)">
+                                        Semua <span class="tab-chip-count">{{ $topAssignees->count() }}</span>
+                                    </button>
+                                    <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('pegawai', this)">
+                                        Pelaksana <span class="tab-chip-count">{{ $topAssignees->filter(fn($u) => in_array($u->role, ['pegawai', 'tim_pokja']))->count() }}</span>
+                                    </button>
+                                    <button type="button" class="btn-assignee-tab" onclick="switchAssigneeTab('katim', this)">
+                                        Katim &amp; Koor <span class="tab-chip-count">{{ $topAssignees->filter(fn($u) => in_array($u->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']))->count() }}</span>
+                                    </button>
+                                </div>
 
-                        <!-- Strip Pengurutan Keaktifan Personil -->
-                        <div class="assignee-sort-strip"
-                            style="display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; background: var(--bg-sub); border-bottom: 1px solid var(--border); font-size: 11px;">
-                            <span
-                                style="color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 4px;"><i
-                                    class="ph-bold ph-arrows-down-up"></i> Urut:</span>
-                            <div style="display: flex; gap: 4px;">
-                                <button type="button" class="btn-sort-pill active" id="sortBtnActive"
-                                    onclick="sortAssigneeList('active', this)"
-                                    title="Urutkan dari beban tugas berjalan">Beban</button>
-                                <button type="button" class="btn-sort-pill" id="sortBtnSt"
-                                    onclick="sortAssigneeList('st', this)"
-                                    title="Urutkan dari yang paling banyak ikut Surat Tugas">Sering ST</button>
-                                <button type="button" class="btn-sort-pill" id="sortBtnReport"
-                                    onclick="sortAssigneeList('report', this)"
-                                    title="Urutkan dari yang paling aktif lapor progres">Aktif Lapor</button>
+                                <div class="assignee-sort-strip">
+                                    <span class="sort-lbl"><i class="ph-bold ph-arrows-down-up"></i> Urut:</span>
+                                    <div class="sort-pills">
+                                        <button type="button" class="btn-sort-pill active" id="sortBtnActive"
+                                            onclick="sortAssigneeList('active', this)"
+                                            title="Urutkan dari beban tugas berjalan">Beban</button>
+                                        <button type="button" class="btn-sort-pill" id="sortBtnSt"
+                                            onclick="sortAssigneeList('st', this)" title="Paling banyak ikut Surat Tugas">Sering ST</button>
+                                        <button type="button" class="btn-sort-pill" id="sortBtnReport"
+                                            onclick="sortAssigneeList('report', this)" title="Paling aktif lapor progres">Aktif Lapor</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="scroll-area" id="assigneeListContainer">
+                        <div class="scroll-area assignee-cards-container" id="assigneeListContainer">
                             @foreach($topAssignees as $staf)
                                 @php
                                     $isKatimOrKoor = in_array($staf->role, ['katim', 'korjafung', 'korlayanan', 'katim_korjafung']);
                                     $roleCategory = $isKatimOrKoor ? 'katim' : 'pegawai';
-                                    $roleBadgeClass = $staf->role === 'pegawai' || $staf->role === 'tim_pokja' ? 'role-pill-pegawai' : ($staf->role === 'katim' ? 'role-pill-katim' : 'role-pill-kor');
-                                    $avClass = '';
                                     $totalActiveVal = $staf->total_active ?? ($staf->pic_count + $staf->member_count);
                                     $stCountVal = $staf->st_count ?? 0;
                                     $repCountVal = $staf->laporan_count ?? 0;
+
+                                    if ($staf->role === 'kepala_balai' || str_contains(strtolower($staf->jabatan ?? ''), 'kepala balai')) {
+                                        $avatarGrad = 'grad-pimpinan';
+                                        $rolePillStyle = 'badge-pimpinan';
+                                    } elseif ($isKatimOrKoor) {
+                                        $avatarGrad = 'grad-katim';
+                                        $rolePillStyle = 'badge-katim';
+                                    } elseif ($staf->role === 'admin') {
+                                        $avatarGrad = 'grad-admin';
+                                        $rolePillStyle = 'badge-admin';
+                                    } else {
+                                        $avatarGrad = 'grad-staff';
+                                        $rolePillStyle = 'badge-staff';
+                                    }
                                 @endphp
-                                <div class="assignee-item" data-role-category="{{ $roleCategory }}"
+                                <div class="assignee-card-item assignee-item" data-role-category="{{ $roleCategory }}"
                                     data-name="{{ strtolower($staf->name) }}" data-fullname="{{ $staf->name }}"
                                     data-active-count="{{ $totalActiveVal }}" data-st-count="{{ $stCountVal }}"
                                     data-rep-count="{{ $repCountVal }}" data-staf="{{ json_encode($staf) }}"
                                     onclick="openPersonModal(this)"
-                                    title="Klik untuk melihat rincian penugasan & laporan {{ $staf->name }}"
-                                    style="cursor: pointer;">
-                                    <div class="assignee-avatar {{ $avClass }}">{{ strtoupper(substr($staf->name, 0, 2)) }}
+                                    title="Klik untuk melihat rincian penugasan & laporan {{ $staf->name }}">
+                                    
+                                    <div class="acard-header">
+                                        <div class="acard-avatar {{ $avatarGrad }}">{{ strtoupper(substr($staf->name, 0, 2)) }}</div>
+                                        <div class="acard-main">
+                                            <div class="acard-name-row">
+                                                <span class="acard-name" title="{{ $staf->name }}">{{ $staf->name }}</span>
+                                            </div>
+                                            <div class="acard-sub">
+                                                <span class="acard-unit-code">{{ $staf->pokja_kode ?? 'BGTK' }}</span>
+                                                <span class="acard-role-pill {{ $rolePillStyle }}">{{ $staf->role_label }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="acard-workload-wrap">
+                                            <span class="acard-workload-pill {{ $totalActiveVal > 0 ? 'workload-busy' : 'workload-idle' }}">
+                                                {{ $totalActiveVal }} tugas
+                                            </span>
+                                            <button type="button"
+                                                onclick="event.stopPropagation(); filterTableByAssignee('{{ addslashes($staf->name) }}')"
+                                                class="btn-filter-icon"
+                                                title="Saring tabel utama berdasarkan {{ $staf->name }}">
+                                                <i class="ph-bold ph-funnel"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div style="overflow: hidden; flex: 1;">
-                                        <div class="assignee-name" title="{{ $staf->name }}">{{ $staf->name }}</div>
-                                        <div class="assignee-sub">
-                                            <span>{{ $staf->pokja_kode ?? ($staf->pokja?->kode_pokja ?? 'BGTK') }}</span>
-                                            <span class="role-pill {{ $roleBadgeClass }}">{{ $staf->role_label }}</span>
-                                        </div>
-                                        <div
-                                            style="display: flex; gap: 4px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
-                                            @if($stCountVal > 0)
-                                                <span class="cmd-st-pill"
-                                                    title="{{ $stCountVal }} kegiatan berbasis Surat Tugas (ST)">
-                                                    <i class="ph-bold ph-file-text"></i> {{ $stCountVal }} ST
-                                                </span>
-                                            @endif
-                                            @if($repCountVal > 0)
-                                                <span class="cmd-rep-pill" title="{{ $repCountVal }} laporan progres diajukan">
-                                                    <i class="ph-bold ph-paper-plane-tilt"></i> {{ $repCountVal }} Lapor
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 6px;">
-                                        <div
-                                            class="assignee-count-badge {{ $totalActiveVal > 0 ? 'has-workload' : 'zero-workload' }}">
-                                            {{ $totalActiveVal }} tugas
-                                        </div>
-                                        <button type="button"
-                                            onclick="event.stopPropagation(); filterTableByAssignee('{{ addslashes($staf->name) }}')"
-                                            class="btn-filter-icon" title="Saring tabel utama berdasarkan {{ $staf->name }}"
-                                            style="background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
-                                            <i class="ph-bold ph-funnel" style="font-size: 11.5px;"></i>
-                                        </button>
+
+                                    <div class="acard-metrics-row">
+                                        @if($stCountVal > 0)
+                                            <span class="acard-metric-chip chip-st"
+                                                title="{{ $stCountVal }} kegiatan berbasis Surat Tugas (ST)">
+                                                <i class="ph-bold ph-file-text"></i> <b>{{ $stCountVal }}</b> ST
+                                            </span>
+                                        @endif
+                                        @if($repCountVal > 0)
+                                            <span class="acard-metric-chip chip-rep"
+                                                title="{{ $repCountVal }} laporan progres diajukan">
+                                                <i class="ph-bold ph-paper-plane-tilt"></i> <b>{{ $repCountVal }}</b> Lapor
+                                            </span>
+                                        @endif
+                                        @if($stCountVal == 0 && $repCountVal == 0)
+                                            <span class="acard-metric-chip chip-idle">
+                                                <i class="ph-bold ph-check"></i> Siap Tugas
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
                         </div>
-                        <div class="assignee-footer" style="font-size: 11px;">
-                            <i class="ph-bold ph-cursor-click"></i> Klik personil untuk melihat detail tugas & laporan
+                        <div class="assignee-footer">
+                            <i class="ph-bold ph-cursor-click"></i> Klik kartu personil untuk melihat detail tugas &amp; laporan
+                        </div>
+                    </div>
+
+                    <!-- Panel: Radar (tenggat + aktivitas) -->
+                    <div class="side-pane" id="paneRadar" hidden>
+                        <div class="scroll-area">
+                            <div class="radar-title"><span><i class="ph-bold ph-alarm"></i> Tenggat 7 Hari ke
+                                    Depan</span><em>{{ count($upcomingDeadlines) }}</em></div>
+                            @forelse($upcomingDeadlines as $d)
+                                <div class="radar-item" onclick="openJobModalById({{ $d['id'] }})"
+                                    title="{{ $d['judul'] }}">
+                                    <div
+                                        class="radar-days {{ $d['sisa_hari'] <= 1 ? 'urgent' : ($d['sisa_hari'] <= 3 ? 'soon' : '') }}">
+                                        <b>{{ $d['sisa_hari'] === 0 ? 'Hari' : 'H-' . $d['sisa_hari'] }}</b>
+                                        <span>{{ $d['sisa_hari'] === 0 ? 'ini' : 'hari' }}</span>
+                                    </div>
+                                    <div class="radar-info">
+                                        <div class="radar-name">{{ $d['judul'] }}</div>
+                                        <div class="radar-meta"><span class="task-code">{{ $d['kode'] }}</span>
+                                            {{ $d['pokja'] }} • {{ $d['pic'] }} • {{ $d['tenggat'] }}</div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="lead-empty">Tidak ada tenggat dalam 7 hari ke depan 🎉</div>
+                            @endforelse
+
+                            <div class="radar-title"><span><i class="ph-bold ph-lightning"></i> Aktivitas
+                                    Terbaru</span><em>{{ count($recentActivity) }}</em></div>
+                            <div class="feed-list">
+                                @forelse($recentActivity as $a)
+                                    <div class="feed-item" onclick="openJobModalById({{ $a['pekerjaan_id'] }})">
+                                        <div
+                                            class="feed-dot {{ $a['status_approval'] === 'disetujui' ? 'ok' : ($a['status_approval'] === 'ditolak' ? 'bad' : 'wait') }}">
+                                        </div>
+                                        <div class="feed-body">
+                                            <div class="feed-line"><b>{{ $a['pelapor'] }}</b>
+                                                {{ $a['is_penyelesaian'] ? 'menyelesaikan' : 'melaporkan progres' }}
+                                                <span class="task-code">{{ $a['kode'] }}</span>
+                                            </div>
+                                            <div class="feed-sub">{{ $a['judul'] }}</div>
+                                            <div class="feed-time"><i class="ph-bold ph-clock"></i> {{ $a['waktu'] }} •
+                                                {{ $a['pokja'] }}</div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="lead-empty">Belum ada aktivitas laporan</div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
 
                 </div>
-
             </div>
 
-            <!-- Kolom kanan: tabel -->
-            <div class="panel-card">
+            <!-- Kolom kanan: tabel / kartu -->
+            <div class="panel-card right-col" id="streamPanel">
 
                 <div class="stream-controls">
                     <div class="stream-tabs">
@@ -519,7 +669,7 @@
                         </a>
                         <a href="{{ route('monitoring.balai', array_merge(request()->except(['status']), ['status' => 'menunggu_verifikasi'])) }}"
                             class="tab-btn {{ request('status') === 'menunggu_verifikasi' ? 'active' : '' }}">
-                            Menunggu Verifikasi <span class="num">{{ $menungguVerifikasi }}</span>
+                            Verifikasi <span class="num">{{ $menungguVerifikasi }}</span>
                         </a>
                         <a href="{{ route('monitoring.balai', array_merge(request()->except(['status']), ['status' => 'terlambat'])) }}"
                             class="tab-btn {{ $lewatTenggat > 0 ? 'tab-danger' : '' }} {{ request('status') === 'terlambat' ? 'active' : '' }}">
@@ -531,8 +681,7 @@
                         </a>
                     </div>
 
-                    <form method="GET" action="{{ route('monitoring.balai') }}"
-                        style="display: flex; gap: 8px; align-items: center;">
+                    <form method="GET" action="{{ route('monitoring.balai') }}" class="stream-form">
                         @if(request('pokja_id')) <input type="hidden" name="pokja_id" value="{{ request('pokja_id') }}">
                         @endif
                         @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}">
@@ -541,7 +690,8 @@
                         <div class="stream-search">
                             <i class="ph-bold ph-magnifying-glass"></i>
                             <input type="text" name="q" id="searchFilterInput" value="{{ request('q') }}"
-                                placeholder="Cari tugas, kode, atau PIC..." onkeyup="clientFilterTable(this.value)">
+                                placeholder="Cari tugas, kode, atau PIC...  ( / )"
+                                onkeyup="clientFilterTable(this.value)">
                         </div>
 
                         @if(request()->hasAny(['pokja_id', 'status', 'q']))
@@ -549,6 +699,13 @@
                                 <i class="ph-bold ph-x"></i> Hapus filter
                             </a>
                         @endif
+
+                        <div class="view-switch" title="Ganti tampilan (tombol V)">
+                            <button type="button" class="btn-view active" id="btnViewTable"
+                                onclick="setView('table')"><i class="ph-bold ph-table"></i></button>
+                            <button type="button" class="btn-view" id="btnViewCards" onclick="setView('cards')"><i
+                                    class="ph-bold ph-squares-four"></i></button>
+                        </div>
                     </form>
                 </div>
 
@@ -570,10 +727,9 @@
                             @forelse($pekerjaanList as $job)
                                 @php
                                     $isTerlambat = $job->isTerlambat();
-                                    $sisaHari = \Carbon\Carbon::today()->diffInDays($job->tenggat, false);
+                                    $sisaHari = (int) \Carbon\Carbon::today()->diffInDays($job->tenggat, false);
                                     $rowLate = $isTerlambat && $job->status_pelaksanaan !== 'selesai_terverifikasi';
                                     $picName = $job->penanggungJawab?->name ?? 'PJ';
-                                    $picAv = '';
 
                                     $statusLabel = match ($job->status_pelaksanaan) {
                                         'selesai_terverifikasi' => 'Selesai',
@@ -652,9 +808,8 @@
                                         <div class="task-title-cell">
                                             <span class="task-title-text" title="{{ $job->judul }}">{{ $job->judul }}</span>
                                             @if($job->nomor_st)
-                                                <span class="st-badge-mini" title="Surat Tugas Nomor: {{ $job->nomor_st }}">
-                                                    <i class="ph-bold ph-file-text"></i> ST
-                                                </span>
+                                                <span class="st-badge-mini" title="Surat Tugas Nomor: {{ $job->nomor_st }}"><i
+                                                        class="ph-bold ph-file-text"></i> ST</span>
                                             @endif
                                         </div>
                                     </td>
@@ -663,10 +818,8 @@
 
                                     <td>
                                         <div class="pic-cell">
-                                            <div class="pic-avatar-mini {{ $picAv }}">
-                                                {{ strtoupper(substr($picName, 0, 2)) }}
-                                            </div>
-                                            <div style="overflow: hidden; flex: 1;">
+                                            <div class="pic-avatar-mini">{{ strtoupper(substr($picName, 0, 2)) }}</div>
+                                            <div class="pic-name-wrap">
                                                 <div class="pic-name-clean"
                                                     title="{{ $job->penanggungJawab->name ?? '-' }}">
                                                     {{ $job->penanggungJawab->name ?? 'Belum ditugaskan' }}
@@ -687,9 +840,8 @@
                                     </td>
 
                                     <td>
-                                        <div
-                                            style="font-size: 12px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 5px;">
-                                            <i class="ph-bold ph-newspaper-clipping" style="color: #64748b;"></i>
+                                        <div class="reports-cell">
+                                            <i class="ph-bold ph-newspaper-clipping"></i>
                                             <span>{{ $job->realisasi->where('status_approval', 'disetujui')->count() }}
                                                 Laporan</span>
                                         </div>
@@ -713,9 +865,8 @@
                                     </td>
 
                                     <td style="text-align: center;">
-                                        <button type="button" class="btn-detail-cmd">
-                                            <i class="ph-bold ph-eye"></i> Detail
-                                        </button>
+                                        <button type="button" class="btn-detail-cmd"><i class="ph-bold ph-eye"></i>
+                                            Detail</button>
                                     </td>
                                 </tr>
                             @empty
@@ -728,29 +879,55 @@
                             @endforelse
                         </tbody>
                     </table>
+
+                    <!-- Tampilan kartu (diisi via JavaScript dari baris tabel) -->
+                    <div class="card-grid" id="cardGrid"></div>
                 </div>
 
                 <div class="table-footer">
                     <span><i class="ph-bold ph-list-checks"></i>Menampilkan <b id="rowShown">0</b> dari <b
                             id="rowTotal">0</b> tugas</span>
-                    <span><i class="ph-bold ph-cursor-click"></i>Klik baris untuk melihat rincian</span>
+                    <span class="kbd-hint"><i class="ph-bold ph-keyboard"></i> <kbd>F</kbd> layar penuh <kbd>S</kbd>
+                        gulir <kbd>R</kbd> segarkan <kbd>T</kbd> tema <kbd>V</kbd> tampilan <kbd>/</kbd> cari</span>
                 </div>
 
             </div>
         </div>
     </main>
+    </div><!-- /.cmd-main-wrapper -->
 
-    <!-- ================= MODAL DETAIL ================= -->
+    <!-- Data chart (dibaca JS; ikut di-refresh otomatis) -->
+    @php
+        $chartPayload = [
+            'status' => [
+                (int) ($statusCounts['selesai'] ?? 0),
+                (int) ($statusCounts['dikerjakan'] ?? 0),
+                (int) ($statusCounts['menunggu_verifikasi'] ?? 0),
+                (int) ($statusCounts['belum_dimulai'] ?? 0),
+            ],
+            'totalPekerjaan' => $totalPekerjaan,
+            'selesai' => $selesaiTerverifikasi,
+            'totalSt' => $totalKegiatanSt,
+            'totalLaporan' => $totalLaporanBalai,
+            'pokja' => collect($pokjaChartData)->values()->all(),
+            'st' => collect($stChartData)->values()->all(),
+            'report' => collect($reportChartData)->values()->all(),
+            'trend' => $trendData,
+        ];
+        $chartPayloadJson = json_encode($chartPayload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+    @endphp
+    <script type="application/json" id="chartPayload">{!! $chartPayloadJson !!}</script>
+
     <!-- ================= MODAL DETAIL TUGAS BALAI ================= -->
     <div id="jobDetailModal" class="cmd-modal-backdrop" onclick="closeJobModal(event)">
         <div class="cmd-modal-dialog" onclick="event.stopPropagation()">
             <div class="cmd-modal-header">
-                <div style="flex: 1; overflow: hidden;">
+                <div class="modal-head-main">
                     <div class="cmd-modal-badges">
-                        <span id="mJobCode" class="task-code" style="font-size: 12px; padding: 3px 9px;">-</span>
+                        <span id="mJobCode" class="task-code on-dark">-</span>
                         <span id="mJobStatus" class="status-badge-cmd">-</span>
-                        <span id="mJobPokja" class="task-pokja-badge" style="background: rgba(255,255,255,.2);">-</span>
-                        <span id="mJobST" class="st-badge-mini" style="display: none;">
+                        <span id="mJobPokja" class="task-pokja-badge on-dark">-</span>
+                        <span id="mJobST" class="st-badge-mini on-dark" style="display: none;">
                             <i class="ph-bold ph-file-text"></i> <span id="mJobSTText">-</span>
                         </span>
                     </div>
@@ -768,7 +945,7 @@
                 <div class="cmd-modal-kpi-grid">
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Laporan Disetujui</div>
-                        <div class="cmd-kpi-val" id="mJobLaporanCount" style="font-size: 15px;">0 Laporan</div>
+                        <div class="cmd-kpi-val" id="mJobLaporanCount">0 Laporan</div>
                         <div class="cmd-kpi-sub">Verifikasi Katim</div>
                     </div>
                     <div class="cmd-kpi-card">
@@ -778,7 +955,7 @@
                     </div>
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Status Penugasan</div>
-                        <div class="cmd-kpi-val" id="mJobStatusPelaksanaan" style="font-size: 13px;">-</div>
+                        <div class="cmd-kpi-val sm" id="mJobStatusPelaksanaan">-</div>
                         <div class="cmd-kpi-sub">Alur pelaksanaan</div>
                     </div>
                     <div class="cmd-kpi-card">
@@ -829,26 +1006,19 @@
                     </div>
                 </div>
 
-                <!-- Daftar Riwayat Laporan Progres Masuk -->
                 <div class="cmd-modal-box" id="mJobLaporanSection">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 class="cmd-box-title" style="margin-bottom: 0;">
-                            <i class="ph-bold ph-newspaper-clipping"></i> Riwayat Laporan Progres Masuk
-                        </h4>
+                    <div class="box-title-row">
+                        <h4 class="cmd-box-title nomargin"><i class="ph-bold ph-newspaper-clipping"></i> Riwayat Laporan
+                            Progres Masuk</h4>
                         <span id="mJobLaporanBadge" class="cmd-team-chip">0 Laporan</span>
                     </div>
-
-                    <div id="mJobLaporanList" style="display: flex; flex-direction: column; gap: 10px;">
-                        <!-- Diisi via JavaScript -->
-                    </div>
+                    <div id="mJobLaporanList" class="stack-list"></div>
                 </div>
             </div>
 
             <div class="cmd-modal-footer">
-                <button type="button" class="btn-cmd-secondary" onclick="closeJobModalDirect()">
-                    <i class="ph-bold ph-x"></i> Tutup
-                </button>
+                <button type="button" class="btn-cmd-secondary" onclick="closeJobModalDirect()"><i
+                        class="ph-bold ph-x"></i> Tutup</button>
                 <a id="mJobLink" href="#" target="_blank" class="btn-cmd-primary">
                     <i class="ph-bold ph-arrow-square-out"></i> Buka Halaman Tugas Lengkap
                 </a>
@@ -858,24 +1028,17 @@
 
     <!-- ================= MODAL DETAIL PERSONIL & PENUGASAN ================= -->
     <div id="personDetailModal" class="cmd-modal-backdrop" onclick="closePersonModal(event)">
-        <div class="cmd-modal-dialog" onclick="event.stopPropagation()" style="max-width: 840px;">
-            <div class="cmd-modal-header" style="background: linear-gradient(135deg, #0b4a82 0%, #083a68 100%);">
-                <div style="flex: 1; overflow: hidden; display: flex; align-items: center; gap: 14px;">
-                    <div id="pPersonAvatar"
-                        style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; border: 2px solid rgba(255, 255, 255, 0.35); flex-shrink: 0;">
-                        PJ
-                    </div>
-                    <div style="overflow: hidden;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
-                            <span id="pPersonPokja" class="task-pokja-badge"
-                                style="background: rgba(255, 255, 255, 0.2); color: white;">BGTK</span>
-                            <span id="pPersonRole" class="role-pill role-pill-pegawai"
-                                style="background: white; color: #0b4a82;">Pegawai</span>
+        <div class="cmd-modal-dialog wide" onclick="event.stopPropagation()">
+            <div class="cmd-modal-header">
+                <div class="modal-head-main person-head">
+                    <div id="pPersonAvatar" class="person-avatar">PJ</div>
+                    <div class="person-head-text">
+                        <div class="cmd-modal-badges tight">
+                            <span id="pPersonPokja" class="task-pokja-badge on-dark">BGTK</span>
+                            <span id="pPersonRole" class="role-pill role-pill-light">Pegawai</span>
                         </div>
-                        <h3 id="pPersonName" class="cmd-modal-title" style="color: white; margin: 0; font-size: 18px;">
-                            Nama Pegawai</h3>
-                        <div id="pPersonSub" style="font-size: 12px; color: #bae6fd; margin-top: 2px;">NIP: - &bull;
-                            Jabatan: -</div>
+                        <h3 id="pPersonName" class="cmd-modal-title">Nama Pegawai</h3>
+                        <div id="pPersonSub" class="person-sub">NIP: - &bull; Jabatan: -</div>
                     </div>
                 </div>
                 <button type="button" class="cmd-modal-close" onclick="closePersonModalDirect()" title="Tutup">
@@ -883,12 +1046,11 @@
                 </button>
             </div>
 
-            <div class="cmd-modal-body" style="padding: 20px 24px;">
-                <!-- KPI ringkasan 6 kolom -->
-                <div class="cmd-modal-kpi-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div class="cmd-modal-body">
+                <div class="cmd-modal-kpi-grid kpi-3">
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Total Beban Aktif</div>
-                        <div class="cmd-kpi-val" id="pPersonActiveBeban" style="color: #0a6fb5;">0 Tugas</div>
+                        <div class="cmd-kpi-val c-blue" id="pPersonActiveBeban">0 Tugas</div>
                         <div class="cmd-kpi-sub">Sedang berjalan</div>
                     </div>
                     <div class="cmd-kpi-card">
@@ -903,103 +1065,73 @@
                     </div>
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Tugas Selesai</div>
-                        <div class="cmd-kpi-val" id="pPersonDoneCount" style="color: #0c8a5d;">0 Tugas</div>
+                        <div class="cmd-kpi-val c-green" id="pPersonDoneCount">0 Tugas</div>
                         <div class="cmd-kpi-sub">Terverifikasi tuntas</div>
                     </div>
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Kegiatan ST</div>
-                        <div class="cmd-kpi-val" id="pPersonStCount" style="color: #6366f1;">0 ST</div>
+                        <div class="cmd-kpi-val c-indigo" id="pPersonStCount">0 ST</div>
                         <div class="cmd-kpi-sub">Surat tugas resmi</div>
                     </div>
                     <div class="cmd-kpi-card">
                         <div class="cmd-kpi-lbl">Laporan Diajukan</div>
-                        <div class="cmd-kpi-val" id="pPersonRepCount" style="color: #10b981;">0 Laporan</div>
+                        <div class="cmd-kpi-val c-teal" id="pPersonRepCount">0 Laporan</div>
                         <div class="cmd-kpi-sub">Progres tugas masuk</div>
                     </div>
                 </div>
 
-                <!-- Tabs: Tugas vs Laporan -->
-                <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-top: 4px;">
-                    <button type="button" id="tabBtnPersonJobs" onclick="switchPersonTab('jobs')"
-                        style="padding: 9px 18px; font-weight: 800; font-size: 13px; border: none; background: none; border-bottom: 3px solid #0a6fb5; color: #0a6fb5; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: -2px;">
+                <div class="p-tabs">
+                    <button type="button" class="p-tab active" id="tabBtnPersonJobs" onclick="switchPersonTab('jobs')">
                         <i class="ph-bold ph-briefcase"></i> Pekerjaan Ditugaskan (<span
                             id="pPersonJobsTabCount">0</span>)
                     </button>
-                    <button type="button" id="tabBtnPersonReports" onclick="switchPersonTab('reports')"
-                        style="padding: 9px 18px; font-weight: 700; font-size: 13px; border: none; background: none; border-bottom: 3px solid transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: -2px;">
-                        <i class="ph-bold ph-newspaper-clipping"></i> Laporan Progres Diajukan (<span
+                    <button type="button" class="p-tab" id="tabBtnPersonReports" onclick="switchPersonTab('reports')">
+                        <i class="ph-bold ph-newspaper-clipping"></i> Laporan Progres (<span
                             id="pPersonReportsTabCount">0</span>)
                     </button>
                 </div>
 
-                <!-- Panel Tab 1: Daftar Pekerjaan Personil -->
-                <div id="pPersonJobsPanel" style="display: flex; flex-direction: column; gap: 10px;">
-                    <!-- Diisi via JavaScript -->
-                </div>
-
-                <!-- Panel Tab 2: Riwayat Laporan Progres Personil -->
-                <div id="pPersonReportsPanel" style="display: none; flex-direction: column; gap: 10px;">
-                    <!-- Diisi via JavaScript -->
-                </div>
+                <div id="pPersonJobsPanel" class="stack-list"></div>
+                <div id="pPersonReportsPanel" class="stack-list" style="display: none;"></div>
             </div>
 
-            <div class="cmd-modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-                <button type="button" id="pPersonFilterBtn" class="btn-cmd-secondary"
-                    style="color: #0a6fb5; border-color: #bae6fd;">
+            <div class="cmd-modal-footer between">
+                <button type="button" id="pPersonFilterBtn" class="btn-cmd-secondary accent">
                     <i class="ph-bold ph-funnel"></i> Saring Tabel Berdasarkan Personil Ini
                 </button>
-                <button type="button" class="btn-cmd-secondary" onclick="closePersonModalDirect()">
-                    <i class="ph-bold ph-x"></i> Tutup
-                </button>
+                <button type="button" class="btn-cmd-secondary" onclick="closePersonModalDirect()"><i
+                        class="ph-bold ph-x"></i> Tutup</button>
             </div>
         </div>
     </div>
 
     <!-- ================= UNIVERSAL FILE PREVIEW MODAL ================= -->
-    <div id="modalPreviewBuktiUniversal" class="cmd-modal-backdrop"
-        style="display: none; z-index: 1100; align-items: center; justify-content: center; padding: 20px;"
+    <div id="modalPreviewBuktiUniversal" class="cmd-modal-backdrop preview-backdrop"
         onclick="closePreviewBuktiOnBackdrop(event)">
-        <div class="cmd-modal-dialog"
-            style="max-width: 900px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;"
-            onclick="event.stopPropagation()">
-            <div class="cmd-modal-header" style="padding: 14px 20px; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
-                    <div id="previewBuktiIconBox"
-                        style="width: 36px; height: 36px; border-radius: 8px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
-                        <i class="ph-bold ph-file-text" id="previewBuktiIcon"></i>
-                    </div>
-                    <div style="overflow: hidden;">
-                        <div style="font-size: 11px; font-weight: 700; color: #bae6fd; text-transform: uppercase;">
-                            Pratinjau Bukti Dukung</div>
-                        <div id="previewBuktiTitle"
-                            style="font-size: 14px; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 500px;">
-                            Nama Berkas</div>
+        <div class="cmd-modal-dialog preview-dialog" onclick="event.stopPropagation()">
+            <div class="cmd-modal-header preview-header">
+                <div class="preview-title-wrap">
+                    <div class="preview-icon"><i class="ph-bold ph-file-text" id="previewBuktiIcon"></i></div>
+                    <div class="preview-title-text">
+                        <div class="preview-eyebrow">Pratinjau Bukti Dukung</div>
+                        <div id="previewBuktiTitle" class="preview-name">Nama Berkas</div>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <a id="previewBuktiExternalBtn" href="#" target="_blank" class="btn-action-outline"
-                        style="padding: 6px 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; color: #ffffff; border: 1px solid rgba(255,255,255,0.4); border-radius: 6px;"
+                <div class="preview-actions">
+                    <a id="previewBuktiExternalBtn" href="#" target="_blank" class="btn-action-outline on-dark"
                         title="Buka di Tab Baru">
                         <i class="ph-bold ph-arrow-square-out"></i> Tab Baru
                     </a>
-                    <a id="previewBuktiDownloadBtn" href="#" download class="btn-action-primary"
-                        style="padding: 6px 14px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #0284c7; color: white; border-radius: 6px;"
-                        title="Unduh Berkas">
+                    <a id="previewBuktiDownloadBtn" href="#" download class="btn-action-primary" title="Unduh Berkas">
                         <i class="ph-bold ph-download-simple"></i> Unduh
                     </a>
-                    <button type="button" class="cmd-modal-close" onclick="closePreviewBukti()" title="Tutup"
-                        style="margin-left: 6px;">&times;</button>
+                    <button type="button" class="cmd-modal-close" onclick="closePreviewBukti()"
+                        title="Tutup">&times;</button>
                 </div>
             </div>
-            <div id="previewBuktiBody"
-                style="flex: 1; overflow: auto; padding: 16px; background: var(--bg-base, #f1f5f9); display: flex; align-items: center; justify-content: center; min-height: 380px;">
-            </div>
-            <div class="cmd-modal-footer"
-                style="padding: 10px 20px; justify-content: space-between; align-items: center;">
-                <div style="font-size: 12px; color: var(--text-muted);">
-                    Format Berkas: <span id="previewBuktiExtBadge"
-                        style="font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;"></span>
-                </div>
+            <div id="previewBuktiBody" class="preview-body"></div>
+            <div class="cmd-modal-footer between">
+                <div class="preview-ext">Format Berkas: <span id="previewBuktiExtBadge"></span></div>
                 <button type="button" class="btn-cmd-secondary" onclick="closePreviewBukti()">Tutup</button>
             </div>
         </div>
@@ -1025,29 +1157,131 @@
         function toggleTheme() {
             const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
-            try { localStorage.setItem('bgtkTheme', next); } catch (e) { }
+            try {
+                localStorage.setItem('tanjidor_theme', next);
+                localStorage.setItem('bgtkTheme', next);
+            } catch (e) { }
             applyThemeIcon();
-            try { switchSidePane(localStorage.getItem('bgtkSidePane') || 'pokja'); } catch (e) { }
             updateRowCount();
             initMonitoringCharts();
         }
 
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) {
+                const isOpen = sidebar.classList.toggle('open');
+                if (backdrop) backdrop.classList.toggle('active', isOpen);
+                document.body.classList.toggle('sidebar-mobile-open', isOpen);
+            }
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
+            document.body.classList.remove('sidebar-mobile-open');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                closeMobileSidebar();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileSidebar();
+            }
+        });
+
+        (function() {
+            const bar = document.getElementById('tanjidorTopProgress');
+            window.addEventListener('pageshow', function() {
+                document.body.classList.remove('is-page-leaving');
+                if (bar) bar.classList.remove('is-loading');
+            });
+            document.addEventListener('click', function(e) {
+                if (e.defaultPrevented) return;
+                const link = e.target.closest('a[href]');
+                if (!link) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                if (link.target === '_blank' || link.hasAttribute('download')) return;
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (link.origin !== window.location.origin) return;
+                if (href.includes('export-excel') || href.includes('export-csv')) return;
+                if (link.href === window.location.href) return;
+
+                e.preventDefault();
+                closeMobileSidebar();
+                document.body.classList.add('is-page-leaving');
+                if (bar) bar.classList.add('is-loading');
+                setTimeout(function() {
+                    window.location.href = link.href;
+                }, 150);
+            });
+        })();
+
         // ============================================================
-        // 2. Diagram Chart.js
+        // 2. Diagram Chart.js (gradient, rounded, stacked, area)
         // ============================================================
+        const COLORS = {
+            selesai: '#12b886', dikerjakan: '#2b8cff', verifikasi: '#8b5cf6',
+            belum: '#cbd5e1', late: '#f43f5e', st: '#6366f1', rep: '#0ea5e9'
+        };
+
+        function readPayload(doc) {
+            try { return JSON.parse(doc.getElementById('chartPayload').textContent); }
+            catch (e) {
+                return { status: [0, 0, 0, 0], totalPekerjaan: 0, selesai: 0, totalSt: 0, totalLaporan: 0, pokja: [], st: [], report: [], trend: { labels: [], masuk: [], disetujui: [] } };
+            }
+        }
+
+        let payload = readPayload(document);
+        let payloadSignature = JSON.stringify(payload);
+
         let chartDonutInstance = null;
         let chartBarInstance = null;
+        let chartTrendInstance = null;
+        let currentChartMode = 'pokja';
 
         function cssVar(name) {
             return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         }
 
+        function vGradient(chart, c1, c2) {
+            const a = chart.chartArea;
+            if (!a) return c2;
+            const g = chart.ctx.createLinearGradient(0, a.bottom, 0, a.top);
+            g.addColorStop(0, c1);
+            g.addColorStop(1, c2);
+            return g;
+        }
+
+        function tooltipStyle() {
+            return {
+                backgroundColor: 'rgba(8, 20, 38, .94)',
+                titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: '800' },
+                bodyFont: { family: 'Plus Jakarta Sans', size: 11.5 },
+                footerFont: { family: 'Plus Jakarta Sans', size: 10.5 },
+                cornerRadius: 10,
+                padding: 12,
+                boxPadding: 5,
+                usePointStyle: true,
+                borderColor: 'rgba(255,255,255,.08)',
+                borderWidth: 1
+            };
+        }
+
         function initMonitoringCharts() {
-            const gridColor = cssVar('--border');
-            const textMuted = cssVar('--text-muted');
-            const textMain = cssVar('--text-body');
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+            Chart.defaults.color = cssVar('--text-muted');
+
             const cardBg = cssVar('--bg-card');
 
+            // --- Donut ---
             const ctxDonut = document.getElementById('cmdDonutStatus');
             if (ctxDonut) {
                 if (chartDonutInstance) chartDonutInstance.destroy();
@@ -1056,94 +1290,116 @@
                     data: {
                         labels: ['Selesai', 'Dikerjakan', 'Verifikasi', 'Belum Dimulai'],
                         datasets: [{
-                            data: [
-                                {{ $statusCounts['selesai'] ?? 0 }},
-                                {{ $statusCounts['dikerjakan'] ?? 0 }},
-                                {{ $statusCounts['menunggu_verifikasi'] ?? 0 }},
-                                {{ $statusCounts['belum_dimulai'] ?? 0 }}
-                            ],
-                            backgroundColor: ['#3d9970', '#0b4a82', '#7f9cc0', '#d3dce7'],
-                            borderWidth: 3,
-                            borderColor: cardBg,
-                            hoverOffset: 6
+                            data: payload.status,
+                            backgroundColor: [COLORS.selesai, COLORS.dikerjakan, COLORS.verifikasi, COLORS.belum],
+                            borderWidth: 0,
+                            spacing: 4,
+                            borderRadius: 10,
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '72%',
-                        animation: { animateRotate: true, duration: 1100 },
+                        cutout: '74%',
+                        animation: { animateRotate: true, duration: 1000, easing: 'easeOutQuart' },
                         plugins: {
                             legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#062f57',
-                                titleFont: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-                                bodyFont: { family: 'Plus Jakarta Sans', size: 11 },
-                                cornerRadius: 8,
-                                padding: 10,
-                                callbacks: {
-                                    label: function (ctx) {
-                                        const val = ctx.parsed || 0;
-                                        return ` ${ctx.label}: ${val} tugas`;
-                                    }
-                                }
-                            }
+                            tooltip: { ...tooltipStyle(), callbacks: { label: c => ` ${c.label}: ${c.parsed} tugas` } }
                         }
                     }
                 });
             }
 
+            renderTrendChart();
             renderBarChart(currentChartMode);
         }
 
-        const pokjaChartData = {
-            labels: {!! json_encode(collect($pokjaChartData ?? [])->pluck('kode')) !!},
-            names: {!! json_encode(collect($pokjaChartData ?? [])->pluck('nama')) !!},
-            data: {!! json_encode(collect($pokjaChartData ?? [])->pluck('selesai')) !!},
-            totals: {!! json_encode(collect($pokjaChartData ?? [])->pluck('total')) !!}
-        };
+        function renderTrendChart() {
+            const ctx = document.getElementById('cmdTrend');
+            if (!ctx) return;
+            if (chartTrendInstance) chartTrendInstance.destroy();
 
-        const stChartData = {
-            ids: {!! json_encode(collect($stChartData ?? [])->pluck('id')) !!},
-            labels: {!! json_encode(collect($stChartData ?? [])->pluck('short_name')) !!},
-            names: {!! json_encode(collect($stChartData ?? [])->pluck('name')) !!},
-            pokja: {!! json_encode(collect($stChartData ?? [])->pluck('pokja')) !!},
-            data: {!! json_encode(collect($stChartData ?? [])->pluck('st_count')) !!},
-            totals: {!! json_encode(collect($stChartData ?? [])->pluck('total_jobs')) !!}
-        };
+            const t = payload.trend || { labels: [], masuk: [], disetujui: [] };
+            const sum = (t.masuk || []).reduce((a, b) => a + b, 0);
+            const sumAcc = (t.disetujui || []).reduce((a, b) => a + b, 0);
+            const sEl = document.getElementById('trendSummary');
+            if (sEl) sEl.textContent = `${sum} laporan • ${sumAcc} disetujui (14 hari)`;
 
-        const reportChartData = {
-            ids: {!! json_encode(collect($reportChartData ?? [])->pluck('id')) !!},
-            labels: {!! json_encode(collect($reportChartData ?? [])->pluck('short_name')) !!},
-            names: {!! json_encode(collect($reportChartData ?? [])->pluck('name')) !!},
-            pokja: {!! json_encode(collect($reportChartData ?? [])->pluck('pokja')) !!},
-            data: {!! json_encode(collect($reportChartData ?? [])->pluck('laporan_count')) !!},
-            totals: {!! json_encode(collect($reportChartData ?? [])->pluck('total_jobs')) !!}
-        };
+            const grid = cssVar('--border');
 
-        let currentChartMode = 'pokja';
+            chartTrendInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: t.labels,
+                    datasets: [
+                        {
+                            label: 'Laporan masuk',
+                            data: t.masuk,
+                            borderColor: COLORS.dikerjakan,
+                            backgroundColor: c => vGradient(c.chart, 'rgba(43,140,255,0)', 'rgba(43,140,255,.38)'),
+                            fill: true,
+                            tension: .42,
+                            borderWidth: 2.6,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: COLORS.dikerjakan,
+                            pointHoverBorderWidth: 3
+                        },
+                        {
+                            label: 'Disetujui',
+                            data: t.disetujui,
+                            borderColor: COLORS.selesai,
+                            backgroundColor: c => vGradient(c.chart, 'rgba(18,184,134,0)', 'rgba(18,184,134,.16)'),
+                            fill: true,
+                            borderDash: [6, 5],
+                            tension: .42,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    animation: { duration: 900, easing: 'easeOutCubic' },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, font: { size: 10.5, weight: '700' }, padding: 12 } },
+                        tooltip: tooltipStyle()
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } }, grid: { color: grid, drawTicks: false }, border: { display: false } },
+                        x: { ticks: { font: { size: 9.5 }, maxTicksLimit: 7, maxRotation: 0 }, grid: { display: false }, border: { display: false } }
+                    }
+                }
+            });
+        }
 
         function switchChartMode(mode) {
             currentChartMode = mode;
             document.querySelectorAll('.btn-cmd-chart-tab').forEach(b => b.classList.remove('active'));
             const btn = document.getElementById(mode === 'pokja' ? 'btnChartModePokja' : (mode === 'st' ? 'btnChartModeSt' : 'btnChartModeLaporan'));
             if (btn) btn.classList.add('active');
+            updateChartModeLabels();
+            renderBarChart(mode);
+        }
 
+        function updateChartModeLabels() {
             const titleEl = document.getElementById('chartModeTitle');
             const subEl = document.getElementById('chartModeSub');
-
-            if (mode === 'pokja') {
-                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-chart-bar"></i> Distribusi Ketuntasan per Tim Kerja';
-                if (subEl) subEl.textContent = `(Balai: {{ $selesaiTerverifikasi }}/{{ $totalPekerjaan }} Tuntas)`;
-            } else if (mode === 'st') {
-                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-file-text"></i> Pegawai Paling Sering Ikut Kegiatan (Surat Tugas)';
-                if (subEl) subEl.textContent = `({{ $totalKegiatanSt }} Kegiatan ST Aktif)`;
+            if (currentChartMode === 'pokja') {
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-chart-bar"></i> Ketuntasan per Tim Kerja';
+                if (subEl) subEl.textContent = `(Balai: ${payload.selesai}/${payload.totalPekerjaan} Tuntas)`;
+            } else if (currentChartMode === 'st') {
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-file-text"></i> Paling Sering Ikut Surat Tugas';
+                if (subEl) subEl.textContent = `(${payload.totalSt} Kegiatan ST)`;
             } else {
-                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-paper-plane-tilt"></i> Pegawai Paling Aktif Melaporkan Progres Tugas';
-                if (subEl) subEl.textContent = `({{ $totalLaporanBalai }} Laporan Masuk)`;
+                if (titleEl) titleEl.innerHTML = '<i class="ph-bold ph-paper-plane-tilt"></i> Paling Aktif Melaporkan Progres';
+                if (subEl) subEl.textContent = `(${payload.totalLaporan} Laporan Masuk)`;
             }
-
-            renderBarChart(mode);
         }
 
         function renderBarChart(mode) {
@@ -1151,90 +1407,71 @@
             if (!ctxBar) return;
             if (chartBarInstance) chartBarInstance.destroy();
 
-            const gridColor = cssVar('--border');
-            const textMuted = cssVar('--text-muted');
+            const grid = cssVar('--border');
             const textMain = cssVar('--text-body');
-            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const isPokja = mode === 'pokja';
+            const rows = isPokja ? (payload.pokja || []) : (mode === 'st' ? (payload.st || []) : (payload.report || []));
+            const labels = rows.map(r => isPokja ? r.kode : r.short_name);
 
-            let labels = [];
-            let data = [];
-            let barColor = '';
-            let datasetLabel = '';
-
-            if (mode === 'pokja') {
-                labels = pokjaChartData.labels;
-                data = pokjaChartData.data;
-                barColor = dark ? '#34d399' : '#10b981';
-                datasetLabel = 'Tugas Selesai';
-            } else if (mode === 'st') {
-                labels = stChartData.labels;
-                data = stChartData.data;
-                barColor = dark ? '#818cf8' : '#6366f1';
-                datasetLabel = 'Kegiatan ST';
+            let datasets;
+            if (isPokja) {
+                datasets = [
+                    { label: 'Selesai', data: rows.map(r => r.selesai), backgroundColor: COLORS.selesai },
+                    { label: 'Verifikasi', data: rows.map(r => r.verifikasi), backgroundColor: COLORS.verifikasi },
+                    { label: 'Dikerjakan', data: rows.map(r => r.dikerjakan), backgroundColor: COLORS.dikerjakan },
+                    { label: 'Belum', data: rows.map(r => r.belum), backgroundColor: COLORS.belum }
+                ].map(d => ({ ...d, stack: 's', borderRadius: 5, borderSkipped: false, maxBarThickness: 34 }));
             } else {
-                labels = reportChartData.labels;
-                data = reportChartData.data;
-                barColor = dark ? '#38bdf8' : '#0284c7';
-                datasetLabel = 'Laporan Diajukan';
+                const c1 = mode === 'st' ? 'rgba(99,102,241,.45)' : 'rgba(14,165,233,.45)';
+                const c2 = mode === 'st' ? '#6366f1' : '#0ea5e9';
+                datasets = [{
+                    label: mode === 'st' ? 'Kegiatan ST' : 'Laporan Diajukan',
+                    data: rows.map(r => mode === 'st' ? r.st_count : r.laporan_count),
+                    backgroundColor: c => vGradient(c.chart, c1, c2),
+                    borderRadius: 9,
+                    borderSkipped: false,
+                    maxBarThickness: 30
+                }];
             }
 
             chartBarInstance = new Chart(ctxBar, {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: datasetLabel,
-                        data: data,
-                        backgroundColor: barColor,
-                        borderRadius: 7,
-                        borderSkipped: false,
-                        maxBarThickness: 28
-                    }]
-                },
+                data: { labels, datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 600 },
+                    animation: { duration: 700, easing: 'easeOutQuart' },
                     onClick: (e, elements) => {
-                        if (elements && elements.length > 0) {
-                            const idx = elements[0].index;
-                            if (mode === 'pokja') {
-                                const code = pokjaChartData.labels[idx];
-                                const searchInput = document.getElementById('searchFilterInput');
-                                if (searchInput) {
-                                    searchInput.value = code;
-                                    clientFilterTable(code);
-                                }
-                            } else if (mode === 'st') {
-                                const userId = stChartData.ids[idx];
-                                if (userId) openPersonModalByUserId(userId);
-                            } else {
-                                const userId = reportChartData.ids[idx];
-                                if (userId) openPersonModalByUserId(userId);
-                            }
+                        if (!elements || !elements.length) return;
+                        const idx = elements[0].index;
+                        if (isPokja) {
+                            const code = rows[idx].kode;
+                            const searchInput = document.getElementById('searchFilterInput');
+                            if (searchInput) { searchInput.value = code; clientFilterTable(code); }
+                        } else if (rows[idx] && rows[idx].id) {
+                            openPersonModalByUserId(rows[idx].id);
                         }
                     },
                     onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
                     plugins: {
-                        legend: { display: false },
+                        legend: isPokja
+                            ? { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 7, boxHeight: 7, font: { size: 10.5, weight: '700' }, padding: 12 } }
+                            : { display: false },
                         tooltip: {
-                            backgroundColor: '#062f57',
-                            titleFont: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-                            bodyFont: { family: 'Plus Jakarta Sans', size: 11 },
-                            cornerRadius: 8,
-                            padding: 10,
+                            ...tooltipStyle(),
                             callbacks: {
-                                title: (items) => {
-                                    const idx = items[0].dataIndex;
-                                    if (mode === 'pokja') return `${pokjaChartData.labels[idx]} - ${pokjaChartData.names[idx]}`;
-                                    if (mode === 'st') return `${stChartData.names[idx]} (${stChartData.pokja[idx]})`;
-                                    return `${reportChartData.names[idx]} (${reportChartData.pokja[idx]})`;
+                                title: items => {
+                                    const r = rows[items[0].dataIndex];
+                                    return isPokja ? `${r.kode} - ${r.nama}` : `${r.name} (${r.pokja})`;
                                 },
-                                label: (c) => {
-                                    const idx = c.dataIndex;
-                                    if (mode === 'pokja') return ` Ketuntasan: ${c.parsed.y} dari ${pokjaChartData.totals[idx]} tugas tuntas`;
-                                    if (mode === 'st') return ` Terlibat dalam: ${c.parsed.y} kegiatan Surat Tugas (ST)`;
-                                    return ` Telah mengajukan: ${c.parsed.y} laporan progres tugas`;
+                                label: c => isPokja
+                                    ? ` ${c.dataset.label}: ${c.parsed.y} tugas`
+                                    : (mode === 'st' ? ` Terlibat: ${c.parsed.y} kegiatan ST` : ` Mengajukan: ${c.parsed.y} laporan`),
+                                footer: items => {
+                                    const r = rows[items[0].dataIndex];
+                                    return isPokja
+                                        ? `Total ${r.total} tugas • ${r.terlambat} terlambat`
+                                        : `Total ${r.total_jobs} tugas`;
                                 }
                             }
                         }
@@ -1242,12 +1479,14 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { precision: 0, font: { family: 'Plus Jakarta Sans', size: 10 }, color: textMuted },
-                            grid: { color: gridColor, drawTicks: false },
+                            stacked: isPokja,
+                            ticks: { precision: 0, font: { size: 10 } },
+                            grid: { color: grid, drawTicks: false },
                             border: { display: false }
                         },
                         x: {
-                            ticks: { font: { family: 'JetBrains Mono', size: 9.5, weight: 'bold' }, color: textMain },
+                            stacked: isPokja,
+                            ticks: { font: { family: 'JetBrains Mono', size: 9.5, weight: '700' }, color: textMain },
                             grid: { display: false },
                             border: { display: false }
                         }
@@ -1258,14 +1497,13 @@
 
         function switchLeaderboardTab(tab) {
             const isSt = tab === 'st';
-            const tabSt = document.getElementById('tabLeadSt');
-            const tabRep = document.getElementById('tabLeadReport');
+            document.getElementById('tabLeadSt')?.classList.toggle('active', isSt);
+            document.getElementById('tabLeadReport')?.classList.toggle('active', !isSt);
             const pSt = document.getElementById('panelLeadSt');
             const pRep = document.getElementById('panelLeadReport');
-            if (tabSt) tabSt.classList.toggle('active', isSt);
-            if (tabRep) tabRep.classList.toggle('active', !isSt);
             if (pSt) pSt.style.display = isSt ? 'flex' : 'none';
             if (pRep) pRep.style.display = !isSt ? 'flex' : 'none';
+            window.__leadTab = tab;
         }
 
         function openPersonModalByUserId(userId) {
@@ -1274,10 +1512,7 @@
             for (let item of items) {
                 try {
                     const staf = JSON.parse(item.dataset.staf);
-                    if (Number(staf.id) === Number(userId)) {
-                        openPersonModal(item);
-                        return;
-                    }
+                    if (Number(staf.id) === Number(userId)) { openPersonModal(item); return; }
                 } catch (e) { }
             }
         }
@@ -1290,25 +1525,15 @@
 
             const container = document.getElementById('assigneeListContainer');
             if (!container) return;
+            const key = criteria === 'st' ? 'stCount' : (criteria === 'report' ? 'repCount' : 'activeCount');
 
             const items = Array.from(container.querySelectorAll('.assignee-item'));
             items.sort((a, b) => {
-                let valA = 0;
-                let valB = 0;
-                if (criteria === 'st') {
-                    valA = parseInt(a.dataset.stCount || '0', 10);
-                    valB = parseInt(b.dataset.stCount || '0', 10);
-                } else if (criteria === 'report') {
-                    valA = parseInt(a.dataset.repCount || '0', 10);
-                    valB = parseInt(b.dataset.repCount || '0', 10);
-                } else {
-                    valA = parseInt(a.dataset.activeCount || '0', 10);
-                    valB = parseInt(b.dataset.activeCount || '0', 10);
-                }
-                if (valB !== valA) return valB - valA;
+                const vA = parseInt(a.dataset[key] || '0', 10);
+                const vB = parseInt(b.dataset[key] || '0', 10);
+                if (vB !== vA) return vB - vA;
                 return (a.dataset.name || '').localeCompare(b.dataset.name || '');
             });
-
             items.forEach(el => container.appendChild(el));
         }
 
@@ -1320,7 +1545,7 @@
             document.getElementById('diagramBtnText').textContent = isDiagramVisible ? 'Tutup' : 'Buka';
             document.getElementById('btnToggleDiagram').classList.toggle('active', isDiagramVisible);
             document.getElementById('diagramToggleLabel').textContent = isDiagramVisible ? 'Diagram: Aktif' : 'Diagram: Tertutup';
-            if (isDiagramVisible) { chartDonutInstance?.resize(); chartBarInstance?.resize(); }
+            if (isDiagramVisible) { chartDonutInstance?.resize(); chartBarInstance?.resize(); chartTrendInstance?.resize(); }
         }
 
         function filterTableByStatusClick(status) {
@@ -1331,13 +1556,12 @@
         // 3. Animasi angka KPI
         // ============================================================
         function animateKpiNumbers() {
-            document.querySelectorAll('.kpi-number[data-count]').forEach(el => {
+            document.querySelectorAll('.count-up[data-count]').forEach(el => {
                 const target = parseFloat(el.dataset.count) || 0;
                 const dec = parseInt(el.dataset.decimals || '0', 10);
-                const suffix = el.dataset.suffix || '';
-                const fmt = v => v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suffix;
+                const fmt = v => v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
                 const start = performance.now();
-                const dur = 900;
+                const dur = 1000;
                 (function tick(now) {
                     const p = Math.min(1, (now - start) / dur);
                     const eased = 1 - Math.pow(1 - p, 3);
@@ -1348,8 +1572,38 @@
         }
 
         // ============================================================
-        // 4. Modal detail tugas & laporan
+        // 4. Helper badge + Modal detail tugas & laporan
         // ============================================================
+        function approvalBadge(status) {
+            if (status === 'disetujui') return '<span class="status-badge-cmd status-badge-selesai sm"><i class="ph-bold ph-check"></i> Disetujui</span>';
+            if (status === 'ditolak') return '<span class="status-badge-cmd status-badge-ditolak sm"><i class="ph-bold ph-x"></i> Perlu Perbaikan</span>';
+            return '<span class="status-badge-cmd status-badge-verifikasi sm"><i class="ph-bold ph-clock"></i> Menunggu Persetujuan</span>';
+        }
+
+        function jenisBadge(isFinal) {
+            return isFinal
+                ? '<span class="status-badge-cmd status-badge-final sm"><i class="ph-bold ph-seal-check"></i> Penyelesaian Akhir</span>'
+                : '<span class="status-badge-cmd status-badge-kemajuan sm"><i class="ph-bold ph-pencil-simple-line"></i> Kemajuan Berkala</span>';
+        }
+
+        function jobStatusBadge(raw) {
+            if (raw === 'selesai_terverifikasi') return '<span class="status-badge-cmd status-badge-selesai sm">Selesai</span>';
+            if (raw === 'hasil_diajukan') return '<span class="status-badge-cmd status-badge-verifikasi sm">Verifikasi</span>';
+            if (raw === 'belum_dimulai') return '<span class="status-badge-cmd st-belum sm">Belum Dimulai</span>';
+            return '<span class="status-badge-cmd status-badge-dikerjakan sm">Dikerjakan</span>';
+        }
+
+        function evidenceButtons(fileUrl, fileName, link) {
+            let html = '';
+            if (fileUrl) {
+                html += `<button type="button" class="btn-evidence" onclick="previewBuktiDukung('${escapeHtml(fileUrl)}', '${escapeHtml(fileName || 'Berkas Bukti Dukung')}')"><i class="ph-bold ph-eye"></i> Pratinjau Berkas</button>`;
+            }
+            if (link) {
+                html += `<a href="${escapeHtml(link)}" target="_blank" rel="noopener" class="btn-evidence ghost"><i class="ph-bold ph-arrow-square-out"></i> Tautan</a>`;
+            }
+            return html;
+        }
+
         let isModalOpen = false;
 
         function openJobModal(job) {
@@ -1379,12 +1633,9 @@
                 parentWrap.style.display = 'none';
             }
 
-            const laporanEl = document.getElementById('mJobLaporanCount');
-            if (laporanEl) laporanEl.textContent = (job.laporan_acc_count || 0) + ' Laporan';
-
+            document.getElementById('mJobLaporanCount').textContent = (job.laporan_acc_count || 0) + ' Laporan';
             document.getElementById('mJobTarget').textContent = job.target || '-';
-            const statusPelaksanaanEl = document.getElementById('mJobStatusPelaksanaan');
-            if (statusPelaksanaanEl) statusPelaksanaanEl.textContent = job.status_label || '-';
+            document.getElementById('mJobStatusPelaksanaan').textContent = job.status_label || '-';
             document.getElementById('mJobTenggat').textContent = job.tenggat || '-';
 
             const sisaEl = document.getElementById('mJobSisaHari');
@@ -1420,7 +1671,7 @@
                     item.className = 'cmd-member-item';
                     item.innerHTML = `
                         <div class="cmd-member-avatar">${escapeHtml(m.initial || 'PL')}</div>
-                        <div style="overflow:hidden;flex:1;">
+                        <div class="member-text">
                             <div class="cmd-member-name" title="${escapeHtml(m.name)}">${escapeHtml(m.name)}</div>
                             <div class="cmd-member-jab" title="${escapeHtml(m.jabatan)}">${escapeHtml(m.jabatan)}</div>
                         </div>`;
@@ -1439,85 +1690,42 @@
                 updateWrap.style.display = 'none';
             }
 
-            // Render Riwayat Laporan Progres Masuk
-            const laporanListEl = document.getElementById('mJobLaporanList');
-            const laporanBadgeEl = document.getElementById('mJobLaporanBadge');
-            if (laporanListEl) {
-                laporanListEl.innerHTML = '';
-                const reports = job.laporan_list || [];
-                if (laporanBadgeEl) laporanBadgeEl.textContent = reports.length + ' Laporan';
+            // Riwayat laporan progres
+            const listEl = document.getElementById('mJobLaporanList');
+            const badgeEl = document.getElementById('mJobLaporanBadge');
+            listEl.innerHTML = '';
+            const reports = job.laporan_list || [];
+            badgeEl.textContent = reports.length + ' Laporan';
 
-                if (reports.length > 0) {
-                    reports.forEach(rep => {
-                        const repItem = document.createElement('div');
-                        repItem.style.background = 'var(--bg-card)';
-                        repItem.style.border = '1px solid var(--border)';
-                        repItem.style.borderRadius = '8px';
-                        repItem.style.padding = '12px 14px';
-
-                        let statusBadgeHtml = '';
-                        if (rep.status_approval === 'disetujui') {
-                            statusBadgeHtml = '<span class="status-badge-cmd status-badge-selesai" style="font-size:10.5px;padding:2px 8px;"><i class="ph-bold ph-check"></i> Disetujui</span>';
-                        } else if (rep.status_approval === 'ditolak') {
-                            statusBadgeHtml = '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 8px;background:rgba(239,68,68,0.15);color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="ph-bold ph-x"></i> Perlu Perbaikan</span>';
-                        } else {
-                            statusBadgeHtml = '<span class="status-badge-cmd status-badge-verifikasi" style="font-size:10.5px;padding:2px 8px;"><i class="ph-bold ph-clock"></i> Menunggu Persetujuan</span>';
-                        }
-
-                        const jenisBadgeHtml = rep.is_penyelesaian
-                            ? '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 8px;background:rgba(147,51,234,0.15);color:#c084fc;border-color:rgba(147,51,234,0.3);"><i class="ph-bold ph-seal-check"></i> Penyelesaian Akhir</span>'
-                            : '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 8px;background:rgba(14,165,233,0.15);color:#38bdf8;border-color:rgba(14,165,233,0.3);"><i class="ph-bold ph-pencil-simple-line"></i> Kemajuan Berkala</span>';
-
-                        let buktiHtml = '';
-                        if (rep.file_bukti) {
-                            const escapedUrl = escapeHtml(rep.file_bukti);
-                            const escapedName = escapeHtml(rep.file_name || 'Berkas Bukti Dukung');
-                            buktiHtml += `<button type="button" class="btn-action-outline" style="padding:4px 9px;font-size:11px;border-radius:5px;cursor:pointer;color:#38bdf8;border-color:rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;gap:4px;" onclick="previewBuktiDukung('${escapedUrl}', '${escapedName}')"><i class="ph-bold ph-eye"></i> Pratinjau Berkas</button>`;
-                        }
-                        if (rep.link_bukti) {
-                            const escapedLink = escapeHtml(rep.link_bukti);
-                            buktiHtml += `<a href="${escapedLink}" target="_blank" class="btn-action-outline" style="padding:4px 9px;font-size:11px;border-radius:5px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);border:1px solid var(--border);"><i class="ph-bold ph-arrow-square-out"></i> Tautan</a>`;
-                        }
-
-                        let kendalaHtml = '';
-                        if (rep.kendala) {
-                            kendalaHtml = `<div style="margin-top:6px;font-size:11.5px;color:#f87171;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;padding:4px 8px;border-radius:0 4px 4px 0;"><strong>Kendala:</strong> ${escapeHtml(rep.kendala)}</div>`;
-                        }
-                        let tindakLanjutHtml = '';
-                        if (rep.tindak_lanjut) {
-                            tindakLanjutHtml = `<div style="margin-top:4px;font-size:11.5px;color:#38bdf8;background:rgba(14,165,233,0.08);border-left:3px solid #0284c7;padding:4px 8px;border-radius:0 4px 4px 0;"><strong>Tindak Lanjut:</strong> ${escapeHtml(rep.tindak_lanjut)}</div>`;
-                        }
-
-                        repItem.innerHTML = `
-                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="cmd-member-avatar" style="width:28px;height:28px;font-size:11px;">${escapeHtml(rep.pelapor_initial || 'PL')}</div>
-                                    <div>
-                                        <div style="font-size:12.5px;font-weight:700;color:var(--text-body);">${escapeHtml(rep.pelapor || '-')}</div>
-                                        <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(rep.tanggal || '-')}</div>
-                                    </div>
-                                </div>
-                                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                                    ${jenisBadgeHtml}
-                                    ${statusBadgeHtml}
+            if (reports.length > 0) {
+                reports.forEach(rep => {
+                    const el = document.createElement('div');
+                    el.className = 'report-card';
+                    const buktiHtml = evidenceButtons(rep.file_bukti, rep.file_name, rep.link_bukti);
+                    el.innerHTML = `
+                        <div class="report-top">
+                            <div class="report-who">
+                                <div class="cmd-member-avatar sm">${escapeHtml(rep.pelapor_initial || 'PL')}</div>
+                                <div>
+                                    <div class="report-name">${escapeHtml(rep.pelapor || '-')}</div>
+                                    <div class="report-date">${escapeHtml(rep.tanggal || '-')}</div>
                                 </div>
                             </div>
-                            <div style="font-size:12px;color:var(--text-body);line-height:1.45;margin-bottom:4px;">
-                                ${escapeHtml(rep.deskripsi || '-')}
-                            </div>
-                            ${kendalaHtml}
-                            ${tindakLanjutHtml}
-                            ${buktiHtml ? `<div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">${buktiHtml}</div>` : ''}
-                        `;
-                        laporanListEl.appendChild(repItem);
-                    });
-                } else {
-                    laporanListEl.innerHTML = `
-                        <div style="text-align:center;padding:18px;color:var(--text-muted);font-size:12px;">
-                            <i class="ph-bold ph-tray" style="font-size:22px;display:block;margin-bottom:4px;opacity:0.4;"></i>
-                            Belum ada laporan progres yang diajukan untuk tugas ini.
-                        </div>`;
-                }
+                            <div class="report-badges">${jenisBadge(rep.is_penyelesaian)}${approvalBadge(rep.status_approval)}</div>
+                        </div>
+                        <div class="report-text">${escapeHtml(rep.deskripsi || '-')}</div>
+                        ${rep.kendala ? `<div class="note-box bad"><strong>Kendala:</strong> ${escapeHtml(rep.kendala)}</div>` : ''}
+                        ${rep.tindak_lanjut ? `<div class="note-box info"><strong>Tindak Lanjut:</strong> ${escapeHtml(rep.tindak_lanjut)}</div>` : ''}
+                        ${rep.catatan_penolakan ? `<div class="note-box bad"><strong>Catatan Penolakan:</strong> ${escapeHtml(rep.catatan_penolakan)}</div>` : ''}
+                        ${buktiHtml ? `<div class="report-evidence">${buktiHtml}</div>` : ''}`;
+                    listEl.appendChild(el);
+                });
+            } else {
+                listEl.innerHTML = `
+                    <div class="mini-empty">
+                        <i class="ph-bold ph-tray"></i>
+                        Belum ada laporan progres yang diajukan untuk tugas ini.
+                    </div>`;
             }
 
             document.getElementById('mJobLink').href = job.url_show || '#';
@@ -1536,7 +1744,7 @@
         }
 
         // ============================================================
-        // 4b. Modal detail personil & tugas/laporannya
+        // 4b. Modal detail personil
         // ============================================================
         let isPersonModalOpen = false;
 
@@ -1556,161 +1764,82 @@
                 document.getElementById('pPersonPicCount').textContent = (staf.pic_count || 0) + ' Tugas';
                 document.getElementById('pPersonMemberCount').textContent = (staf.member_count || 0) + ' Tugas';
                 document.getElementById('pPersonDoneCount').textContent = (staf.tugas_selesai || 0) + ' Tugas';
-                const stCountEl = document.getElementById('pPersonStCount');
-                if (stCountEl) stCountEl.textContent = (staf.st_count || 0) + ' ST';
-                const repCountEl = document.getElementById('pPersonRepCount');
-                if (repCountEl) repCountEl.textContent = (staf.laporan_count || 0) + ' Laporan';
+                document.getElementById('pPersonStCount').textContent = (staf.st_count || 0) + ' ST';
+                document.getElementById('pPersonRepCount').textContent = (staf.laporan_count || 0) + ' Laporan';
 
                 const jobs = staf.jobs || [];
                 const reports = staf.laporan || [];
-
                 document.getElementById('pPersonJobsTabCount').textContent = jobs.length;
                 document.getElementById('pPersonReportsTabCount').textContent = reports.length;
 
-                // Render Tab 1: Pekerjaan
+                // Tab 1: Pekerjaan
                 const jobsPanel = document.getElementById('pPersonJobsPanel');
                 jobsPanel.innerHTML = '';
                 if (jobs.length > 0) {
                     jobs.forEach(j => {
-                        const jCard = document.createElement('div');
-                        jCard.className = 'cmd-pic-card';
-                        jCard.style.padding = '12px 14px';
-                        jCard.style.background = 'var(--bg-card)';
-                        jCard.style.border = '1px solid var(--border)';
-                        jCard.style.borderRadius = '8px';
+                        const card = document.createElement('div');
+                        card.className = 'report-card';
+                        const peran = j.is_pic
+                            ? '<span class="status-badge-cmd status-badge-dikerjakan sm"><i class="ph-bold ph-crown"></i> PIC Utama</span>'
+                            : '<span class="status-badge-cmd st-belum sm"><i class="ph-bold ph-users"></i> Anggota Tim</span>';
+                        const stBadge = j.nomor_st ? `<span class="st-badge-mini" title="Surat Tugas: ${escapeHtml(j.nomor_st)}"><i class="ph-bold ph-file-text"></i> ST: ${escapeHtml(j.nomor_st)}</span>` : '';
 
-                        const peranBadge = j.is_pic
-                            ? '<span class="status-badge-cmd status-badge-dikerjakan" style="font-size:10.5px;padding:2px 7px;"><i class="ph-bold ph-crown"></i> PIC Utama</span>'
-                            : '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 7px;background:rgba(148,163,184,0.15);color:var(--text-muted);border-color:var(--border);"><i class="ph-bold ph-users"></i> Anggota Tim</span>';
-
-                        const stBadge = j.nomor_st ? `<span class="st-badge-mini" style="font-size:10px;display:inline-flex;align-items:center;gap:3px;" title="Surat Tugas: ${escapeHtml(j.nomor_st)}"><i class="ph-bold ph-file-text"></i> ST: ${escapeHtml(j.nomor_st)}</span>` : '';
-
-                        let statusBadge = '';
-                        if (j.status_raw === 'selesai_terverifikasi') {
-                            statusBadge = '<span class="status-badge-cmd status-badge-selesai" style="font-size:10.5px;padding:2px 7px;">Selesai</span>';
-                        } else if (j.status_raw === 'hasil_diajukan') {
-                            statusBadge = '<span class="status-badge-cmd status-badge-verifikasi" style="font-size:10.5px;padding:2px 7px;">Verifikasi</span>';
-                        } else if (j.status_raw === 'belum_dimulai') {
-                            statusBadge = '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 7px;background:rgba(148,163,184,0.15);color:var(--text-muted);">Belum Dimulai</span>';
-                        } else {
-                            statusBadge = '<span class="status-badge-cmd status-badge-dikerjakan" style="font-size:10.5px;padding:2px 7px;">Dikerjakan</span>';
-                        }
-
-                        jCard.innerHTML = `
-                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;">
-                                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                                    <span class="task-code" style="font-size:11px;">${escapeHtml(j.kode || '-')}</span>
-                                    ${peranBadge}
-                                    ${stBadge}
-                                    <span class="task-pokja-badge" style="font-size:10px;">${escapeHtml(j.pokja || 'BGTK')}</span>
+                        card.innerHTML = `
+                            <div class="report-top">
+                                <div class="report-badges">
+                                    <span class="task-code">${escapeHtml(j.kode || '-')}</span>
+                                    ${peran}${stBadge}
+                                    <span class="task-pokja-badge sm">${escapeHtml(j.pokja || 'BGTK')}</span>
                                 </div>
-                                <div>${statusBadge}</div>
+                                <div>${jobStatusBadge(j.status_raw)}</div>
                             </div>
-                            <div style="font-size:13px;font-weight:700;color:var(--text-body);margin-bottom:6px;line-height:1.4;">
-                                ${escapeHtml(j.judul || '-')}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);flex-wrap:wrap;">
-                                <div>
-                                    <i class="ph-bold ph-calendar"></i> Tenggat: <span style="font-weight:600;color:${j.is_terlambat ? 'var(--danger)' : 'var(--text-body)'}">${escapeHtml(j.tenggat || '-')} ${j.is_terlambat ? '(Terlambat)' : ''}</span>
-                                    <span style="margin:0 4px;">•</span>
+                            <div class="report-title">${escapeHtml(j.judul || '-')}</div>
+                            <div class="report-foot">
+                                <div class="report-meta">
+                                    <i class="ph-bold ph-calendar"></i> Tenggat:
+                                    <span class="${j.is_terlambat ? 'txt-late' : ''}">${escapeHtml(j.tenggat || '-')} ${j.is_terlambat ? '(Terlambat)' : ''}</span>
+                                    <span class="sep">•</span>
                                     <i class="ph-bold ph-newspaper-clipping"></i> ${j.laporan_count || 0} Laporan
                                 </div>
-                                <button type="button" class="btn-cmd-primary" style="padding:4px 10px;font-size:11px;border-radius:6px;cursor:pointer;" onclick="openJobModalById(${j.id})">
-                                    <i class="ph-bold ph-eye"></i> Detail Tugas
-                                </button>
-                            </div>
-                        `;
-                        jobsPanel.appendChild(jCard);
+                                <button type="button" class="btn-cmd-primary sm" onclick="openJobModalById(${j.id})"><i class="ph-bold ph-eye"></i> Detail Tugas</button>
+                            </div>`;
+                        jobsPanel.appendChild(card);
                     });
                 } else {
-                    jobsPanel.innerHTML = `
-                        <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">
-                            <i class="ph-bold ph-briefcase" style="font-size:26px;display:block;margin-bottom:6px;opacity:0.4;"></i>
-                            Tidak ada pekerjaan yang sedang ditugaskan kepada personil ini.
-                        </div>`;
+                    jobsPanel.innerHTML = `<div class="mini-empty"><i class="ph-bold ph-briefcase"></i>Tidak ada pekerjaan yang sedang ditugaskan kepada personil ini.</div>`;
                 }
 
-                // Render Tab 2: Laporan Progres
+                // Tab 2: Laporan
                 const repPanel = document.getElementById('pPersonReportsPanel');
                 repPanel.innerHTML = '';
                 if (reports.length > 0) {
                     reports.forEach(r => {
-                        const rCard = document.createElement('div');
-                        rCard.style.padding = '12px 14px';
-                        rCard.style.background = 'var(--bg-card)';
-                        rCard.style.border = '1px solid var(--border)';
-                        rCard.style.borderRadius = '8px';
-
-                        let statusBadge = '';
-                        if (r.status_approval === 'disetujui') {
-                            statusBadge = '<span class="status-badge-cmd status-badge-selesai" style="font-size:10.5px;padding:2px 7px;"><i class="ph-bold ph-check"></i> Disetujui</span>';
-                        } else if (r.status_approval === 'ditolak') {
-                            statusBadge = '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 7px;background:rgba(239,68,68,0.15);color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="ph-bold ph-x"></i> Perlu Perbaikan</span>';
-                        } else {
-                            statusBadge = '<span class="status-badge-cmd status-badge-verifikasi" style="font-size:10.5px;padding:2px 7px;"><i class="ph-bold ph-clock"></i> Menunggu Persetujuan</span>';
-                        }
-
-                        const jenisBadge = r.is_penyelesaian
-                            ? '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 7px;background:rgba(147,51,234,0.15);color:#c084fc;border-color:rgba(147,51,234,0.3);"><i class="ph-bold ph-seal-check"></i> Penyelesaian Akhir</span>'
-                            : '<span class="status-badge-cmd" style="font-size:10.5px;padding:2px 7px;background:rgba(14,165,233,0.15);color:#38bdf8;border-color:rgba(14,165,233,0.3);"><i class="ph-bold ph-pencil-simple-line"></i> Kemajuan Berkala</span>';
-
-                        let fileAction = '';
-                        if (r.file_bukti) {
-                            const fUrl = escapeHtml(r.file_bukti);
-                            const fName = escapeHtml(r.file_name || 'Berkas Bukti Dukung');
-                            fileAction += `<button type="button" class="btn-action-outline" style="padding:4px 9px;font-size:11px;border-radius:5px;cursor:pointer;color:#38bdf8;border-color:rgba(56,189,248,0.3);background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;gap:4px;" onclick="previewBuktiDukung('${fUrl}', '${fName}')"><i class="ph-bold ph-eye"></i> Pratinjau Berkas</button>`;
-                        }
-                        if (r.link_bukti) {
-                            const lUrl = escapeHtml(r.link_bukti);
-                            fileAction += `<a href="${lUrl}" target="_blank" class="btn-action-outline" style="padding:4px 9px;font-size:11px;border-radius:5px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);border:1px solid var(--border);"><i class="ph-bold ph-arrow-square-out"></i> Tautan</a>`;
-                        }
-
-                        let kendalaBox = '';
-                        if (r.kendala) {
-                            kendalaBox = `<div style="margin-top:6px;font-size:11.5px;color:#f87171;background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;padding:4px 8px;border-radius:0 4px 4px 0;"><strong>Kendala:</strong> ${escapeHtml(r.kendala)}</div>`;
-                        }
-
-                        rCard.innerHTML = `
-                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                        const card = document.createElement('div');
+                        card.className = 'report-card';
+                        const buktiHtml = evidenceButtons(r.file_bukti, r.file_name, r.link_bukti);
+                        card.innerHTML = `
+                            <div class="report-top">
                                 <div>
-                                    <span class="task-code" style="font-size:10.5px;margin-right:6px;">${escapeHtml(r.pekerjaan_kode || '-')}</span>
-                                    <span style="font-size:12.5px;font-weight:700;color:var(--text-body);">${escapeHtml(r.pekerjaan_judul || '-')}</span>
+                                    <span class="task-code">${escapeHtml(r.pekerjaan_kode || '-')}</span>
+                                    <span class="report-title inline">${escapeHtml(r.pekerjaan_judul || '-')}</span>
                                 </div>
-                                <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
-                                    ${jenisBadge}
-                                    ${statusBadge}
-                                </div>
+                                <div class="report-badges">${jenisBadge(r.is_penyelesaian)}${approvalBadge(r.status_approval)}</div>
                             </div>
-                            <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px;">
-                                <i class="ph-bold ph-calendar"></i> Tanggal Lapor: <strong>${escapeHtml(r.tanggal || '-')}</strong>
-                            </div>
-                            <div style="font-size:12px;color:var(--text-body);line-height:1.45;background:var(--bg-table-row, rgba(255,255,255,0.02));padding:8px 10px;border-radius:6px;border:1px solid var(--border);">
-                                ${escapeHtml(r.deskripsi || '-')}
-                            </div>
-                            ${kendalaBox}
-                            <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <div style="display:flex;gap:6px;align-items:center;">
-                                    ${fileAction}
-                                </div>
-                                <button type="button" class="btn-cmd-secondary" style="padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;" onclick="openJobModalById(${r.pekerjaan_id})">
-                                    <i class="ph-bold ph-arrow-square-out"></i> Buka Tugas Terkait
-                                </button>
-                            </div>
-                        `;
-                        repPanel.appendChild(rCard);
+                            <div class="report-date"><i class="ph-bold ph-calendar"></i> Tanggal Lapor: <strong>${escapeHtml(r.tanggal || '-')}</strong></div>
+                            <div class="report-text boxed">${escapeHtml(r.deskripsi || '-')}</div>
+                            ${r.kendala ? `<div class="note-box bad"><strong>Kendala:</strong> ${escapeHtml(r.kendala)}</div>` : ''}
+                            <div class="report-foot">
+                                <div class="report-evidence">${buktiHtml}</div>
+                                <button type="button" class="btn-cmd-secondary sm" onclick="openJobModalById(${r.pekerjaan_id})"><i class="ph-bold ph-arrow-square-out"></i> Buka Tugas Terkait</button>
+                            </div>`;
+                        repPanel.appendChild(card);
                     });
                 } else {
-                    repPanel.innerHTML = `
-                        <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">
-                            <i class="ph-bold ph-newspaper-clipping" style="font-size:26px;display:block;margin-bottom:6px;opacity:0.4;"></i>
-                            Belum ada riwayat laporan progres yang diajukan oleh personil ini.
-                        </div>`;
+                    repPanel.innerHTML = `<div class="mini-empty"><i class="ph-bold ph-newspaper-clipping"></i>Belum ada riwayat laporan progres yang diajukan oleh personil ini.</div>`;
                 }
 
-                // Default switch to Tab 'jobs'
                 switchPersonTab('jobs');
 
-                // Filter button in person modal footer
                 const filterBtn = document.getElementById('pPersonFilterBtn');
                 if (filterBtn) {
                     filterBtn.onclick = function () {
@@ -1728,34 +1857,10 @@
 
         function switchPersonTab(tab) {
             const isJobs = tab === 'jobs';
-            const btnJobs = document.getElementById('tabBtnPersonJobs');
-            const btnReps = document.getElementById('tabBtnPersonReports');
-            const panelJobs = document.getElementById('pPersonJobsPanel');
-            const panelReps = document.getElementById('pPersonReportsPanel');
-
-            if (isJobs) {
-                btnJobs.style.borderBottomColor = '#0a6fb5';
-                btnJobs.style.color = '#0a6fb5';
-                btnJobs.style.fontWeight = '800';
-
-                btnReps.style.borderBottomColor = 'transparent';
-                btnReps.style.color = 'var(--text-muted)';
-                btnReps.style.fontWeight = '700';
-
-                panelJobs.style.display = 'flex';
-                panelReps.style.display = 'none';
-            } else {
-                btnReps.style.borderBottomColor = '#0a6fb5';
-                btnReps.style.color = '#0a6fb5';
-                btnReps.style.fontWeight = '800';
-
-                btnJobs.style.borderBottomColor = 'transparent';
-                btnJobs.style.color = 'var(--text-muted)';
-                btnJobs.style.fontWeight = '700';
-
-                panelJobs.style.display = 'none';
-                panelReps.style.display = 'flex';
-            }
+            document.getElementById('tabBtnPersonJobs').classList.toggle('active', isJobs);
+            document.getElementById('tabBtnPersonReports').classList.toggle('active', !isJobs);
+            document.getElementById('pPersonJobsPanel').style.display = isJobs ? 'flex' : 'none';
+            document.getElementById('pPersonReportsPanel').style.display = isJobs ? 'none' : 'flex';
         }
 
         function closePersonModalDirect() {
@@ -1774,88 +1879,57 @@
             if (!jobId) return;
             const numId = Number(jobId);
             if (window.allPekerjaanMap && window.allPekerjaanMap.has(numId)) {
-                const j = window.allPekerjaanMap.get(numId);
                 closePersonModalDirect();
-                openJobModal(j);
+                openJobModal(window.allPekerjaanMap.get(numId));
             } else {
                 window.open('/pekerjaan/' + jobId, '_blank');
             }
         }
 
         // ============================================================
-        // 4c. Universal Preview Modal Bukti Dukung
+        // 4c. Preview Bukti Dukung
         // ============================================================
         function previewBuktiDukung(fileUrl, fileName = 'Berkas Bukti Dukung') {
             const modal = document.getElementById('modalPreviewBuktiUniversal');
-            if (!modal) {
-                window.open(fileUrl, '_blank');
-                return;
-            }
+            if (!modal) { window.open(fileUrl, '_blank'); return; }
 
-            const titleEl = document.getElementById('previewBuktiTitle');
             const bodyEl = document.getElementById('previewBuktiBody');
-            const extBadge = document.getElementById('previewBuktiExtBadge');
-            const extBtn = document.getElementById('previewBuktiExternalBtn');
-            const dlBtn = document.getElementById('previewBuktiDownloadBtn');
-            const iconEl = document.getElementById('previewBuktiIcon');
-
-            if (titleEl) titleEl.textContent = fileName;
-            if (extBtn) extBtn.href = fileUrl;
-            if (dlBtn) dlBtn.href = fileUrl;
+            document.getElementById('previewBuktiTitle').textContent = fileName;
+            document.getElementById('previewBuktiExternalBtn').href = fileUrl;
+            document.getElementById('previewBuktiDownloadBtn').href = fileUrl;
 
             const cleanUrl = fileUrl.split('?')[0].split('#')[0];
             const ext = cleanUrl.split('.').pop().toLowerCase();
-            if (extBadge) extBadge.textContent = ext.toUpperCase();
+            document.getElementById('previewBuktiExtBadge').textContent = ext.toUpperCase();
 
+            const isImg = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext);
             let iconClass = 'ph-bold ph-file-text';
-            if (['pdf'].includes(ext)) iconClass = 'ph-bold ph-file-pdf';
-            else if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext)) iconClass = 'ph-bold ph-image';
+            if (ext === 'pdf') iconClass = 'ph-bold ph-file-pdf';
+            else if (isImg) iconClass = 'ph-bold ph-image';
             else if (['doc', 'docx'].includes(ext)) iconClass = 'ph-bold ph-file-doc';
             else if (['xls', 'xlsx'].includes(ext)) iconClass = 'ph-bold ph-file-xls';
-            if (iconEl) iconEl.className = iconClass;
+            document.getElementById('previewBuktiIcon').className = iconClass;
 
-            if (bodyEl) {
-                bodyEl.innerHTML = '';
-                if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext)) {
-                    const img = document.createElement('img');
-                    img.src = fileUrl;
-                    img.alt = fileName;
-                    img.style.maxWidth = '100%';
-                    img.style.maxHeight = '70vh';
-                    img.style.borderRadius = '8px';
-                    img.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
-                    img.style.objectFit = 'contain';
-                    bodyEl.appendChild(img);
-                } else if (ext === 'pdf') {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = fileUrl;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '70vh';
-                    iframe.style.border = 'none';
-                    iframe.style.borderRadius = '8px';
-                    iframe.style.background = '#ffffff';
-                    bodyEl.appendChild(iframe);
-                } else {
-                    bodyEl.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px;">
-                            <div style="width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 16px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 38px;">
-                                <i class="${iconClass}"></i>
-                            </div>
-                            <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 800; color: var(--text-body);">Pratinjau Langsung Tidak Didukung</h4>
-                            <p style="margin: 0 0 20px 0; font-size: 13px; color: var(--text-muted); max-width: 420px; margin-inline: auto;">
-                                Berkas berformat <strong>.${ext.toUpperCase()}</strong> memerlukan aplikasi eksternal atau dapat diunduh untuk membukanya.
-                            </p>
-                            <div style="display: flex; gap: 10px; justify-content: center;">
-                                <a href="${fileUrl}" target="_blank" class="btn-action-outline" style="padding: 8px 16px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px;">
-                                    <i class="ph-bold ph-arrow-square-out"></i> Buka di Tab Baru
-                                </a>
-                                <a href="${fileUrl}" download class="btn-action-primary" style="padding: 8px 18px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; background: #0284c7; color: white;">
-                                    <i class="ph-bold ph-download-simple"></i> Unduh Berkas
-                                </a>
-                            </div>
+            bodyEl.innerHTML = '';
+            if (isImg) {
+                const img = document.createElement('img');
+                img.src = fileUrl; img.alt = fileName; img.className = 'preview-img';
+                bodyEl.appendChild(img);
+            } else if (ext === 'pdf') {
+                const iframe = document.createElement('iframe');
+                iframe.src = fileUrl; iframe.className = 'preview-frame';
+                bodyEl.appendChild(iframe);
+            } else {
+                bodyEl.innerHTML = `
+                    <div class="preview-unsupported">
+                        <div class="preview-unsupported-ico"><i class="${iconClass}"></i></div>
+                        <h4>Pratinjau Langsung Tidak Didukung</h4>
+                        <p>Berkas berformat <strong>.${escapeHtml(ext.toUpperCase())}</strong> perlu dibuka di aplikasi eksternal atau diunduh.</p>
+                        <div class="preview-unsupported-actions">
+                            <a href="${escapeHtml(fileUrl)}" target="_blank" class="btn-action-outline"><i class="ph-bold ph-arrow-square-out"></i> Buka di Tab Baru</a>
+                            <a href="${escapeHtml(fileUrl)}" download class="btn-action-primary"><i class="ph-bold ph-download-simple"></i> Unduh Berkas</a>
                         </div>
-                    `;
-                }
+                    </div>`;
             }
 
             modal.style.display = 'flex';
@@ -1869,8 +1943,7 @@
         }
 
         function closePreviewBuktiOnBackdrop(e) {
-            const modal = document.getElementById('modalPreviewBuktiUniversal');
-            if (e.target === modal) closePreviewBukti();
+            if (e.target === document.getElementById('modalPreviewBuktiUniversal')) closePreviewBukti();
         }
 
         // Index semua tugas ke map untuk cross-navigation cepat
@@ -1890,6 +1963,14 @@
             const row = e.target.closest('tr.table-row-item');
             if (!row || !row.dataset.job) return;
             try { openJobModal(JSON.parse(row.dataset.job)); } catch (err) { console.warn('Data tugas tidak valid', err); }
+        });
+
+        // Klik kartu (tampilan kartu)
+        document.getElementById('cardGrid').addEventListener('click', (e) => {
+            const card = e.target.closest('.job-card');
+            if (!card) return;
+            const j = window.allPekerjaanMap.get(Number(card.dataset.id));
+            if (j) openJobModal(j);
         });
 
         // ============================================================
@@ -1931,7 +2012,7 @@
         }
 
         async function refreshDashboardData() {
-            if (isRefreshing || isModalOpen) return;
+            if (isRefreshing || isModalOpen || isPersonModalOpen) return;
             isRefreshing = true;
             renderRefreshLabel();
 
@@ -1943,23 +2024,41 @@
                 if (response.ok) {
                     const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
 
+                    swapSection(doc, '.hero-card', false);
                     swapSection(doc, '.giant-kpi-grid', false);
+                    swapSection(doc, '#donutLegend', false);
+                    swapSection(doc, '#donutNum', false);
                     swapSection(doc, '.diagram-leaderboard-box', false);
                     swapSection(doc, '#pokjaScrollContainer', true);
                     swapSection(doc, '#assigneeListContainer', true);
+                    swapSection(doc, '#paneRadar', true);
                     swapSection(doc, '.stream-tabs', false);
                     swapSection(doc, '#commandTable tbody', false);
 
+                    // Perbarui chart bila data berubah
+                    const newPayload = readPayload(doc);
+                    const sig = JSON.stringify(newPayload);
+                    if (sig !== payloadSignature) {
+                        payload = newPayload;
+                        payloadSignature = sig;
+                        updateChartModeLabels();
+                        initMonitoringCharts();
+                    }
+
+                    // Pulihkan tab leaderboard yang sedang aktif
+                    if (window.__leadTab) switchLeaderboardTab(window.__leadTab);
+
                     indexAllJobs();
                     if (currentAssigneeSort !== 'active') {
-                        sortAssigneeList(currentAssigneeSort, document.getElementById('sortBtn' + (currentAssigneeSort === 'st' ? 'St' : (currentAssigneeSort === 'report' ? 'Report' : 'Active'))));
+                        const idMap = { st: 'sortBtnSt', report: 'sortBtnReport' };
+                        sortAssigneeList(currentAssigneeSort, document.getElementById(idMap[currentAssigneeSort]));
                     }
                     filterAssigneeRows();
                     if (selectedAssigneeName) markSelectedAssignee(selectedAssigneeName);
-                    updateRowCount();
 
                     const searchInput = document.getElementById('searchFilterInput');
                     if (searchInput && searchInput.value) clientFilterTable(searchInput.value);
+                    else updateRowCount();
                 }
             } catch (err) {
                 console.warn('Gagal sinkronisasi data monitoring balai:', err);
@@ -1972,7 +2071,7 @@
         }
 
         function runRefreshCountdown() {
-            if (!isAutoRefreshActive || isRefreshing || isModalOpen) return;
+            if (!isAutoRefreshActive || isRefreshing || isModalOpen || isPersonModalOpen) return;
             const active = document.activeElement;
             if (active && active.tagName === 'INPUT' && active.value) {
                 refreshSecondsLeft = REFRESH_INTERVAL;
@@ -2035,7 +2134,7 @@
             reachedBottom = false;
             scrollPausedUntil = Date.now() + 2500;
             scrollTimer = setInterval(() => {
-                if (!isAutoScrollActive || !scrollContainer || isModalOpen) return;
+                if (!isAutoScrollActive || !scrollContainer || isModalOpen || isPersonModalOpen) return;
                 const now = Date.now();
                 if (now < scrollPausedUntil) return;
 
@@ -2058,8 +2157,62 @@
         }
 
         // ============================================================
-        // 8. Filter cepat
+        // 8. Filter cepat + tampilan Tabel / Kartu
         // ============================================================
+        let currentView = 'table';
+        try { currentView = localStorage.getItem('bgtkView') || 'table'; } catch (e) { }
+
+        function setView(v) {
+            currentView = v === 'cards' ? 'cards' : 'table';
+            try { localStorage.setItem('bgtkView', currentView); } catch (e) { }
+            document.getElementById('streamPanel').classList.toggle('view-cards', currentView === 'cards');
+            document.getElementById('btnViewTable').classList.toggle('active', currentView === 'table');
+            document.getElementById('btnViewCards').classList.toggle('active', currentView === 'cards');
+            renderCards();
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('cardGrid');
+            if (!grid) return;
+            if (currentView !== 'cards') { grid.innerHTML = ''; return; }
+
+            const rows = Array.from(document.querySelectorAll('#commandTable tr.table-row-item')).filter(r => r.style.display !== 'none');
+            if (!rows.length) {
+                grid.innerHTML = '<div class="mini-empty wide"><i class="ph-bold ph-tray"></i>Tidak ada tugas yang sesuai dengan filter ini.</div>';
+                return;
+            }
+
+            grid.innerHTML = rows.map(r => {
+                let j;
+                try { j = JSON.parse(r.dataset.job); } catch (e) { return ''; }
+                const late = j.is_terlambat && j.status_raw !== 'selesai_terverifikasi';
+                const team = (j.pelaksana || []).length;
+                return `
+                    <article class="job-card ${late ? 'is-late' : ''}" data-id="${j.id}">
+                        <div class="job-card-top">
+                            <span class="task-code">${escapeHtml(j.kode)}</span>
+                            <span class="status-badge-cmd ${escapeHtml(j.status_class)}">${escapeHtml(j.status_label)}</span>
+                        </div>
+                        <h4 class="job-card-title">${escapeHtml(j.judul)}</h4>
+                        <div class="job-card-tags">
+                            <span class="task-pokja-badge sm">${escapeHtml(j.pokja_code)}</span>
+                            ${j.nomor_st ? '<span class="st-badge-mini"><i class="ph-bold ph-file-text"></i> ST</span>' : ''}
+                        </div>
+                        <div class="job-card-foot">
+                            <div class="job-card-pic">
+                                <div class="pic-avatar-mini">${escapeHtml(j.pj_initial)}</div>
+                                <span title="${escapeHtml(j.pj_nama)}">${escapeHtml(j.pj_nama)}</span>
+                                ${team > 1 ? `<em>+${team - 1}</em>` : ''}
+                            </div>
+                            <div class="job-card-meta">
+                                <span class="${late ? 'txt-late' : ''}"><i class="ph-bold ph-calendar"></i> ${escapeHtml(j.tenggat)}</span>
+                                <span><i class="ph-bold ph-newspaper-clipping"></i> ${j.laporan_acc_count}</span>
+                            </div>
+                        </div>
+                    </article>`;
+            }).join('');
+        }
+
         function clientFilterTable(query) {
             query = (query || '').toLowerCase().trim();
             document.querySelectorAll('.table-row-item').forEach(row => {
@@ -2075,16 +2228,18 @@
             const b = document.getElementById('rowTotal');
             if (a) a.textContent = shown;
             if (b) b.textContent = rows.length;
+            renderCards();
         }
 
-        // Saklar panel kiri: Tim Kerja / Personil
+        // Saklar panel kiri: Tim / Personil / Radar
         function switchSidePane(name) {
-            const isPokja = name !== 'staf';
-            document.getElementById('panePokja').hidden = !isPokja;
-            document.getElementById('paneStaf').hidden = isPokja;
-            document.getElementById('sideTabPokja').classList.toggle('active', isPokja);
-            document.getElementById('sideTabStaf').classList.toggle('active', !isPokja);
-            try { localStorage.setItem('bgtkSidePane', isPokja ? 'pokja' : 'staf'); } catch (e) { }
+            ['pokja', 'staf', 'radar'].forEach(n => {
+                const pane = document.getElementById('pane' + n.charAt(0).toUpperCase() + n.slice(1));
+                const tab = document.getElementById('sideTab' + n.charAt(0).toUpperCase() + n.slice(1));
+                if (pane) pane.hidden = n !== name;
+                if (tab) tab.classList.toggle('active', n === name);
+            });
+            try { localStorage.setItem('bgtkSidePane', name); } catch (e) { }
         }
 
         let currentAssigneeTab = 'all';
@@ -2131,7 +2286,7 @@
         }
 
         // ============================================================
-        // 9. Pintasan keyboard: F, S, R, T, Esc
+        // 9. Pintasan keyboard: F, S, R, T, V, /, Esc
         // ============================================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -2147,6 +2302,8 @@
             else if (k === 's') toggleAutoScroll();
             else if (k === 'r') toggleAutoRefresh();
             else if (k === 't') toggleTheme();
+            else if (k === 'v') setView(currentView === 'table' ? 'cards' : 'table');
+            else if (k === '/') { e.preventDefault(); document.getElementById('searchFilterInput')?.focus(); }
         });
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -2154,6 +2311,9 @@
             initMonitoringCharts();
             animateKpiNumbers();
             indexAllJobs();
+            try { switchSidePane(localStorage.getItem('bgtkSidePane') || 'pokja'); } catch (e) { }
+            updateRowCount();
+            setView(currentView);
         });
     </script>
 </body>

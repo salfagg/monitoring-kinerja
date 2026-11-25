@@ -1,4 +1,4 @@
-﻿/* === TANJIDOR Pokja Management Styles === */
+/* === TANJIDOR Pokja Management Styles === */
 /* Page Header */
     .pokja-page-header {
         display: flex;
@@ -89,38 +89,39 @@
     }
 
     .pokja-tabs-wrapper {
-        display: flex;
-        gap: 6px;
+        display: inline-flex;
+        gap: 4px;
+        padding: 4px;
+        background: var(--bg-sub);
+        border: 1px solid var(--border);
+        border-radius: 13px;
         overflow-x: auto;
-        padding-bottom: 2px;
     }
 
     .pokja-tab-btn {
-        background: var(--bg-hover, #f1f5f9);
+        background: transparent;
         color: var(--text-muted, #64748b);
-        border: 1px solid var(--border);
-        padding: 6px 14px;
-        border-radius: 20px;
+        border: none;
+        padding: 7px 14px;
+        border-radius: 9px;
         font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.18s ease;
+        transition: all 0.16s ease;
         white-space: nowrap;
     }
 
     .pokja-tab-btn:hover {
-        background: #e2e8f0;
-        color: var(--primary);
+        color: var(--text-dark);
     }
 
     .pokja-tab-btn.active {
-        background: var(--primary);
-        color: #ffffff;
-        border-color: var(--primary);
-        box-shadow: 0 2px 8px rgba(10, 111, 181, 0.28);
+        background: var(--card-bg);
+        color: var(--navy);
+        box-shadow: 0 2px 6px rgba(11, 74, 130, 0.12), 0 0 0 1px var(--border);
     }
 
     .pokja-tab-count {
@@ -1046,26 +1047,31 @@
     }
 
     .custom-table thead th {
-        background: #f8fafc;
-        color: #475569;
-        font-weight: 700;
-        font-size: 11.5px;
+        background: var(--bg-sub);
+        color: var(--text-muted);
+        font-weight: 800;
+        font-size: 10.5px;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 14px 20px;
-        border-bottom: 1px solid #e2e8f0;
+        letter-spacing: 0.06em;
+        padding: 12px 18px;
+        border-bottom: 2px solid var(--border-strong);
         white-space: nowrap;
     }
 
     .custom-table tbody td {
-        padding: 15px 20px;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
         vertical-align: middle;
-        color: #334155;
+        color: var(--text-body);
+        transition: background 0.15s ease;
     }
 
     .custom-table tbody tr:hover td {
-        background-color: #fafbfc;
+        background-color: rgba(10, 111, 181, 0.035);
+    }
+
+    .custom-table tbody tr:hover td:first-child {
+        box-shadow: inset 4px 0 0 var(--primary);
     }
 
     .custom-table tbody tr:last-child td {
@@ -1080,18 +1086,18 @@
     }
 
     .cell-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: var(--grad-brand);
         color: white;
         font-weight: 800;
-        font-size: 13.5px;
+        font-size: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+        box-shadow: 0 2px 8px rgba(11, 74, 130, 0.22);
     }
 
     .user-name-title {
@@ -1599,3 +1605,134 @@
         border-radius: 99px;
     }
 
+    /* ==========================================================================
+       Responsive Overhaul for Master Data (Pokjas & Users)
+       ========================================================================== */
+    @media (max-width: 900px) {
+        .pokja-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .filter-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .pokja-header {
+            padding: 16px 18px;
+            border-radius: 12px;
+        }
+        .pokja-header h2 {
+            font-size: 18px;
+        }
+        .pokja-kpi-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px;
+        }
+        .pokja-kpi-card {
+            padding: 12px 14px;
+        }
+        .pokja-kpi-val {
+            font-size: 20px;
+        }
+        .pokja-toolbar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 10px;
+            padding: 12px;
+        }
+        .pokja-toolbar > * {
+            width: 100%;
+        }
+        .pokja-tabs-bar {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            padding-bottom: 4px;
+        }
+        .pokja-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px;
+        }
+        .table-responsive, .table-card {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100%;
+        }
+        .data-table {
+            min-width: 650px;
+        }
+        .modal-card {
+            width: 95vw !important;
+            max-height: 92vh;
+            border-radius: 14px;
+        }
+        .filter-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .pokja-kpi-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+
+
+/* ==========================================================================
+   DARK MODE OVERRIDES — User Management & Master Data Tambahan
+   ========================================================================== */
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .toolbar-card,
+[data-theme="dark"] .pilar-banner,
+[data-theme="dark"] .role-legend-card {
+    background: #0f1a2c !important;
+    border-color: #1c2e47 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .stat-val,
+[data-theme="dark"] .cell-user-name,
+[data-theme="dark"] .pokja-card-title {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .cell-user-nip,
+[data-theme="dark"] .pokja-desc {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .custom-table thead th {
+    background: #0a1423 !important;
+    color: #7f95ad !important;
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .custom-table tbody td {
+    color: #cbd5e1 !important;
+    border-bottom-color: #1a2e46 !important;
+}
+
+[data-theme="dark"] .custom-table tbody tr:hover td {
+    background: #13263d !important;
+}
+
+[data-theme="dark"] .pokja-tabs-wrapper {
+    background: #0a1423 !important;
+    border-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .pokja-tab-btn {
+    background: transparent !important;
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .pokja-tab-btn.active {
+    background: #15243a !important;
+    color: #38a3ec !important;
+}

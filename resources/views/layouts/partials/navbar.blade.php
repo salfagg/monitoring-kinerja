@@ -1,10 +1,15 @@
 <!-- Top Navbar Component (TANJIDOR Navy Style) -->
 <header class="top-navbar">
     <div class="navbar-left">
+        <!-- Hamburger Menu Button for Mobile & Tablet -->
+        <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()" aria-label="Buka Menu Navigasi" title="Buka Menu">
+            <i class="ph-bold ph-list"></i>
+        </button>
+
         <div class="navbar-brand-badge">
             <i class="ph-bold ph-shield-check"></i>
         </div>
-        <div>
+        <div class="navbar-brand-text-wrap">
             <div class="navbar-brand-title">
                 <span>BGTK PROVINSI DKI JAKARTA</span>
                 <span class="navbar-live-tag">TANJIDOR</span>

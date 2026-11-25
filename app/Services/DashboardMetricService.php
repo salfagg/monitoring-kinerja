@@ -62,7 +62,9 @@ class DashboardMetricService
                 'pokja',
                 'pekerjaanSebagaiPj' => fn ($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
                 'pekerjaanDitugaskan' => fn ($q) => $q->with(['pokja', 'realisasi.user'])->orderBy('tenggat', 'asc'),
-                'realisasiPekerjaan' => fn ($q) => $q->with(['pekerjaan.pokja'])->latest()->take(30),
+                // Catatan: take() pada eager load berlaku GLOBAL (bukan per user),
+                // jadi pemotongan 30 laporan terbaru dilakukan per user di dalam map().
+                'realisasiPekerjaan' => fn ($q) => $q->with(['pekerjaan.pokja'])->latest(),
             ])
             ->get()
             ->map(function ($u) {
@@ -107,7 +109,7 @@ class DashboardMetricService
                     ];
                 })->toArray();
 
-                $laporanPayload = $u->realisasiPekerjaan->map(function ($r) {
+                $laporanPayload = $u->realisasiPekerjaan->take(30)->map(function ($r) {
                     return [
                         'id' => $r->id,
                         'pekerjaan_id' => $r->pekerjaan_id,
@@ -130,7 +132,7 @@ class DashboardMetricService
                         'file_name' => $r->file_bukti ? basename($r->file_bukti) : null,
                         'link_bukti' => $r->link_bukti,
                     ];
-                })->toArray();
+                })->values()->toArray();
 
                 return (object) [
                     'id' => $u->id,
@@ -160,6 +162,99 @@ class DashboardMetricService
     }
 
     /**
+     * Tren laporan progres masuk per hari (default 14 hari terakhir).
+     * Mengembalikan label, jumlah laporan masuk, dan jumlah yang disetujui.
+     */
+    public function getTrendLaporan(int $days = 14): array
+    {
+        $start = Carbon::today()->subDays($days - 1);
+
+        $rows = RealisasiPekerjaan::where('created_at', '>=', $start)
+            ->selectRaw("DATE(created_at) as tgl, COUNT(*) as total, SUM(CASE WHEN status_approval = 'disetujui' THEN 1 ELSE 0 END) as disetujui")
+            ->groupBy('tgl')
+            ->get()
+            ->keyBy('tgl');
+
+        $labels = [];
+        $masuk = [];
+        $disetujui = [];
+
+        for ($i = 0; $i < $days; $i++) {
+            $d = $start->copy()->addDays($i);
+            $row = $rows->get($d->toDateString());
+            $labels[] = $d->locale('id')->translatedFormat('d M');
+            $masuk[] = (int) ($row->total ?? 0);
+            $disetujui[] = (int) ($row->disetujui ?? 0);
+        }
+
+        return [
+            'labels' => $labels,
+            'masuk' => $masuk,
+            'disetujui' => $disetujui,
+        ];
+    }
+
+    /**
+     * Tugas yang akan jatuh tempo dalam N hari ke depan (belum selesai).
+     */
+    public function getUpcomingDeadlines(int $days = 7, int $limit = 8): Collection
+    {
+        $today = Carbon::today();
+
+        return Pekerjaan::with(['penanggungJawab', 'pokja'])
+            ->where('status_pelaksanaan', '!=', 'selesai_terverifikasi')
+            ->whereDate('tenggat', '>=', $today)
+            ->whereDate('tenggat', '<=', $today->copy()->addDays($days))
+            ->orderBy('tenggat', 'asc')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($j) => [
+                'id' => $j->id,
+                'kode' => $j->kode_tampilan,
+                'judul' => $j->judul,
+                'pic' => $j->penanggungJawab?->name ?? 'Belum ditugaskan',
+                'pokja' => $j->pokja?->kode_pokja ?? 'BGTK',
+                'tenggat' => $j->tenggat ? $j->tenggat->format('d/m/Y') : '-',
+                'sisa_hari' => (int) $today->diffInDays(Carbon::parse($j->tenggat)->startOfDay(), false),
+            ]);
+    }
+
+    /**
+     * Aktivitas laporan progres terbaru di seluruh balai (live feed).
+     */
+    public function getRecentActivity(int $limit = 10): Collection
+    {
+        return RealisasiPekerjaan::with(['user', 'pekerjaan.pokja'])
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'pekerjaan_id' => $r->pekerjaan_id,
+                'pelapor' => $r->user?->name ?? 'Pegawai Pelaksana',
+                'initial' => strtoupper(substr($r->user?->name ?? 'P', 0, 2)),
+                'kode' => $r->pekerjaan?->kode_tampilan ?? '-',
+                'judul' => $r->pekerjaan?->judul ?? 'Tugas tidak ditemukan',
+                'pokja' => $r->pekerjaan?->pokja?->kode_pokja ?? 'BGTK',
+                'status_approval' => $r->status_approval,
+                'is_penyelesaian' => $r->isPenyelesaian(),
+                'waktu' => $r->created_at ? $r->created_at->locale('id')->diffForHumans() : '-',
+            ]);
+    }
+
+    /**
+     * Nama pendek untuk label chart: "Budi S."
+     */
+    private function shortName(string $name): string
+    {
+        $parts = preg_split('/\s+/', trim($name)) ?: [$name];
+        $first = $parts[0] ?? $name;
+        $second = isset($parts[1]) ? ' '.mb_substr($parts[1], 0, 1).'.' : '';
+
+        return $first.$second;
+    }
+
+    /**
      * Ambil metrik dan data pelengkap untuk halaman Command Center / Monitoring Balai.
      */
     public function getCommandCenterData(Request $request): array
@@ -179,20 +274,29 @@ class DashboardMetricService
 
         $tingkatKetuntasan = $totalPekerjaan > 0 ? round(($selesaiTerverifikasi / $totalPekerjaan) * 100, 1) : 0;
         $avgProgres = $tingkatKetuntasan;
+        $onTimeRate = $totalPekerjaan > 0 ? round((($totalPekerjaan - $lewatTenggat) / $totalPekerjaan) * 100, 1) : 100;
 
         // Capaian Kinerja per Pokja
+        $today = Carbon::today();
         $pokjas = Pokja::with([
             'katim',
             'anggota' => fn ($q) => $q->withCount([
                 'pekerjaanSebagaiPj as pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
                 'pekerjaanDitugaskan as member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
             ]),
-            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan'),
-        ])->orderBy('kode_pokja')->get()->map(function ($p) {
-            $totalTugas = $p->pekerjaan->count();
-            $selesai = $p->pekerjaan->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
+            'pekerjaan' => fn ($q) => $q->select('id', 'pokja_id', 'status_pelaksanaan', 'tenggat'),
+        ])->orderBy('kode_pokja')->get()->map(function ($p) use ($today) {
+            $jobs = $p->pekerjaan;
+            $totalTugas = $jobs->count();
+            $selesai = $jobs->where('status_pelaksanaan', 'selesai_terverifikasi')->count();
             $ketuntasanPokja = $totalTugas > 0 ? round(($selesai / $totalTugas) * 100, 1) : 0;
-            $berjalan = $p->pekerjaan->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan'])->count();
+            $berjalan = $jobs->whereIn('status_pelaksanaan', ['belum_dimulai', 'dikerjakan'])->count();
+            $verifikasi = $jobs->where('status_pelaksanaan', 'hasil_diajukan')->count();
+            $dikerjakan = $jobs->whereIn('status_pelaksanaan', ['dikerjakan', 'perlu_perbaikan_hasil'])->count();
+            $belum = $jobs->where('status_pelaksanaan', 'belum_dimulai')->count();
+            $terlambat = $jobs->filter(fn ($j) => $j->status_pelaksanaan !== 'selesai_terverifikasi'
+                && $j->tenggat
+                && Carbon::parse($j->tenggat)->startOfDay()->lt($today))->count();
 
             return (object) [
                 'id' => $p->id,
@@ -203,31 +307,36 @@ class DashboardMetricService
                 'avg_progres' => $ketuntasanPokja,
                 'tugas_selesai' => $selesai,
                 'tugas_berjalan' => $berjalan,
+                'tugas_verifikasi' => $verifikasi,
+                'tugas_dikerjakan' => $dikerjakan,
+                'tugas_belum' => $belum,
+                'tugas_terlambat' => $terlambat,
                 'anggota' => $p->anggota,
                 'anggota_count' => $p->anggota->count(),
             ];
         });
 
-        // Data Pokja untuk Chart
+        // Data Pokja untuk Chart (stacked per status)
+        $mapPokjaChart = fn ($p) => [
+            'id' => $p->id,
+            'kode' => $p->kode_pokja,
+            'nama' => $p->nama_pokja,
+            'total' => $p->total_tugas,
+            'selesai' => $p->tugas_selesai,
+            'berjalan' => $p->tugas_berjalan,
+            'verifikasi' => $p->tugas_verifikasi,
+            'dikerjakan' => $p->tugas_dikerjakan,
+            'belum' => $p->tugas_belum,
+            'terlambat' => $p->tugas_terlambat,
+        ];
+
         $pokjaChartData = $pokjas->filter(fn ($p) => $p->total_tugas > 0)
-            ->sortByDesc('tugas_selesai')
+            ->sortByDesc('total_tugas')
             ->values()
-            ->map(fn ($p) => [
-                'kode' => $p->kode_pokja,
-                'nama' => $p->nama_pokja,
-                'total' => $p->total_tugas,
-                'selesai' => $p->tugas_selesai,
-                'berjalan' => $p->tugas_berjalan,
-            ]);
+            ->map($mapPokjaChart);
 
         if ($pokjaChartData->isEmpty()) {
-            $pokjaChartData = $pokjas->take(6)->values()->map(fn ($p) => [
-                'kode' => $p->kode_pokja,
-                'nama' => $p->nama_pokja,
-                'total' => $p->total_tugas,
-                'selesai' => $p->tugas_selesai,
-                'berjalan' => $p->tugas_berjalan,
-            ]);
+            $pokjaChartData = $pokjas->take(6)->values()->map($mapPokjaChart);
         }
 
         // Top Assignees
@@ -268,7 +377,7 @@ class DashboardMetricService
             ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
-                'short_name' => explode(' ', trim($u->name))[0].' '.(isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1).'.' : ''),
+                'short_name' => $this->shortName($u->name),
                 'pokja' => $u->pokja_kode,
                 'st_count' => $u->st_count,
                 'total_jobs' => $u->total_semua_tugas,
@@ -280,11 +389,16 @@ class DashboardMetricService
             ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
-                'short_name' => explode(' ', trim($u->name))[0].' '.(isset(explode(' ', trim($u->name))[1]) ? substr(explode(' ', trim($u->name))[1], 0, 1).'.' : ''),
+                'short_name' => $this->shortName($u->name),
                 'pokja' => $u->pokja_kode,
                 'laporan_count' => $u->laporan_count,
                 'total_jobs' => $u->total_semua_tugas,
             ]);
+
+        // Data baru: tren, tenggat mendatang & feed aktivitas
+        $trendData = $this->getTrendLaporan(14);
+        $upcomingDeadlines = $this->getUpcomingDeadlines(7, 8);
+        $recentActivity = $this->getRecentActivity(10);
 
         // Query Utama Pekerjaan
         $query = Pekerjaan::with([
@@ -339,6 +453,7 @@ class DashboardMetricService
             'lewatTenggat',
             'avgProgres',
             'tingkatKetuntasan',
+            'onTimeRate',
             'pokjas',
             'pokjaChartData',
             'statusCounts',
@@ -349,6 +464,9 @@ class DashboardMetricService
             'totalLaporanBalai',
             'stChartData',
             'reportChartData',
+            'trendData',
+            'upcomingDeadlines',
+            'recentActivity',
             'allPokjas',
             'pekerjaanList'
         );

@@ -60,10 +60,14 @@ Route::middleware('auth')->group(function () {
     // ---------------------------------------------------------------------
     // B. Modul Rekapitulasi Beban Penugasan & Surat Tugas (ST)
     // ---------------------------------------------------------------------
-    Route::controller(RekapPenugasanController::class)->prefix('rekap-penugasan')->name('rekap-penugasan.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/export-excel', 'exportExcel')->name('export-excel');
-    });
+    Route::middleware('role:admin,kabal,kasubag,korjafung,katim,katim_korjafung,korlayanan,koordinator_layanan')
+        ->controller(RekapPenugasanController::class)
+        ->prefix('rekap-penugasan')
+        ->name('rekap-penugasan.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/export-excel', 'exportExcel')->name('export-excel');
+        });
 
     // ---------------------------------------------------------------------
     // C. Modul Sasaran Kinerja Pegawai (SKP Tahunan / RHK)

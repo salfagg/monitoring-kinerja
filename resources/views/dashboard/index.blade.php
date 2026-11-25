@@ -1262,6 +1262,8 @@
 // Visual Charts Initialization (Chart.js)
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+    const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+
     // 1. Donut Chart Status Pelaksanaan
     const ctxStatus = document.getElementById('chartStatusTugas');
     if (ctxStatus) {
@@ -1283,7 +1285,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         '#94a3b8'  // Belum Dimulai
                     ],
                     borderWidth: 2,
-                    borderColor: '#ffffff',
+                    borderColor: isDarkTheme ? '#0f1a2c' : '#ffffff',
                     hoverOffset: 6
                 }]
             },
@@ -1366,16 +1368,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         ticks: {
                             callback: val => val + '%',
                             font: { family: 'Plus Jakarta Sans', size: 10.5 },
-                            color: '#64748b',
+                            color: isDarkTheme ? '#94a3b8' : '#64748b',
                             stepSize: 25
                         },
-                        grid: { color: '#f1f5f9' },
+                        grid: { color: isDarkTheme ? '#1c2e47' : '#f1f5f9' },
                         border: { display: false }
                     },
                     x: {
                         ticks: {
                             font: { family: 'JetBrains Mono', size: 10.5, weight: 'bold' },
-                            color: '#334155'
+                            color: isDarkTheme ? '#cbd5e1' : '#334155'
                         },
                         grid: { display: false },
                         border: { display: false }

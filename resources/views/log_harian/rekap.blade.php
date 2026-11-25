@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Rekapitulasi Log Harian Bulanan')
 @section('page-title', 'Rekapitulasi Kinerja Bulanan')
@@ -53,7 +53,7 @@
         <!-- Kop Dokumen Resmi -->
         <div class="rekap-header-kop">
             <h3>Kementerian Pendidikan Dasar dan Menengah</h3>
-            <h2>BALAI GURU PENGGERAK PROVINSI DKI JAKARTA</h2>
+            <h2>BALAI GURU DAN TENAGA KEPENDIDIKAN PROVINSI DKI JAKARTA</h2>
             <p>Tata Kelola Kinerja Digital dan Monitoring (TANJIDOR)</p>
         </div>
 
@@ -76,105 +76,97 @@
             <span class="identitas-value">: {{ $targetUser->pokja?->nama_pokja ?? 'BGTK DKI Jakarta' }}</span>
         </div>
 
-        <!-- Ringkasan Eksekutif -->
-        <div class="rekap-summary-strip">
-            <div class="rekap-summary-box">
-                <strong>{{ $totalHariAktif }} Hari</strong>
-                <span>Hari Kerja Terisi</span>
-            </div>
-            <div class="rekap-summary-box">
-                <strong>{{ $totalLogs }}</strong>
-                <span>Total Aktivitas Log</span>
-            </div>
-            <div class="rekap-summary-box">
-                <strong>{{ $totalJamKerja }} Jam</strong>
-                <span>Total Durasi Kerja</span>
-            </div>
-            <div class="rekap-summary-box">
-                <strong>{{ $totalVolume }}</strong>
-                <span>Total Volume Capaian</span>
-            </div>
-        </div>
-
         <!-- Tabel Catatan Kegiatan Harian -->
+        <div class="rekap-table-wrap">
         <table class="rekap-table">
             <thead>
                 <tr>
-                    <th style="width: 32px;">No</th>
-                    <th style="width: 85px;">Tanggal</th>
-                    <th style="width: 85px;">Waktu</th>
+                    <th style="width: 44px;">No</th>
+                    <th style="width: 100px;">Tanggal</th>
                     <th>Uraian Aktivitas / Kegiatan Harian</th>
-                    <th style="width: 140px;">Output / Hasil</th>
-                    <th style="width: 70px;">Volume</th>
-                    <th style="width: 130px;">Tautan Tugas / SKP</th>
-                    <th style="width: 90px;">Status</th>
+                    <th style="width: 180px;">Output / Hasil</th>
+                    <th style="width: 90px;">Volume</th>
+                    <th style="width: 170px;">Tautan Tugas / SKP</th>
+                    <th style="width: 110px;">Status</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($logs as $index => $log)
+                @php
+                    $groupedLogs = $logs->groupBy(fn($item) => \Carbon\Carbon::parse($item->tanggal_kegiatan)->format('Y-m-d'));
+                @endphp
+                @forelse($groupedLogs as $dateKey => $dayLogs)
                     @php
-                        $durasiStr = '-';
-                        if ($log->jam_mulai && $log->jam_selesai) {
-                            $start = \Carbon\Carbon::parse($log->jam_mulai);
-                            $end = \Carbon\Carbon::parse($log->jam_selesai);
-                            $diff = $start->diffInMinutes($end);
-                            $durasiStr = round($diff / 60, 1) . ' Jam';
-                        }
+                        $hasMulti = $dayLogs->count() > 1;
                     @endphp
                     <tr>
-                        <td style="text-align: center; font-weight: 700;">{{ $index + 1 }}</td>
-                        <td style="white-space: nowrap; font-weight: 600;">
-                            {{ \Carbon\Carbon::parse($log->tanggal_kegiatan)->format('d/m/Y') }}
-                        </td>
-                        <td style="font-family: monospace; font-size: 11px; text-align: center;">
-                            @if($log->jam_mulai && $log->jam_selesai)
-                                {{ \Carbon\Carbon::parse($log->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($log->jam_selesai)->format('H:i') }}
-                                <br><small style="color: #64748b;">({{ $durasiStr }})</small>
-                            @else
-                                <span style="color: #94a3b8;">-</span>
-                            @endif
+                        <td style="text-align: center; font-weight: 700;">{{ $loop->iteration }}</td>
+                        <td style="white-space: nowrap; font-weight: 600; text-align: center;">
+                            {{ \Carbon\Carbon::parse($dateKey)->format('d/m/Y') }}
                         </td>
                         <td>
-                            <strong>{{ $log->uraian_kegiatan }}</strong>
-                            @if($log->catatan_katim)
-                                <div style="font-size: 10.5px; color: #047857; margin-top: 3px;">
-                                    <em>Catatan Katim: {{ $log->catatan_katim }}</em>
+                            @foreach($dayLogs as $i => $log)
+                                <div class="rekap-cell-item {{ $i > 0 ? 'has-sep' : '' }}">
+                                    <strong>@if($hasMulti)<span style="color: var(--primary);">{{ $i + 1 }}.</span> @endif{{ $log->uraian_kegiatan }}</strong>
+                                    @if($log->catatan_katim)
+                                        <div style="font-size: 10.5px; color: #047857; margin-top: 3px;">
+                                            <em>Catatan Katim: {{ $log->catatan_katim }}</em>
+                                        </div>
+                                    @endif
+                                    @if($log->buktiDukung->isNotEmpty())
+                                        <div style="font-size: 10.5px; color: #0284c7; margin-top: 2px;">
+                                            📎 {{ $log->buktiDukung->pluck('nama_dokumen')->implode(', ') }}
+                                        </div>
+                                    @endif
                                 </div>
-                            @endif
-                            @if($log->buktiDukung->isNotEmpty())
-                                <div style="font-size: 10.5px; color: #0284c7; margin-top: 2px;">
-                                    📎 {{ $log->buktiDukung->pluck('nama_dokumen')->implode(', ') }}
-                                </div>
-                            @endif
+                            @endforeach
                         </td>
-                        <td>{{ $log->output_kegiatan }}</td>
+                        <td>
+                            @foreach($dayLogs as $i => $log)
+                                <div class="rekap-cell-item {{ $i > 0 ? 'has-sep' : '' }}">
+                                    @if($hasMulti)<span style="color: var(--primary); font-weight: 700;">{{ $i + 1 }}.</span> @endif{{ $log->output_kegiatan }}
+                                </div>
+                            @endforeach
+                        </td>
                         <td style="text-align: center; font-weight: 700;">
-                            {{ $log->volume_capaian }} {{ $log->satuan }}
+                            @foreach($dayLogs as $i => $log)
+                                <div class="rekap-cell-item {{ $i > 0 ? 'has-sep' : '' }}">
+                                    {{ $log->volume_capaian }} {{ $log->satuan }}
+                                </div>
+                            @endforeach
                         </td>
                         <td style="font-size: 11px;">
-                            @if($log->pekerjaan)
-                                <div style="color: #0b4a82;"><strong>Tugas:</strong> [{{ $log->pekerjaan->kode_tampilan }}] {{ Str::limit($log->pekerjaan->judul, 25) }}</div>
-                            @endif
-                            @if($log->skpTahunan)
-                                <div style="color: #6f45bd;"><strong>SKP:</strong> {{ Str::limit($log->skpTahunan->rencana_hasil_kerja, 25) }}</div>
-                            @endif
-                            @if(!$log->pekerjaan && !$log->skpTahunan)
-                                <span style="color: #94a3b8;">Umum</span>
-                            @endif
+                            @foreach($dayLogs as $i => $log)
+                                <div class="rekap-cell-item {{ $i > 0 ? 'has-sep' : '' }}">
+                                    @if($log->pekerjaan)
+                                        <div style="color: #0b4a82;"><strong>Tugas:</strong> [{{ $log->pekerjaan->kode_tampilan }}] {{ Str::limit($log->pekerjaan->judul, 28) }}</div>
+                                    @endif
+                                    @if($log->skpTahunan)
+                                        <div style="color: #6f45bd;"><strong>SKP:</strong> {{ Str::limit($log->skpTahunan->rencana_hasil_kerja, 28) }}</div>
+                                    @endif
+                                    @if(!$log->pekerjaan && !$log->skpTahunan)
+                                        <span style="color: #94a3b8;">Umum</span>
+                                    @endif
+                                </div>
+                            @endforeach
                         </td>
                         <td style="text-align: center; font-weight: 700; font-size: 11px;">
-                            {{ $log->status_label }}
+                            @foreach($dayLogs as $i => $log)
+                                <div class="rekap-cell-item {{ $i > 0 ? 'has-sep' : '' }}">
+                                    {{ $log->status_label }}
+                                </div>
+                            @endforeach
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 24px; color: #94a3b8;">
+                        <td colspan="7" style="text-align: center; padding: 28px; color: #94a3b8;">
                             Belum ada catatan log harian pada periode bulan ini.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         <!-- Lembar Pengesahan / Tanda Tangan -->
         <div class="rekap-ttd-row">

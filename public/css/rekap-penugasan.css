@@ -1,7 +1,12 @@
 /* Hero Header */
     .rekap-hero {
-        background: linear-gradient(135deg, #0b4a82 0%, #083a68 50%, #062646 100%);
-        border-radius: var(--radius-lg);
+        background-color: var(--navy);
+        background-image:
+            radial-gradient(420px 120px at 15% 0%, rgba(34, 184, 232, 0.25), transparent 70%),
+            radial-gradient(rgba(255, 255, 255, 0.10) 1.2px, transparent 1.2px),
+            linear-gradient(135deg, var(--navy-soft) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+        background-size: 100% 100%, 22px 22px, 100% 100%;
+        border-radius: 18px;
         padding: 24px 28px;
         color: #ffffff;
         margin-bottom: 22px;
@@ -9,8 +14,8 @@
         align-items: center;
         justify-content: space-between;
         gap: 20px;
-        box-shadow: 0 8px 24px rgba(11, 74, 130, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 28px rgba(11, 74, 130, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.14);
         position: relative;
         overflow: hidden;
     }
@@ -606,3 +611,169 @@
             align-items: flex-start;
         }
     }
+
+    @media (max-width: 640px) {
+        .rekap-hero {
+            padding: 16px;
+            border-radius: 12px;
+        }
+        .rekap-hero h2 {
+            font-size: 18px;
+        }
+        .kpi-rekap-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px;
+        }
+        .kpi-rekap-card {
+            padding: 12px 14px;
+        }
+        .rekap-action-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .rekap-action-bar .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+        .table-responsive, .table-container {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100%;
+        }
+        .table-responsive table, .table-container table {
+            min-width: 700px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .kpi-rekap-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+
+/* ==========================================================================
+   DARK MODE OVERRIDES — Rekap Penugasan
+   ========================================================================== */
+[data-theme="dark"] .detail-drawer-row {
+    background: #0a1423 !important;
+}
+
+[data-theme="dark"] .detail-drawer-content {
+    background: #0f1a2c !important;
+    border-color: #1c2e47 !important;
+    border-left-color: #38a3ec !important;
+}
+
+[data-theme="dark"] .detail-header-info {
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .detail-header-info h4 {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .sub-table thead th {
+    background: #0a1423 !important;
+    color: #7f95ad !important;
+    border-bottom-color: #1c2e47 !important;
+}
+
+[data-theme="dark"] .sub-table tbody td {
+    color: #cbd5e1 !important;
+    border-bottom-color: #1a2e46 !important;
+}
+
+[data-theme="dark"] .sub-table tbody tr:hover {
+    background: #13263d !important;
+}
+
+[data-theme="dark"] .btn-toggle-detail {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .btn-toggle-detail:hover {
+    background: #27354f !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-toggle-detail.active {
+    background: #2563eb !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .badge-role-pj {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+[data-theme="dark"] .badge-role-anggota,
+[data-theme="dark"] .badge-belum {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .badge-st-num,
+[data-theme="dark"] .badge-dikerjakan {
+    background: rgba(14, 165, 233, 0.18) !important;
+    color: #7dd3fc !important;
+    border-color: rgba(14, 165, 233, 0.35) !important;
+}
+
+[data-theme="dark"] .badge-selesai {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+[data-theme="dark"] .badge-verifikasi {
+    background: rgba(168, 85, 247, 0.18) !important;
+    color: #d8b4fe !important;
+    border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+[data-theme="dark"] .badge-revisi {
+    background: rgba(239, 68, 68, 0.18) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Interactive KPI Stat Cards (Auto Filter) */
+a.kpi-stat-card.is-clickable {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+a.kpi-stat-card.is-clickable:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(10, 111, 181, 0.12);
+}
+
+a.kpi-stat-card.is-clickable.is-active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow, rgba(10, 111, 181, 0.18));
+}
+
+[data-theme="dark"] a.kpi-stat-card.is-clickable {
+    background: #0f1a2c;
+    border-color: #1c2e47;
+}
+
+[data-theme="dark"] a.kpi-stat-card.is-clickable:hover {
+    border-color: #38a3ec;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] a.kpi-stat-card.is-clickable.is-active {
+    border-color: #38a3ec;
+    box-shadow: 0 0 0 3px rgba(56, 163, 236, 0.22);
+}

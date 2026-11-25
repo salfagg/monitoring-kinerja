@@ -165,6 +165,8 @@ class RekapPenugasanService
 
             if ($filterTugas === 'ada_tugas' && $totalTugas === 0) {
                 continue;
+            } elseif ($filterTugas === 'ada_st' && count($userStList) === 0) {
+                continue;
             } elseif ($filterTugas === 'tanpa_tugas' && $totalTugas > 0) {
                 continue;
             }
@@ -235,7 +237,7 @@ class RekapPenugasanService
         $sheet1->setTitle('Rekap Beban Pegawai');
 
         $sheet1->setCellValue('A1', 'REKAPITULASI BEBAN PENUGASAN & SURAT TUGAS PEGAWAI');
-        $sheet1->setCellValue('A2', 'BALAI GURU PENGGERAK (BGTK) PROVINSI DKI JAKARTA - TANJIDOR');
+        $sheet1->setCellValue('A2', 'BALAI GURU DAN TENAGA KEPENDIDIKAN (BGTK) PROVINSI DKI JAKARTA - TANJIDOR');
         $sheet1->setCellValue('A3', 'Waktu Pengunduhan: '.Carbon::now()->isoFormat('dddd, D MMMM Y HH:mm').' WIB');
 
         $sheet1->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new Color('0B4A82'));
@@ -287,7 +289,7 @@ class RekapPenugasanService
             $sheet1->setCellValueExplicit("C{$rowNum1}", (string) ($item['nip'] ?? '-'), DataType::TYPE_STRING);
             $sheet1->setCellValue("D{$rowNum1}", $statusPegawai);
             $sheet1->setCellValue("E{$rowNum1}", $item['jabatan'] ?? '-');
-            $sheet1->setCellValue("F{$rowNum1}", $item['pokja_nama'] ?? 'Balai Guru Penggerak');
+            $sheet1->setCellValue("F{$rowNum1}", $item['pokja_nama'] ?? 'Balai Guru dan Tenaga Kependidikan');
             $sheet1->setCellValue("G{$rowNum1}", $item['total_st']);
             $sheet1->setCellValue("H{$rowNum1}", $item['total_tugas']);
             $sheet1->setCellValue("I{$rowNum1}", $item['total_pj']);
@@ -344,7 +346,7 @@ class RekapPenugasanService
         $sheet2->setTitle('Rincian ST & Tugas');
 
         $sheet2->setCellValue('A1', 'RINCIAN SELURUH PENUGASAN & SURAT TUGAS PER PEGAWAI');
-        $sheet2->setCellValue('A2', 'BALAI GURU PENGGERAK (BGTK) PROVINSI DKI JAKARTA - TANJIDOR');
+        $sheet2->setCellValue('A2', 'BALAI GURU DAN TENAGA KEPENDIDIKAN (BGTK) PROVINSI DKI JAKARTA - TANJIDOR');
         $sheet2->setCellValue('A3', 'Waktu Pengunduhan: '.Carbon::now()->isoFormat('dddd, D MMMM Y HH:mm').' WIB');
 
         $sheet2->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new Color('0A6FB5'));
@@ -393,7 +395,7 @@ class RekapPenugasanService
                 $sheet2->setCellValue("B{$rowNum2}", $item['name']);
                 $sheet2->setCellValueExplicit("C{$rowNum2}", (string) ($item['nip'] ?? '-'), DataType::TYPE_STRING);
                 $sheet2->setCellValue("D{$rowNum2}", $item['jabatan'] ?? '-');
-                $sheet2->setCellValue("E{$rowNum2}", $item['pokja_nama'] ?? 'Balai Guru Penggerak');
+                $sheet2->setCellValue("E{$rowNum2}", $item['pokja_nama'] ?? 'Balai Guru dan Tenaga Kependidikan');
                 $sheet2->setCellValue("F{$rowNum2}", '(Belum ada penugasan)');
                 $sheet2->setCellValue("G{$rowNum2}", '-');
                 $sheet2->setCellValue("H{$rowNum2}", '-');

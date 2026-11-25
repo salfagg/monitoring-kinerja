@@ -236,6 +236,20 @@
                 spellLetters();
             });
         })();
+
+        // Responsif & interaktif saat submit form login
+        (function () {
+            const loginForm = document.querySelector('.form-right form');
+            if (!loginForm) return;
+            loginForm.addEventListener('submit', function () {
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.85';
+                    submitBtn.innerHTML = '<i class="ph-bold ph-spinner-gap"></i> Memverifikasi...';
+                }
+            });
+        })();
     </script>
 </body>
 

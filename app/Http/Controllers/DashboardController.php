@@ -69,14 +69,7 @@ class DashboardController extends Controller
                 $data['totalPokjas'] = Pokja::count();
                 $data['totalLaporan'] = LaporanKinerja::count();
                 $data['recentUsers'] = User::with('pokja')->latest()->take(5)->get();
-                $data['pokjas'] = Pokja::with([
-                    'katim',
-                    'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                    ]),
-                    'pekerjaan',
-                ])->withCount('anggota')->orderBy('id')->get();
+                $data['pokjas'] = $this->pokjaWithWorkload();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
 
@@ -88,14 +81,7 @@ class DashboardController extends Controller
                     ->first();
                 $data['laporanSelesaiCount'] = LaporanKinerja::whereIn('status', ['disetujui_katim', 'dikonsolidasi_kasubag', 'disetujui_kabal'])->count();
                 $data['laporanAntreanApproval'] = LaporanKonsolidasiBgk::where('status_kabal', 'diajukan')->get();
-                $data['pokjas'] = Pokja::with([
-                    'katim',
-                    'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                    ]),
-                    'pekerjaan',
-                ])->withCount('anggota')->orderBy('id')->get();
+                $data['pokjas'] = $this->pokjaWithWorkload();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
 
@@ -114,14 +100,7 @@ class DashboardController extends Controller
                     ->latest()
                     ->take(6)
                     ->get();
-                $data['pokjas'] = Pokja::with([
-                    'katim',
-                    'anggota' => fn ($q) => $q->withCount([
-                        'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                        'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
-                    ]),
-                    'pekerjaan',
-                ])->withCount('anggota')->orderBy('id')->get();
+                $data['pokjas'] = $this->pokjaWithWorkload();
                 $data['bebanKerjaPegawai'] = $this->getWorkloadList();
                 break;
 
@@ -202,6 +181,22 @@ class DashboardController extends Controller
     }
 
     /**
+     * Daftar Pokja beserta katim, anggota (dengan beban tugas aktif) dan pekerjaannya.
+     * Dipakai oleh dashboard admin, kabal, dan kasubag.
+     */
+    private function pokjaWithWorkload()
+    {
+        return Pokja::with([
+            'katim',
+            'anggota' => fn ($q) => $q->withCount([
+                'pekerjaanSebagaiPj as active_pic_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                'pekerjaanDitugaskan as active_member_count' => fn ($sub) => $sub->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+            ]),
+            'pekerjaan',
+        ])->withCount('anggota')->orderBy('id')->get();
+    }
+
+    /**
      * Mengambil rekapitulasi beban kerja seluruh pegawai dan katim (pekerjaan aktif sebagai PIC maupun Anggota)
      */
     private function getWorkloadList()
@@ -249,7 +244,6 @@ class DashboardController extends Controller
             'realisasi' => fn ($r) => $r->latest(),
         ]);
 
-        // Filter Pencarian Teks (Judul / Kode / No ST)
         if ($request->filled('q_pekerjaan')) {
             $search = trim($request->q_pekerjaan);
             $query->where(function ($q) use ($search) {
@@ -259,12 +253,10 @@ class DashboardController extends Controller
             });
         }
 
-        // Filter Unit Kerja / Pokja
         if ($request->filled('filter_pokja')) {
             $query->where('pokja_id', $request->filter_pokja);
         }
 
-        // Filter Pegawai Pelaksana (baik sebagai PIC Utama maupun Anggota Pelaksana)
         if ($request->filled('filter_pegawai')) {
             $pegawaiId = $request->filter_pegawai;
             $query->where(function ($q) use ($pegawaiId) {
@@ -273,7 +265,6 @@ class DashboardController extends Controller
             });
         }
 
-        // Filter Status Pelaksanaan
         if ($request->filled('filter_status')) {
             $status = $request->filter_status;
             if ($status === 'berjalan') {
@@ -301,12 +292,8 @@ class DashboardController extends Controller
         // 3. Rekapitulasi Beban Kerja Pegawai (Workload Monitoring)
         $bebanKerjaPegawai = User::whereIn('role', ['pegawai', 'tim_pokja', 'katim', 'korjafung', 'korlayanan'])
             ->withCount([
-                'pekerjaanSebagaiPj as tugas_pic_count' => function ($q) {
-                    $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                },
-                'pekerjaanDitugaskan as tugas_anggota_count' => function ($q) {
-                    $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi');
-                },
+                'pekerjaanSebagaiPj as tugas_pic_count' => fn ($q) => $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
+                'pekerjaanDitugaskan as tugas_anggota_count' => fn ($q) => $q->where('status_pelaksanaan', '!=', 'selesai_terverifikasi'),
             ])
             ->with(['pokja'])
             ->orderByDesc('tugas_pic_count')
